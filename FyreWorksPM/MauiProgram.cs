@@ -81,7 +81,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<BidsPageViewModel>();                
         builder.Services.AddSingleton<HomePageViewModel>();
         builder.Services.AddSingleton<LoginShellViewModel>();
-        builder.Services.AddSingleton<LoginViewModel>();
+        builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddSingleton<ProjectsPageViewModel>();
         builder.Services.AddSingleton<ServicePageViewModel>();
 

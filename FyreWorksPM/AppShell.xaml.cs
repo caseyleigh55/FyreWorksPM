@@ -17,5 +17,6 @@ public partial class AppShell : Shell
     {
         await _authService.LogoutAsync();
         Application.Current.MainPage = new LoginShell(_authService);
+       
     }
 }

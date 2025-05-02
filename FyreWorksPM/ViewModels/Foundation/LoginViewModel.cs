@@ -24,6 +24,13 @@ public class LoginViewModel : ViewModelBase
         GoToRegisterCommand = new Command(async () => await _nav.GoToAsync("//register"));
     }
 
+    public void Reset()
+    {
+        Username = string.Empty;
+        Password = string.Empty;
+    }
+
+
     public async Task<bool> LoginAsync()
     {
         if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))

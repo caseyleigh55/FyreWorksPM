@@ -31,6 +31,7 @@ public partial class LoginPage : ContentPage
         _appShell = appShell ?? throw new ArgumentNullException(nameof(appShell));
         _nav = nav ?? throw new ArgumentNullException(nameof(nav));
 
+        _vm.Reset();
         BindingContext = _vm;
     }
 
@@ -63,4 +64,13 @@ public partial class LoginPage : ContentPage
     {
         await _nav.PushPageAsync<RegisterPage>(); // 👈 No more "page already has parent" errors!
     }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        _vm.Reset(); // 💣 NOW it runs every time the page is shown, not just on creation
+    }
+
+
+
 }

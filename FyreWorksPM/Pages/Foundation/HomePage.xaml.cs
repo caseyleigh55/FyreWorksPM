@@ -23,6 +23,9 @@ public partial class HomePage : ContentPage
 
         if (authService is not null)
             await authService.LogoutAsync();
+        // 🔁 Navigate to the login route
+        // 🔄 Completely replace the app's MainPage with a *fresh shell*
+        Application.Current.MainPage = new LoginShell(authService);
     }
 
 
