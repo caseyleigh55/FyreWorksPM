@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="FyreWorksPM.Pages.Creation.CreateBidPage"
+    Title="New Bid">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- ============================= -->
+            <!--        BID INFORMATION        -->
+            <!-- ============================= -->
+            <Border Stroke="White" BackgroundColor="Black" StrokeThickness="1" Padding="15">
+                <VerticalStackLayout Spacing="10">
+
+                    <Label Text="Bid Information" 
+                           TextDecorations="Underline"
+                           FontSize="18"
+                           FontAttributes="Bold,Italic"
+                           TextColor="White" />
+
+                    <!-- Bid Number -->
+                    <Entry Placeholder="Bid Number (e.g. B-001)"
+                           Text="{Binding BidNumber}" />
+
+                    <!-- Project Name -->
+                    <Entry Placeholder="Project Name"
+                           Text="{Binding JobName}" />
+
+                    <!-- Client Picker + Add Client Button -->
+                    <Grid ColumnDefinitions="3*,Auto" ColumnSpacing="10">
+
+                        <!-- 🔥 Correct: Picker for Clients -->
+                        <Picker Grid.Column="0"
+                                Title="Select Client"
+                                ItemsSource="{Binding Clients}"
+                                ItemDisplayBinding="{Binding Name}"
+                                SelectedItem="{Binding SelectedClient}" />
+
+                        <Button Grid.Column="1"
+                                Text="➕ New Client" 
+                                Command="{Binding AddNewClientCommand}"
+                                BackgroundColor="MediumPurple"
+                                TextColor="White" />
+                    </Grid>
+
+                    <!-- Created Date -->
+                    <DatePicker Date="{Binding CreatedDate}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ============================= -->
+            <!--       TOTALS OVERVIEW         -->
+            <!-- ============================= -->
+            <Border Stroke="White" BackgroundColor="Black" StrokeThickness="1" Padding="15">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Totals Overview"
+   TextDecorations="Underline"
+   FontAttributes="Bold,Italic"
+   FontSize="18"
+   TextColor="White" />
+
+                    <!-- Side-by-side Totals -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="30">
+                        <!-- === Bid Calculated Totals === -->
+                        <VerticalStackLayout Grid.Column="0" Spacing="6">
+                            <Label Text="Bid Calculated Totals and Sale Price" FontAttributes="Bold" FontSize="18" TextColor="White" />
+                            <Grid ColumnDefinitions="Auto,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="4">
+                                <Label Text="Cost Total:" />
+                                <Label Text="{Binding CalculatedCostTotal, StringFormat='${0:F2}'}" Grid.Column="1" />
+
+                                <Label Text="Sale Total:" Grid.Row="1" />
+                                <Label Text="{Binding CalculatedSaleTotal, StringFormat='${0:F2}'}" Grid.Row="1" Grid.Column="1" Padding="14" />
+
+                                <Label Text="Profit:" Grid.Row="2" />
+                                <Label Text="{Binding CalculatedProfit, StringFormat='${0:F2}'}" Grid.Row="2" Grid.Column="1" />
+
+                                <Label Text="Margin:" Grid.Row="3" />
+                                <Label Text="{Binding CalculatedMargin, StringFormat='{0:P2}'}" Grid.Row="3" Grid.Column="1" Padding="20" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto,*,*,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="6">
+                                <Label Text="Regular" FontAttributes="Bold" Grid.Row="0" Grid.Column="2" />
+                                <Label Text="Overnight" FontAttributes="Bold" Grid.Row="0" Grid.Column="3"/>
+
+
+                                <Label Text="Journeyman Hours:" Grid.Row="1" />
+                                <Label Text="{Binding JourneymanRegularHoursTotal, StringFormat='{0:P2}'}" Grid.Row="1" Grid.Column="2" />
+
+                                <Label Text="Apprentice Hours:" Grid.Row="2" />
+                                <Label Text="{Binding ApprenticeRegularHoursTotal, StringFormat='{0:P2}'}" Grid.Row="2" Grid.Column="2" />
+
+                                <Label Text="{Binding JourneymanOvernightHoursTotal, StringFormat='{0:P2}'}" Grid.Row="1" Grid.Column="3" />
+
+                                <Label Text="{Binding ApprenticeOvernightHoursTotal, StringFormat='{0:P2}'}" Grid.Row="2" Grid.Column="3" />
+
+
+                                <!--Start Here overnight hours-->
+
+
+
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <!-- === Adjusted Totals === -->
+                        <VerticalStackLayout Grid.Column="1" Spacing="6">
+                            <Label Text="Bid Calculated Totals and Adjusted Sale" FontAttributes="Bold" FontSize="18" TextColor="White" />
+                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="4">
+                                <Label Text="Cost Total:" />
+                                <Label Text="{Binding CalculatedCostTotal, StringFormat='${0:F2}'}" Grid.Column="1" />
+
+                                <Label Text="Adjusted Sale Total:" Grid.Row="1" />
+                                <Entry Text="{Binding AdjustedSaleTotal}" Grid.Row="1" Grid.Column="1" Keyboard="Numeric" />
+
+                                <Label Text="Profit:" Grid.Row="2" />
+                                <Label Text="{Binding AdjustedProfit, StringFormat='${0:F2}'}" Grid.Row="2" Grid.Column="1" />
+
+                                <Label Text="Margin:" Grid.Row="3" />
+                                <Label Text="{Binding AdjustedMargin, StringFormat='{0:P2}'}" Grid.Row="3" Grid.Column="1" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ============================= -->
+            <!--           SITE INFO           -->
+            <!-- ============================= -->
+            <Border Stroke="White" BackgroundColor="Black" StrokeThickness="1" Padding="15">
+                <VerticalStackLayout Spacing="10">
+                    <!-- Header -->
+                    <Label Text="Site Info"
+                           TextDecorations="Underline"
+                           FontSize="18"
+                           FontAttributes="Bold,Italic"
+                           TextColor="White" />
+
+                    <!-- Structured two-column layout for labels + inputs -->
+                    <Grid ColumnDefinitions="160,*"
+                          RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                          RowSpacing="6">
+
+                        <!-- Row 0: Scope of Work with Editor -->
+                        <Label Grid.Row="0" Grid.Column="0" Text="Scope of Work" VerticalOptions="Start" />
+                        <Editor Grid.Row="0" Grid.Column="1" Text="{Binding ScopeOfWork}" AutoSize="TextChanges" HeightRequest="80" />
+
+                        <!-- Rows 1-13: Address / Site fields -->
+                        <Label Grid.Row="1" Grid.Column="0" Text="Address Line 1" />
+                        <Entry Grid.Row="1" Grid.Column="1" Text="{Binding AddressLine1}" />
+
+                        <Label Grid.Row="2" Grid.Column="0" Text="Address Line 2" />
+                        <Entry Grid.Row="2" Grid.Column="1" Text="{Binding AddressLine2}" />
+
+                        <Label Grid.Row="3" Grid.Column="0" Text="City" />
+                        <Entry Grid.Row="3" Grid.Column="1" Text="{Binding City}" />
+
+                        <Label Grid.Row="4" Grid.Column="0" Text="State" />
+                        <Entry Grid.Row="4" Grid.Column="1" Text="{Binding State}" />
+
+                        <Label Grid.Row="5" Grid.Column="0" Text="Zip Code" />
+                        <Entry Grid.Row="5" Grid.Column="1" Text="{Binding Zip}" />
+
+                        <Label Grid.Row="6" Grid.Column="0" Text="Parcel Number" />
+                        <Entry Grid.Row="6" Grid.Column="1" Text="{Binding ParcelNumber}" />
+
+                        <Label Grid.Row="7" Grid.Column="0" Text="Jurisdiction" />
+                        <Entry Grid.Row="7" Grid.Column="1" Text="{Binding Jurisdiction}" />
+
+                        <Label Grid.Row="8" Grid.Column="0" Text="Building Area (ft²)" />
+                        <Entry Grid.Row="8" Grid.Column="1" Text="{Binding BuildingArea}" Keyboard="Numeric" />
+
+                        <Label Grid.Row="9" Grid.Column="0" Text="Number of Stories" />
+                        <Entry Grid.Row="9" Grid.Column="1" Text="{Binding Stories}" Keyboard="Numeric" />
+
+                        <Label Grid.Row="10" Grid.Column="0" Text="Occupancy Group" />
+                        <Entry Grid.Row="10" Grid.Column="1" Text="{Binding OccupancyGroup}" />
+
+                        <Label Grid.Row="11" Grid.Column="0" Text="Occupant Load" />
+                        <Entry Grid.Row="11" Grid.Column="1" Text="{Binding OccupantLoad}" Keyboard="Numeric" />
+
+                        <Label Grid.Row="12" Grid.Column="0" Text="Construction Type" />
+                        <Entry Grid.Row="12" Grid.Column="1" Text="{Binding ConstructionType}" />
+
+                        <Label Grid.Row="13" Grid.Column="0" Text="Sprinklered (Yes/No)" />
+                        <Entry Grid.Row="13" Grid.Column="1" Text="{Binding IsSprinklered}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ============================= -->
+            <!--     ADMIN / ENGINEERING      -->
+            <!-- ============================= -->
+            <Border Stroke="White" BackgroundColor="Black" StrokeThickness="1" Padding="15">
+                <VerticalStackLayout Spacing="15">
+                    <!-- Header -->
+                    <Label Text="Admin / Engineering Tasks"
+                           TextDecorations="Underline"
+                           FontAttributes="Bold,Italic"
+                           FontSize="18"
+                           TextColor="White" />
+
+                    <!-- ===== ADMIN TASKS ===== -->
+                    <Label Text="Administration Task List"
+                           FontAttributes="Bold"
+                           TextColor="White" />
+
+                    <!-- Admin Tasks with fix to avoid scrunching -->
+                    <VerticalStackLayout>
+                        <CollectionView ItemsSource="{Binding AdminTasks}"
+                                        ItemsLayout="VerticalList">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="2*,*,*,*" ColumnSpacing="10" Padding="5">
+                                        <Entry Placeholder="Task Name" Text="{Binding Name}" Grid.Column="0" />
+                                        <Entry Placeholder="$0.00" Text="{Binding Cost}" Grid.Column="1" Keyboard="Numeric" />
+                                        <Entry Placeholder="0%" Text="{Binding MarkupPercent}" Grid.Column="2" Keyboard="Numeric" />
+                                        <Label Text="{Binding Sale, StringFormat='${0:F2}'}" Grid.Column="3" TextColor="LawnGreen" HorizontalTextAlignment="End" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+
+                    <!-- Admin Buttons -->
+                    <HorizontalStackLayout Spacing="10">
+                        <Button Text="➕ Add Task" Command="{Binding AddAdminTaskCommand}" BackgroundColor="MediumPurple" TextColor="White" />
+                        <Button Text="🗑️ Delete Task" Command="{Binding RemoveAdminTaskCommand}" BackgroundColor="DarkRed" TextColor="White" />
+                    </HorizontalStackLayout>
+
+                    <!-- == Admin Subtotals == -->
+                    <Grid ColumnDefinitions="2*,*"      
+                          RowDefinitions="Auto,Auto"      
+                          Padding="0,10,0,0"      
+                          RowSpacing="6">
+
+                        <!-- Admin Cost Total -->
+                        <Label Text="Admin Cost Total:" Grid.Row="0" Grid.Column="0" />
+                        <Label Text="{Binding AdminCostTotal, StringFormat='${0:F2}'}"           
+                               Grid.Row="0" Grid.Column="1" />
+
+                        <!-- Admin Sale Total -->
+                        <Label Text="Admin Sale Total:" Grid.Row="1" Grid.Column="0" />
+                        <Label Text="{Binding AdminSaleTotal, StringFormat='${0:F2}'}"           
+                               Grid.Row="1" Grid.Column="1" />
+                    </Grid>
+
+                    <!-- ===== ENGINEERING TASKS ===== -->
+                    <Label Text="Engineering Task List"               
+                           FontAttributes="Bold"               
+                           TextColor="White"               
+                           Margin="0,20,0,0" />
+
+                    <!-- Engineering Tasks with same fix -->
+                    <VerticalStackLayout>
+                        <CollectionView ItemsSource="{Binding EngTasks}"
+                                        ItemsLayout="VerticalList" Margin="0,5">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="2*,*,*,*" ColumnSpacing="10" Padding="5">
+                                        <Entry Placeholder="Task Name" Text="{Binding Name}" Grid.Column="0" />
+                                        <Entry Placeholder="$0.00" Text="{Binding Cost}" Grid.Column="1" Keyboard="Numeric" />
+                                        <Entry Placeholder="0%" Text="{Binding MarkupPercent}" Grid.Column="2" Keyboard="Numeric" />
+                                        <Label Text="{Binding Sale, StringFormat='${0:F2}'}" Grid.Column="3" TextColor="LawnGreen" HorizontalTextAlignment="End" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+
+                    <!-- Engineering Buttons -->
+                    <HorizontalStackLayout Spacing="10">
+                        <Button Text="➕ Add Task" Command="{Binding AddEngTaskCommand}" BackgroundColor="MediumPurple" TextColor="White" />
+                        <Button Text="🗑️ Delete Task" Command="{Binding RemoveEngTaskCommand}" BackgroundColor="DarkRed" TextColor="White" />
+                    </HorizontalStackLayout>
+
+                    <!-- == Engineering Subtotals == -->
+                    <Grid ColumnDefinitions="2*,*"    
+                          RowDefinitions="Auto,Auto"    
+                          Padding="0,10,0,0"      
+                          RowSpacing="6">
+
+                        <Label Text="Engineering Cost Total:" Grid.Row="0" Grid.Column="0" />
+                        <Label Text="{Binding EngCostTotal, StringFormat='${0:F2}'}"
+                               Grid.Row="0" Grid.Column="1" />
+
+                        <Label Text="Engineering Sale Total:" Grid.Row="1" Grid.Column="0" />
+                        <Label Text="{Binding EngSaleTotal, StringFormat='${0:F2}'}"
+                               Grid.Row="1" Grid.Column="1" />
+                    </Grid>
+
+                    <!-- Combined Admin + Engineering Total -->
+                    <Grid ColumnDefinitions="2*,*" Padding="0,15,0,0">
+                        <Label Text="Admin/Eng Combined Total:" FontAttributes="Bold" />
+                        <Label Text="{Binding AdminEngSaleTotal, StringFormat='${0:F2}'}"
+                               FontAttributes="Bold"
+                               TextColor="Lime" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ============================= -->
+            <!--     LABOR HOUR CALCULATOR     -->
+            <!-- ============================= -->
+            <Border Stroke="White" BackgroundColor="Black" StrokeThickness="1" Padding="15">
+                <VerticalStackLayout Spacing="15">
+                    <!-- Header -->
+                    <Label Text="Labor Hour Calculator"
+                           TextDecorations="Underline"
+                           FontAttributes="Bold,Italic"
+                           FontSize="18"
+                           TextColor="White" />
+
+                    <!-- Minutes per Device -->
+                    <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="6">
+                        <!-- Headers -->
+                        <Label Text="Normal" Grid.Row="0" Grid.Column="1" FontAttributes="Bold" />
+                        <Label Text="Lift" Grid.Row="0" Grid.Column="2" FontAttributes="Bold" />
+
+                        <!-- Types -->
+                        <Label Text="Warehouse Pre-Wire Minutes/Device" Grid.Row="1" Grid.Column="0" />
+                        <Entry Grid.Row="1" Grid.Column="1" Placeholder="30" />
+                        <Entry Grid.Row="1" Grid.Column="2" Placeholder="60" />
+
+                        <Label Text="Hardlid Pre-Wire Minutes/Device" Grid.Row="2" Grid.Column="0" />
+                        <Entry Grid.Row="2" Grid.Column="1" Placeholder="20" />
+                        <Entry Grid.Row="2" Grid.Column="2" Placeholder="-" />
+
+                        <Label Text="T-Bar Pre-Wire Minutes/Device" Grid.Row="3" Grid.Column="0" />
+                        <Entry Grid.Row="3" Grid.Column="1" Placeholder="15" />
+                        <Entry Grid.Row="3" Grid.Column="2" Placeholder="-" />
+
+                        <Label Text="Trim Minutes/Device" Grid.Row="4" Grid.Column="0" />
+                        <Entry Grid.Row="4" Grid.Column="1" Placeholder="15" />
+                        <Entry Grid.Row="4" Grid.Column="2" Placeholder="30" />
+                    </Grid>
+
+                    <!-- Total Devices & Hours -->
+                    <Label Text="Total Devices + Hours by Location" FontAttributes="Bold" Margin="0,15,0,0" />
+                    <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="6">
+                        <!-- Headers -->
+                        <Label Text="Location" Grid.Row="0" Grid.Column="0" FontAttributes="Bold" />
+                        <Label Text="Normal" Grid.Row="0" Grid.Column="1" />
+                        <Label Text="Lift" Grid.Row="0" Grid.Column="2" />
+                        <!--<Label Text="Min/Normal" Grid.Row="0" Grid.Column="3" />
+                        <Label Text="Min/Lift" Grid.Row="0" Grid.Column="4" />-->
+                        <Label Text="Total Hours" Grid.Row="0" Grid.Column="5" FontAttributes="Bold" />
+
+                        <!-- Warehouse Row -->
+                        <Label Text="Warehouse" Grid.Row="1" Grid.Column="0" />
+                        <Entry Grid.Row="1" Grid.Column="1" Placeholder="0" />
+                        <Entry Grid.Row="1" Grid.Column="2" Placeholder="0" />
+                        <!--<Entry Grid.Row="1" Grid.Column="3" Placeholder="0" />
+                        <Entry Grid.Row="1" Grid.Column="4" Placeholder="0" />-->
+                        <Label Text="0" Grid.Row="1" Grid.Column="5" />
+
+                        <!-- Hardlid Row -->
+                        <Label Text="Hardlid" Grid.Row="2" Grid.Column="0" />
+                        <Entry Grid.Row="2" Grid.Column="1" Placeholder="0" />
+                        <Entry Grid.Row="2" Grid.Column="2" Placeholder="0" />
+                        <!--<Entry Grid.Row="2" Grid.Column="3" Placeholder="0" />
+                        <Entry Grid.Row="2" Grid.Column="4" Placeholder="0" />-->
+                        <Label Text="0" Grid.Row="2" Grid.Column="5" />
+
+                        <!-- T-Bar Row -->
+                        <Label Text="T-Bar" Grid.Row="3" Grid.Column="0" />
+                        <Entry Grid.Row="3" Grid.Column="1" Placeholder="0" />
+                        <Entry Grid.Row="3" Grid.Column="2" Placeholder="0" />
+                        <!--<Entry Grid.Row="3" Grid.Column="3" Placeholder="0" />
+                        <Entry Grid.Row="3" Grid.Column="4" Placeholder="0" />-->
+                        <Label Text="0" Grid.Row="3" Grid.Column="5" />
+
+                        <!-- Trim Row -->
+                        <Label Text="Trim" Grid.Row="4" Grid.Column="0" />
+                        <Entry Grid.Row="4" Grid.Column="1" Placeholder="0" />
+                        <Entry Grid.Row="4" Grid.Column="2" Placeholder="0" />
+                        <!--<Entry Grid.Row="4" Grid.Column="3" Placeholder="0" />
+                        <Entry Grid.Row="4" Grid.Column="4" Placeholder="0" />-->
+                        <Label Text="0" Grid.Row="4" Grid.Column="5" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ============================= -->
+            <!--         LABOR SECTION         -->
+            <!-- ============================= -->
+            <Border Stroke="White" BackgroundColor="Black" StrokeThickness="1" Padding="15">
+                <VerticalStackLayout Spacing="20">
+                    <!-- Header -->
+                    <Label Text="Labor Section"
+                           FontAttributes="Bold,Italic"
+                           TextDecorations="Underline"
+                           FontSize="18"
+                           TextColor="White" />
+
+                    <!-- 🔧 Repeatable Labor Group Template -->
+                    <!-- === PREWIRE === -->
+                    <Border Stroke="Gray" StrokeThickness="1" Padding="10">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Rates" FontAttributes="Bold" TextColor="White" />
+                            <Grid ColumnDefinitions="2*,*,*,*,*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+                                <!--<Label Text="Role" FontAttributes="Bold" Grid.Row="0" Grid.Column="0" />-->
+                                <Label Text="Regular Direct Rate" FontAttributes="Bold" Grid.Row="0" Grid.Column="1" />
+                                <Label Text="Regular Billed Rate" FontAttributes="Bold" Grid.Row="0" Grid.Column="2" />
+                                <Label Text="Overnight Direct Rate" FontAttributes="Bold" Grid.Row="0" Grid.Column="3" />
+                                <Label Text="Overnight Billed Rate" FontAttributes="Bold" Grid.Row="0" Grid.Column="4" />
+
+                                <!-- Journeyman -->
+                                <Label Text="Journeyman" Grid.Row="1" Grid.Column="0" />
+                                <Entry Text="{Binding JourneymanRegularDirectRate}" Placeholder="$65.00" Grid.Row="1" Grid.Column="1" />
+                                <Entry Text="{Binding JourneymanRegularBilledRate}" Placeholder="$90.00" Grid.Row="1" Grid.Column="2" />
+                                <Entry Text="{Binding JourneymanOvernightDirectRate}" Placeholder="$75.00" Grid.Row="1" Grid.Column="3" />
+                                <Entry Text="{Binding JourneymanOvernightBilledRate}" Placeholder="$115" Grid.Row="1" Grid.Column="4" />
+
+                                <!-- Apprentice -->
+                                <Label Text="Apprentice" Grid.Row="2" Grid.Column="0" />
+                                <Entry Text="{Binding ApprenticeRegularDirectRate}" Placeholder="$30.00" Grid.Row="2" Grid.Column="1" />
+                                <Entry Text="{Binding ApprenticeRegularBilledRate}" Placeholder="$54.00" Grid.Row="2" Grid.Column="2" />
+                                <Entry Text="{Binding ApprenticeOvernightDirectRate}" Placeholder="$45.00" Grid.Row="2" Grid.Column="3" />
+                                <Entry Text="{Binding ApprenticeOvernightBilledRate}" Placeholder="$83.00" Grid.Row="2" Grid.Column="4" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- === Hours === -->
+                    <Border Stroke="Gray" StrokeThickness="1" Padding="10">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Hours" FontAttributes="Bold" TextColor="White" />
+                            <Grid ColumnDefinitions="2*,*,*,*,*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+                                <!--<Label Text="Role" FontAttributes="Bold" Grid.Row="0" Grid.Column="0" />-->
+                                <Label Text="Pre-Wire" FontAttributes="Bold" Grid.Row="0" Grid.Column="1" />
+                                <Label Text="Trim" FontAttributes="Bold" Grid.Row="0" Grid.Column="2" />
+                                <Label Text="Test" FontAttributes="Bold" Grid.Row="0" Grid.Column="3" />
+                                <Label Text="Overnight" FontAttributes="Bold" Grid.Row="0" Grid.Column="4" />
+                                <!--<Label Text="Sale" FontAttributes="Bold" Grid.Row="0" Grid.Column="5" />-->
+
+                                <!-- Journeyman Hours -->
+                                <Label Text="Journeyman" Grid.Row="1" Grid.Column="0" />
+                                <Entry Text="{Binding PrewireJourneymanHours}" Placeholder="0" Grid.Row="1" Grid.Column="1" />
+                                <Entry Text="{Binding TrimJourneymanHours}" Placeholder="0" Grid.Row="1" Grid.Column="2" />
+                                <Entry Text="{Binding TestJourneymanHours}" Placeholder="0" Grid.Row="1" Grid.Column="3" />
+                                <Entry Text="{Binding OvernightJourneymanHours}" Placeholder="0" Grid.Row="1" Grid.Column="4" />
+
+
+                                <!-- Apprentice Hours -->
+                                <Label Text="Apprentice" Grid.Row="2" Grid.Column="0" />
+                                <Entry Text="{Binding PrewireApprenticeHours}" Placeholder="0" Grid.Row="2" Grid.Column="1" />
+                                <Entry Text="{Binding TrimApprenticeHours}" Placeholder="0" Grid.Row="2" Grid.Column="2" />
+                                <Entry Text="{Binding TestApprenticeHours}" Placeholder="0" Grid.Row="2" Grid.Column="3" />
+                                <Entry Text="{Binding OvernightApprenticeHours}" Placeholder="0" Grid.Row="2" Grid.Column="4" />
+
+                            </Grid>
+
+
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- 💰 Grand Labor Totals -->
+                    <!-- Total Hours -->
+                    <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+                        <Label Text="Total Hours" FontAttributes="Bold" Grid.Column="0" Grid.Row="0" />
+                        <Label Text="Regular Hours" FontAttributes="Bold" Grid.Column="1" Grid.Row="0" />
+                        <Label Text="Overnight Hours" FontAttributes="Bold" Grid.Column="2" Grid.Row="0" />
+                        <Label Text="Journeyman:" Grid.Column="0" Grid.Row="2" />
+                        <Label Text="Apprentice:" Grid.Column="0" Grid.Row="3" />
+                        <Label Text="{Binding JourneymanRegularHoursTotal, StringFormat='Cost: ${0:F2}'}" Grid.Column="1" Grid.Row="2" />
+                        <Label Text="{Binding ApprenticeRegularHoursTotal, StringFormat='Sale: ${0:F2}'}" Grid.Column="1" Grid.Row="3" />
+                        <Label Text="{Binding JourneymanOvernightHoursTotal, StringFormat='Cost: ${0:F2}'}" Grid.Column="3" Grid.Row="2" />
+                        <Label Text="{Binding ApprenticeOvernightHoursTotal, StringFormat='Sale: ${0:F2}'}" Grid.Column="4" Grid.Row="2" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+
+            <!-- ============================= -->
+            <!--         MATERIALS SECTION     -->
+            <!-- ============================= -->
+            <Border Stroke="White" BackgroundColor="Black" StrokeThickness="1" Padding="15">
+                <VerticalStackLayout Spacing="20">
+                    <!-- Header -->
+                    <Label Text="Material Section" 
+                           TextDecorations="Underline" 
+                           FontAttributes="Bold,Italic" 
+                           FontSize="18" 
+                           TextColor="White" />
+
+                    <!-- === WIRE SUBSECTION === -->
+                    <Border Stroke="Gray" StrokeThickness="1" Padding="10">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Wire" TextDecorations="Underline" FontAttributes="Bold" FontSize="18" TextColor="White" />
+
+                            <!-- Headers -->
+                            <Grid ColumnDefinitions="2*,3*,Auto,*,*" ColumnSpacing="10">
+                                <Label Text="Item" Grid.Column="0" FontAttributes="Bold" />
+                                <Label Text="Description" Grid.Column="1" FontAttributes="Bold" />
+                                <Label Text="Qty" Grid.Column="2" FontAttributes="Bold" />
+                                <Label Text="Unit Cost" Grid.Column="3" FontAttributes="Bold" />
+                                <Label Text="Unit Sale" Grid.Column="4" FontAttributes="Bold" />
+                            </Grid>
+
+                            <!-- Scrollable list of items -->
+                            <ScrollView HeightRequest="200">
+                                <VerticalStackLayout Spacing="5">
+                                    <CollectionView ItemsSource="{Binding WireItems}">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid ColumnDefinitions="2*,3*,Auto,*,*" ColumnSpacing="10">
+                                                    <Entry Grid.Column="0" Text="{Binding Item}" Placeholder="Item" />
+                                                    <Entry Grid.Column="1" Text="{Binding Description}" Placeholder="Description" />
+                                                    <Entry Grid.Column="2" Text="{Binding Quantity}" Keyboard="Numeric" Placeholder="Qty" />
+                                                    <Entry Grid.Column="3" Text="{Binding UnitCost}" Keyboard="Numeric" Placeholder="Unit Cost" />
+                                                    <Entry Grid.Column="4" Text="{Binding UnitSale}" Keyboard="Numeric" Placeholder="Unit Sale" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                </VerticalStackLayout>
+                            </ScrollView>
+
+                            <!-- Buttons -->
+                            <HorizontalStackLayout Spacing="10">
+                                <Button Text="➕ Add Item" Command="{Binding AddWireItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
+                                <Button Text="🗑️ Delete Item" Command="{Binding RemoveWireItemCommand}" BackgroundColor="DarkRed" TextColor="White" />
+                            </HorizontalStackLayout>
+
+                            <!-- Totals -->
+                            <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
+                                <Label Text="Wire Totals:" FontAttributes="Bold" Grid.Column="0" />
+                                <Label Text="{Binding WireCostTotal, StringFormat='${0:F2}'}" Grid.Column="1" />
+                                <Label Text="{Binding WireSaleTotal, StringFormat='${0:F2}'}" Grid.Column="2" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- === PANEL COMPONENTS === -->
+                    <Border Stroke="Gray" StrokeThickness="1" Padding="10">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Panel Components" TextDecorations="Underline" FontAttributes="Bold" FontSize="18" TextColor="White" />
+
+                            <!-- Headers -->
+                            <Grid ColumnDefinitions="2*,3*,Auto,*,*" ColumnSpacing="10">
+                                <Label Text="Item" FontAttributes="Bold" Grid.Column="0" />
+                                <Label Text="Description" FontAttributes="Bold" Grid.Column="1" />
+                                <Label Text="Qty" FontAttributes="Bold" Grid.Column="2" />
+                                <Label Text="Unit Cost" FontAttributes="Bold" Grid.Column="3" />
+                                <Label Text="Unit Sale" FontAttributes="Bold" Grid.Column="4" />
+                            </Grid>
+
+                            <!-- Scrollable list -->
+                            <ScrollView HeightRequest="200">
+                                <CollectionView ItemsSource="{Binding PanelItems}">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid ColumnDefinitions="2*,3*,Auto,*,*" ColumnSpacing="10" Padding="5">
+                                                <Entry Grid.Column="0" Text="{Binding Item}" Placeholder="Item" />
+                                                <Entry Grid.Column="1" Text="{Binding Description}" Placeholder="Description" />
+                                                <Entry Grid.Column="2" Text="{Binding Quantity}" Keyboard="Numeric" Placeholder="Qty" />
+                                                <Entry Grid.Column="3" Text="{Binding UnitCost}" Keyboard="Numeric" Placeholder="Unit Cost" />
+                                                <Entry Grid.Column="4" Text="{Binding UnitSale}" Keyboard="Numeric" Placeholder="Unit Sale" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </ScrollView>
+
+                            <!-- Buttons -->
+                            <HorizontalStackLayout Spacing="10">
+                                <Button Text="➕ Add Item" Command="{Binding AddPanelItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
+                                <Button Text="🗑️ Delete Item" Command="{Binding RemovePanelItemCommand}" BackgroundColor="DarkRed" TextColor="White" />
+                            </HorizontalStackLayout>
+
+                            <!-- Totals -->
+                            <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
+                                <Label Text="Panel Totals:" FontAttributes="Bold" Grid.Column="0" />
+                                <Label Text="{Binding PanelCostTotal, StringFormat='${0:F2}'}" Grid.Column="1" />
+                                <Label Text="{Binding PanelSaleTotal, StringFormat='${0:F2}'}" Grid.Column="2" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- === GENERAL MATERIALS === -->
+                    <Border Stroke="Gray" StrokeThickness="1" Padding="10">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Materials" TextDecorations="Underline" FontAttributes="Bold" FontSize="18" TextColor="White" />
+
+                            <!-- Headers -->
+                            <Grid ColumnDefinitions="2*,3*,Auto,*,*" ColumnSpacing="10">
+                                <Label Text="Item" FontAttributes="Bold" Grid.Column="0" />
+                                <Label Text="Description" FontAttributes="Bold" Grid.Column="1" />
+                                <Label Text="Qty" FontAttributes="Bold" Grid.Column="2" />
+                                <Label Text="Unit Cost" FontAttributes="Bold" Grid.Column="3" />
+                                <Label Text="Unit Sale" FontAttributes="Bold" Grid.Column="4" />
+                            </Grid>
+
+                            <!-- Scrollable list -->
+                            <ScrollView HeightRequest="200">
+                                <CollectionView ItemsSource="{Binding MaterialItems}">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid ColumnDefinitions="2*,3*,Auto,*,*" ColumnSpacing="10" Padding="5">
+                                                <Entry Grid.Column="0" Text="{Binding Item}" Placeholder="Item" />
+                                                <Entry Grid.Column="1" Text="{Binding Description}" Placeholder="Description" />
+                                                <Entry Grid.Column="2" Text="{Binding Quantity}" Keyboard="Numeric" Placeholder="Qty" />
+                                                <Entry Grid.Column="3" Text="{Binding UnitCost}" Keyboard="Numeric" Placeholder="Unit Cost" />
+                                                <Entry Grid.Column="4" Text="{Binding UnitSale}" Keyboard="Numeric" Placeholder="Unit Sale" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </ScrollView>
+
+                            <!-- Buttons -->
+                            <HorizontalStackLayout Spacing="10">
+                                <Button Text="➕ Add Item" Command="{Binding AddMaterialItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
+                                <Button Text="🗑️ Delete Item" Command="{Binding RemoveMaterialItemCommand}" BackgroundColor="DarkRed" TextColor="White" />
+                            </HorizontalStackLayout>
+
+                            <!-- Totals + Markup % -->
+                            <Grid ColumnDefinitions="4*,*,*,Auto" RowSpacing="10" Padding="0,10,0,0">
+                                <Label Text="Material Totals:" FontAttributes="Bold" Grid.Column="0" />
+                                <Label Text="{Binding MaterialCostTotal, StringFormat='${0:F2}'}" Grid.Column="1" />
+                                <Label Text="{Binding MaterialSaleTotal, StringFormat='${0:F2}'}" Grid.Column="2" />
+                                <StackLayout Orientation="Horizontal" Grid.Column="3" Spacing="5">
+                                    <Label Text="Markup %" />
+                                    <Entry Text="{Binding MaterialMarkupPercent}" WidthRequest="60" Keyboard="Numeric" />
+                                </StackLayout>
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

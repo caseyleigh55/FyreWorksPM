@@ -1,0 +1,111 @@
+﻿
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FyreWorksPM.ViewModels"
+             x:Class="FyreWorksPM.Pages.Creation.CreateItemsPage"
+             Title="Manage Items"
+             x:Name="ItemPage">
+
+    <!-- Grid with three rows:
+         Row 0 - top content (input fields, suggestions, add/search)
+         Row 1 - scrollable list (in a bordered container)
+         Row 2 - bottom buttons -->
+    <Grid RowDefinitions="Auto,*,Auto" Padding="10">
+
+        <!-- Top Form Section (Fixed) -->
+        <VerticalStackLayout Grid.Row="0" Spacing="10">
+
+            <!-- Input Form -->
+            <Entry x:Name="ItemNameEntry"
+                   Placeholder="Item Name" 
+                   Text="{Binding Name}" />
+
+            <Entry Placeholder="Description" 
+                   Text="{Binding Description}" />
+
+            <!-- Item Type Autocomplete Entry -->
+            <Entry x:Name="ItemTypeEntry"
+                   Placeholder="Item Type"
+                   Text="{Binding SelectedItemType, Mode=TwoWay}"
+                   TextChanged="OnItemTypeTextChanged" 
+                   Completed="OnEntryCompleted"/>
+
+            <!-- Suggestions dropdown for Item Types -->
+            <CollectionView x:Name="ItemTypeSuggestions"
+                            ItemsSource="{Binding FilteredItemTypes}"
+                            SelectionMode="Single"
+                            IsVisible="{Binding AreSuggestionsVisible}"
+                            HeightRequest="100">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Label Text="{Binding .}"
+                               Padding="10"
+                               BackgroundColor="Purple"
+                               TextColor="White">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding BindingContext.SelectItemTypeCommand, Source={x:Reference Name=ItemPage}}"
+                                                      CommandParameter="{Binding .}" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Add Item Button -->
+            <Button Text="Add Item" Command="{Binding AddItemCommand}" />
+
+            <!-- Search Bar -->
+            <Entry Placeholder="Search items..." Text="{Binding SearchText}" />
+
+        </VerticalStackLayout>
+
+        <!-- Scrollable List of Items (Fixed border gap above) -->
+        <Border Grid.Row="1"
+                Stroke="Gray"
+                StrokeThickness="1"
+                Padding="0"
+                Margin="0,10,0,0"  
+            BackgroundColor="Transparent"
+                HeightRequest="300">
+            <!-- Items in this Border scroll while the Border stays fixed -->
+            <ScrollView>
+                <CollectionView x:Name="ItemsList"
+                                ItemsSource="{Binding FilteredItems}"
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="10" Margin="5">
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                    <Label Text="{Binding Description}" FontSize="12"/>
+                                    <Label Text="{Binding ItemType.Name}" FontSize="10" TextColor="Gray"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </ScrollView>
+        </Border>
+
+        <!-- Bottom Button Row (Fixed) -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,*" Padding="0,10,0,0">
+            <Button Text="Edit Selected Item"
+                    Command="{Binding EditSelectedItemCommand}" 
+                    IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToBoolConverter}}"
+                    BackgroundColor="Orange"
+                    TextColor="White"
+                    Margin="5"
+                    Grid.Column="0" />
+
+            <Button Text="Remove Selected Item"
+                    Command="{Binding RemoveSelectedItemCommand}" 
+                    IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToBoolConverter}}"
+                    BackgroundColor="DarkRed"
+                    TextColor="White"
+                    Margin="5"
+                    Grid.Column="1" />
+        </Grid>
+
+    </Grid>
+</ContentPage>

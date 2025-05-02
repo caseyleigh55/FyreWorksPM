@@ -1,0 +1,6 @@
+@FyreWorksPM.Api_HostAddress = http://localhost:5257
+
+GET {{FyreWorksPM.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

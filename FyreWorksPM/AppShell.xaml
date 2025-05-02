@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell
+    x:Class="FyreWorksPM.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:foundationPages="clr-namespace:FyreWorksPM.Pages.Foundation"
+    Title="FyreWorksPM"
+    Shell.FlyoutBehavior="Flyout">
+
+    <FlyoutItem Title="Home" Route="home">
+        <ShellContent ContentTemplate="{DataTemplate foundationPages:HomePage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Bids" Route="bids">
+        <ShellContent ContentTemplate="{DataTemplate foundationPages:BidsPage}" />
+    </FlyoutItem>
+
+    <MenuItem Text="Logout" Clicked="OnLogoutClicked" />
+</Shell>

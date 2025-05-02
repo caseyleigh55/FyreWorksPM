@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+ xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+ x:Class="FyreWorksPM.Pages.PopUps.ManageItemTypesPopup"
+ x:Name="PopupPage"
+ BackgroundColor="#80000000"
+ Padding="20"
+ Shell.NavBarIsVisible="False">
+
+    <Frame
+     BackgroundColor="White"
+     CornerRadius="20"
+     Padding="20"
+     VerticalOptions="Center"
+     HorizontalOptions="Center"
+     WidthRequest="350"
+     HasShadow="True">
+
+        <StackLayout Spacing="15">
+            <Label Text="Manage Item Types" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center" />
+
+            <CollectionView ItemsSource="{Binding ItemTypes}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout Orientation="Horizontal" Spacing="10">
+                            <Entry Text="{Binding Name, Mode=TwoWay}" WidthRequest="200" />
+
+                            <Button
+                             Text="Save"
+                             Command="{Binding BindingContext.SaveCommand, Source={x:Reference PopupPage}}"
+                             CommandParameter="{Binding .}" />
+
+                            <Button
+                             Text="Delete"
+                             Command="{Binding BindingContext.DeleteCommand, Source={x:Reference PopupPage}}"
+                             CommandParameter="{Binding .}"
+                             IsEnabled="{Binding IsDeletable}" />
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button Text="+ Add New Type" Command="{Binding AddNewTypeCommand}" />
+            <Button Text="Close" Command="{Binding CloseCommand}" />
+        </StackLayout>
+    </Frame>
+</ContentPage>

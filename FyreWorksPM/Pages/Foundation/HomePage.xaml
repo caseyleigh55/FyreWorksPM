@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="FyreWorksPM.Pages.Foundation.HomePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Home">
+
+    <VerticalStackLayout Padding="20" Spacing="20" VerticalOptions="Center">
+        <Label Text="🏠 Welcome to the Home Page!" 
+               HorizontalOptions="Center" 
+               FontSize="24" 
+               FontAttributes="Bold" />
+
+        <Button Text="Logout"
+                Clicked="OnLogoutClicked"
+                BackgroundColor="Crimson"
+                TextColor="White"
+                HorizontalOptions="Center" />
+    </VerticalStackLayout>
+</ContentPage>
