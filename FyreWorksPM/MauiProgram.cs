@@ -10,7 +10,9 @@ using FyreWorksPM.ViewModels.Solitary;
 using FyreWorksPM.Services.Navigation;
 using FyreWorksPM.DataAccess.Data;
 using FyreWorksPM.DataAccess.Data.Models;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http;
+using FyreWorksPM.Configuration;
 
 namespace FyreWorksPM;
 public static class MauiProgram
@@ -26,15 +28,17 @@ public static class MauiProgram
         }).UseMauiCommunityToolkit();
 
         //DB connection
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=FyreWorksPMDb;Trusted_Connection=True;"));
+        builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
+        {
+            client.BaseAddress = new Uri(ApiConfig.BaseUrl);
+        });
+
 
 
         // Register services
         builder.Services.AddSingleton<IAuthService, AuthService>();
         builder.Services.AddSingleton<App>();
-        builder.Services.AddSingleton<INavigationService, NavigationService>();
-        builder.Services.AddDbContext<ApplicationDbContext>();
+        builder.Services.AddSingleton<INavigationService, NavigationService>();      
 
         //Register Shells****************************
         builder.Services.AddSingleton<AppShell>();
@@ -88,29 +92,11 @@ public static class MauiProgram
 
 
         var app = builder.Build();           // ✅ Build the app first
-        SeedTestUser(app.Services);         // ✅ Now we can use the service provider
         return app;                         // ✅ Return the built app
 
 
 
     }
 
-    private static void SeedTestUser(IServiceProvider services)
-    {
-        using var scope = services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-        // Prevent dupes
-        if (!db.Users.Any(u => u.Username == "admin"))
-        {
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword("password123");
-            db.Users.Add(new UserModel
-            {
-                Username = "admin",
-                Email = "admin@example.com",
-                PasswordHash = hashedPassword
-            });
-            db.SaveChanges();
-        }
-    }
+    
 }
