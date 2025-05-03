@@ -8,95 +8,111 @@ using FyreWorksPM.Pages.PopUps;
 using FyreWorksPM.Pages.Solitary;
 using FyreWorksPM.ViewModels.Solitary;
 using FyreWorksPM.Services.Navigation;
-using FyreWorksPM.DataAccess.Data;
-using FyreWorksPM.DataAccess.Data.Models;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Http;
+using FyreWorksPM.Services.Common;
 using FyreWorksPM.Configuration;
+using FyreWorksPM.Services.Item;
 
 namespace FyreWorksPM;
+
+/// <summary>
+/// The entry point for app setup and DI registration.
+/// Configures all pages, services, viewmodels, and libraries.
+/// </summary>
 public static class MauiProgram
 {
-    
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
-        builder.UseMauiApp<App>().ConfigureFonts(fonts =>
-        {
-            fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-            fonts.AddFont("OpenSans-SemiBold.ttf", "OpenSansSemiBold");
-        }).UseMauiCommunityToolkit();
 
-        //DB connection
+        // ============================
+        // 🔧 Core App + Fonts
+        // ============================
+        builder
+            .UseMauiApp<App>()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-SemiBold.ttf", "OpenSansSemiBold");
+            })
+            .UseMauiCommunityToolkit();
+
+        // ============================
+        // 🌐 HTTP Clients
+        // ============================
         builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
         {
             client.BaseAddress = new Uri(ApiConfig.BaseUrl);
         });
 
+        builder.Services.AddHttpClient<RegisterViewModel>(); // ⚠️ Used to inject HttpClient into RegisterViewModel
 
-
-        // Register services
-        //builder.Services.AddSingleton<IAuthService, AuthService>();
+        // ============================
+        // 🔧 Core Services
+        // ============================
         builder.Services.AddSingleton<App>();
-        builder.Services.AddSingleton<INavigationService, NavigationService>();      
+        builder.Services.AddSingleton<INavigationService, NavigationService>();
+        builder.Services.AddSingleton<ILoadingService, LoadingService>();
+        builder.Services.AddSingleton<IItemService, ItemService>();
+        builder.Services.AddSingleton<IItemTypeService, ItemTypeService>();
 
-        //Register Shells****************************
+        // ============================
+        // 🐚 Shells
+        // ============================
         builder.Services.AddSingleton<AppShell>();
         builder.Services.AddSingleton<LoginShell>();
 
-        // Register pages*****************************
+        // ============================
+        // 📄 Pages
+        // ============================
 
-        //Creation Pages
-        builder.Services.AddSingleton<CreateBidPage>();
-        builder.Services.AddSingleton<CreateClientPage>();
-        builder.Services.AddSingleton<CreateItemsPage>();
-        builder.Services.AddTransient<RegisterPage>();
-
-        //Foundation Pages
+        // Foundation Pages
         builder.Services.AddSingleton<BidsPage>();
         builder.Services.AddSingleton<HomePage>();
         builder.Services.AddSingleton<LoginPage>();
         builder.Services.AddSingleton<ProjectsPage>();
         builder.Services.AddSingleton<ServicePage>();
 
-        //Pop Up Pages
+        // Creation Pages
+        builder.Services.AddSingleton<CreateBidPage>();
+        builder.Services.AddSingleton<CreateClientPage>();
+        builder.Services.AddSingleton<CreateItemsPage>();
+        builder.Services.AddTransient<RegisterPage>();
+
+        // Pop-Up Pages
         builder.Services.AddSingleton<ManageItemPopup>();
         builder.Services.AddSingleton<ManageItemTypesPopup>();
 
-        //Solitary Pages
+        // Solitary Pages
         builder.Services.AddSingleton<SelectedBidPage>();
         builder.Services.AddSingleton<SelectedProjectPage>();
         builder.Services.AddSingleton<SelectedTicketPage>();
 
-        //Register ViewModels
+        // ============================
+        // 🧠 ViewModels
+        // ============================
 
-        //Creation ViewModels
-        builder.Services.AddSingleton<CreateBidViewModel>();
-        builder.Services.AddSingleton<CreateClientViewModel>();
-        builder.Services.AddSingleton<CreateItemsViewModel>();
-        builder.Services.AddSingleton<RegisterViewModel>();
-
-        //Foundation ViewModels
+        // Foundation ViewModels
         builder.Services.AddSingleton<AppShellViewModel>();
-        builder.Services.AddSingleton<BidsPageViewModel>();                
+        builder.Services.AddSingleton<BidsPageViewModel>();
         builder.Services.AddSingleton<HomePageViewModel>();
         builder.Services.AddSingleton<LoginShellViewModel>();
         builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddSingleton<ProjectsPageViewModel>();
         builder.Services.AddSingleton<ServicePageViewModel>();
 
-        //Pop Up ViewModels
+        // Creation ViewModels
+        builder.Services.AddSingleton<CreateBidViewModel>();
+        builder.Services.AddSingleton<CreateClientViewModel>();
+        builder.Services.AddSingleton<CreateItemsViewModel>();
+
+        // Pop-Up ViewModels
         builder.Services.AddSingleton<ManageItemPopupViewModel>();
         builder.Services.AddSingleton<ManageItemTypesPopupViewModel>();
-        // etc.
 
-
-        var app = builder.Build();           // ✅ Build the app first
-        return app;                         // ✅ Return the built app
-
-
-
+        // ============================
+        // 🏁 Build & Return
+        // ============================
+        var app = builder.Build();
+        return app;
     }
-
-    
 }

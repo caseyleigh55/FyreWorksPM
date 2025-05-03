@@ -41,11 +41,5 @@ public class ApplicationDbContext : DbContext
     /// </summary>
     public DbSet<ClientModel> Clients { get; set; } = default!;
 
-    #endregion
-
-    // Optional: Add OnModelCreating override here if you need custom config
-    // protected override void OnModelCreating(ModelBuilder modelBuilder)
-    // {
-    //     // e.g. modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
-    // }
+    #endregion    
 }

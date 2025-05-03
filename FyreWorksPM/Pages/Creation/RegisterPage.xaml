@@ -1,13 +1,45 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage 
-    x:Class="FyreWorksPM.Pages.Creation.RegisterPage"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Register">
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FyreWorksPM.Pages.Creation.RegisterPage"
+             Title="Register">
 
-    <VerticalStackLayout Padding="30" Spacing="20">
-        <Label Text="Registration coming soon!" HorizontalOptions="Center" VerticalOptions="Center" />
-        <Button Text="Back to Login"
-        Command="{Binding GoToLoginCommand}" />
-    </VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="20">
+
+            <Label Text="Create an Account"
+                   FontSize="24"
+                   HorizontalOptions="Center" />
+
+            <!-- Username -->
+            <Entry Placeholder="Username"
+                   Text="{Binding Username}" />
+
+            <!-- Email -->
+            <Entry Placeholder="Email"
+                   Keyboard="Email"
+                   Text="{Binding Email}" />
+
+            <!-- Password -->
+            <Entry Placeholder="Password"
+                   IsPassword="True"
+                   Text="{Binding Password}" />
+
+            <!-- Confirm Password -->
+            <Entry Placeholder="Confirm Password"
+                   IsPassword="True"
+                   Text="{Binding ConfirmPassword}" />
+
+            <!-- Register Button -->
+            <Button Text="Register"
+                    Command="{Binding RegisterCommand}" />
+
+            <!-- Back to Login -->
+            <Button Text="Back to Login"
+                    Command="{Binding GoToLoginCommand}"
+                    BackgroundColor="LightGray"
+                    TextColor="Black" />
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

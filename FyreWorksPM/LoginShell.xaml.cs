@@ -6,13 +6,17 @@ using FyreWorksPM.Services.Auth;
 namespace FyreWorksPM;
 
 /// <summary>
-/// Shell used for unauthenticated users (Login/Register only).
-/// This shell is manually composed using DI pages.
+/// Shell used for unauthenticated users (Login and Register only).
+/// This layout is created programmatically and listens for auth state changes.
 /// </summary>
 public partial class LoginShell : Shell
 {
     private readonly IAuthService _authService;
 
+    /// <summary>
+    /// Constructs the LoginShell and listens for auth changes.
+    /// </summary>
+    /// <param name="authService">Injected authentication service.</param>
     public LoginShell(IAuthService authService)
     {
         _authService = authService ?? throw new ArgumentNullException(nameof(authService));
@@ -21,45 +25,54 @@ public partial class LoginShell : Shell
         _authService.AuthStateChanged += OnAuthStateChanged;
     }
 
+    // ===============================
+    // 🧱 Shell Layout Setup
+    // ===============================
+
     /// <summary>
-    /// Sets up the shell layout programmatically using DI-resolved pages.
+    /// Builds the login shell layout with Login and Register tabs.
+    /// Pages are resolved using DI.
     /// </summary>
     private void InitializeShell()
     {
-        // ✅ Register routes for clean Shell navigation
+        // ✅ Register navigation routes (clean GoToAsync support)
         Routing.RegisterRoute("login", typeof(LoginPage));
         Routing.RegisterRoute("register", typeof(RegisterPage));
 
-        // Create login and register pages via DI
+        // Resolve pages using DI
         var loginPage = App.Services.GetRequiredService<LoginPage>();
         var registerPage = App.Services.GetRequiredService<RegisterPage>();
 
-        // Setup Login tab
+        // 🧑‍💻 Login Tab
         Items.Add(new ShellContent
         {
             Title = "Login",
             Content = loginPage,
-            Route = "login" // ✅ Ensure Shell recognizes this route
+            Route = "login"
         });
 
-        // Setup Register tab
+        // 🆕 Register Tab
         Items.Add(new ShellContent
         {
             Title = "Register",
             Content = registerPage,
-            Route = "register" // ✅ Ensure Shell recognizes this route
+            Route = "register"
         });
     }
 
+    // ===============================
+    // 🔄 Auth Event Listener
+    // ===============================
 
     /// <summary>
-    /// Swap shell once user successfully logs in.
+    /// Handles login state change.
+    /// Swaps to AppShell when user successfully logs in.
     /// </summary>
     private void OnAuthStateChanged(object sender, AuthStateChangedEventArgs e)
     {
         if (e.IsLoggedIn)
         {
-            // Switch to the authenticated shell
+            // 🔁 Replace shell with authenticated layout
             var newShell = App.Services.GetRequiredService<AppShell>();
             Application.Current.MainPage = newShell;
         }

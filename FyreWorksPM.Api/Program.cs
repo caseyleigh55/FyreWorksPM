@@ -7,9 +7,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// =====================
-// JWT Auth Configuration 🔐
-// =====================
+// ==============================
+// 🔐 JWT Authentication Config
+// ==============================
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "SuperSecretKeyYouShouldChange";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "FyreWorksPMApi";
 
@@ -22,7 +22,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // For development only
+    options.RequireHttpsMetadata = false; // 🚧 DEV ONLY
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -35,57 +35,71 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// =====================
-// Swagger + Bearer Support 🧪
-// =====================
+// ==============================
+// 📦 Swagger + Bearer Support
+// ==============================
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "FyreWorksPM API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "FyreWorksPM API",
+        Version = "v1",
+        Description = "Backend API for FyreWorks Project Management"
+    });
+
+    // 🔐 Add JWT Auth to Swagger UI
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme.\r\n\r\nEnter 'Bearer' [space] and then your token.\r\n\r\nExample: \"Bearer abc123\"",
+        Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer {token}'",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement{
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
         {
-            new OpenApiSecurityScheme{
-                Reference = new OpenApiReference{
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
                     Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
                 }
             },
-            new string[]{}
+            Array.Empty<string>()
         }
     });
 });
 
-// =====================
-// Services
-// =====================
+// ==============================
+// 🧩 Services & Infrastructure
+// ==============================
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=FyreWorksPMDb;Trusted_Connection=True;"));
 
+// ==============================
+// 🚀 Build the app
+// ==============================
 var app = builder.Build();
 
-// =====================
-// Middleware Pipeline
-// =====================
+// ==============================
+// 🌐 HTTP Request Pipeline
+// ==============================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.MapOpenApi(); // << moved inside dev check
+    app.MapOpenApi(); // Only expose OpenAPI in dev
 }
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication(); // 🔐 Before UseAuthorization
+app.UseAuthentication(); // 🔐 Must be BEFORE UseAuthorization
 app.UseAuthorization();
 
 app.MapControllers();

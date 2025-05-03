@@ -139,6 +139,9 @@
 	  <MauiXaml Update="Pages\Foundation\ServicePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Pages\PopUps\LoadingPopup.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Pages\Solitary\SelectedBidPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

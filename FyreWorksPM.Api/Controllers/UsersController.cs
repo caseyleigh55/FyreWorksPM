@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,12 +8,11 @@ using System.Text;
 using FyreWorksPM.DataAccess.Data;
 using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.Api.DTOs;
-using Microsoft.AspNetCore.Authorization;
 
 namespace FyreWorksPM.Api.Controllers;
 
 /// <summary>
-/// Handles user-related actions such as registration and user listing (for testing only).
+/// Handles all user-related endpoints including registration, login, and (temporary) listing.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
@@ -28,7 +28,7 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// Returns a full list of users. 🔐 TEMP FOR DEBUGGING ONLY.
+    /// 🔐 TEMP: Returns all users. Remove or lock this down in production.
     /// </summary>
     [Authorize]
     [HttpGet]
@@ -39,24 +39,23 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// Registers a new user with hashed password.
+    /// Registers a new user with a securely hashed password.
     /// </summary>
+    /// <param name="dto">The user registration data.</param>
     [HttpPost("register")]
     public async Task<IActionResult> RegisterUser([FromBody] RegisterUserDto dto)
     {
         if (!ModelState.IsValid)
-        {
             return BadRequest("Invalid input.");
-        }
 
+        // Check for existing username/email
         bool exists = await _db.Users.AnyAsync(u =>
             u.Username == dto.Username || u.Email == dto.Email);
 
         if (exists)
-        {
             return BadRequest("A user with this username or email already exists.");
-        }
 
+        // Hash password using BCrypt (includes salt)
         string hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
         var user = new UserModel
@@ -73,23 +72,24 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// Logs in a user and returns a JWT token.
+    /// Logs in the user and returns a JWT access token.
     /// </summary>
+    /// <param name="dto">Login credentials (username/password).</param>
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserDto dto)
     {
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
 
+        // Validate credentials
         if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
-        {
             return Unauthorized("Invalid username or password");
-        }
 
-        // JWT Config
+        // Load JWT configuration values
         var jwtKey = _configuration["Jwt:Key"];
         var jwtIssuer = _configuration["Jwt:Issuer"];
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
 
+        // Build claims to embed into token
         var authClaims = new[]
         {
             new Claim(ClaimTypes.Name, user.Username),
@@ -97,6 +97,7 @@ public class UsersController : ControllerBase
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
+        // Construct JWT token
         var token = new JwtSecurityToken(
             issuer: jwtIssuer,
             audience: null,

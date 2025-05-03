@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:Popup
+    x:Class="FyreWorksPM.Pages.PopUps.LoadingPopup"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:views="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
+    CanBeDismissedByTappingOutsideOfPopup="False"
+    Color="#80000000">
+
+    <Grid VerticalOptions="Center" HorizontalOptions="Center">
+        <Frame BackgroundColor="#333333" Padding="30" CornerRadius="12" HasShadow="True">
+            <ActivityIndicator IsRunning="True" Color="White" WidthRequest="40" HeightRequest="40" />
+        </Frame>
+    </Grid>
+
+</views:Popup>

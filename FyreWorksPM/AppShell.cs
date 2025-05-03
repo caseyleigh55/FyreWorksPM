@@ -4,18 +4,33 @@ using FyreWorksPM.Services.Auth;
 
 namespace FyreWorksPM;
 
+/// <summary>
+/// The main shell layout for authenticated users.
+/// Dynamically builds tabs using DI-injected pages and provides a logout action.
+/// </summary>
 public partial class AppShell : Shell
 {
     private readonly IAuthService _authService;
 
+    /// <summary>
+    /// Constructs the AppShell and injects the authenticated page layout.
+    /// </summary>
     public AppShell(IAuthService authService)
     {
         _authService = authService ?? throw new ArgumentNullException(nameof(authService));
 
-        BuildShellLayout();  // 👈 All pages injected via DI
-        RegisterRoutes();    // 👈 For manual GoToAsync() support
+        BuildShellLayout();  // Inject and add Shell tabs
+        RegisterRoutes();    // Register named routes for GoToAsync()
     }
 
+    // ===============================
+    // 🧱 Shell Layout Tabs (DI-based)
+    // ===============================
+
+    /// <summary>
+    /// Builds the tabbed UI layout by resolving pages from DI.
+    /// Adds each as a ShellContent entry.
+    /// </summary>
     private void BuildShellLayout()
     {
         // 🏠 Home Page Tab
@@ -36,7 +51,20 @@ public partial class AppShell : Shell
             Route = "bids"
         });
 
-        // 🛠 Projects Tab (optional)
+        //=============================================================
+        //
+        // 🧪 TEMP: Expose CreateItemsPage directly for manual testing
+        //
+        //=============================================================
+        var itemsPage = App.Services.GetRequiredService<CreateItemsPage>();
+        Items.Add(new ShellContent
+        {
+            Title = "🔧 Manage Items (Temp)",
+            Content = itemsPage,
+            Route = "createitems" // still register route in case we navigate programmatically later
+        });
+
+        // 🛠 Projects Tab
         var projectsPage = App.Services.GetRequiredService<ProjectsPage>();
         Items.Add(new ShellContent
         {
@@ -45,7 +73,7 @@ public partial class AppShell : Shell
             Route = "projects"
         });
 
-        // 🔧 Services Tab (optional)
+        // 🔧 Services Tab
         var servicePage = App.Services.GetRequiredService<ServicePage>();
         Items.Add(new ShellContent
         {
@@ -61,17 +89,28 @@ public partial class AppShell : Shell
             Command = new Command(async () =>
             {
                 await _authService.LogoutAsync();
+
+                // 🔄 Reset to LoginShell after logout
                 Application.Current.MainPage = new LoginShell(_authService);
             })
         });
     }
 
+    // ===============================
+    // 🧭 Route Registration
+    // ===============================
+
+    /// <summary>
+    /// Registers routes for Shell navigation (GoToAsync).
+    /// Enables deep linking and non-tab routing.
+    /// </summary>
     private void RegisterRoutes()
     {
         Routing.RegisterRoute("home", typeof(HomePage));
         Routing.RegisterRoute("bids", typeof(BidsPage));
+        Routing.RegisterRoute("createitems", typeof(CreateItemsPage));
         Routing.RegisterRoute("projects", typeof(ProjectsPage));
         Routing.RegisterRoute("services", typeof(ServicePage));
-        Routing.RegisterRoute("register", typeof(RegisterPage)); // Optional if Register is deep-linked
+        Routing.RegisterRoute("register", typeof(RegisterPage)); // Used by LoginShell
     }
 }
