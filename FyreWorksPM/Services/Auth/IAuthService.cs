@@ -9,4 +9,5 @@ public interface IAuthService
 
     public event EventHandler<AuthStateChangedEventArgs> AuthStateChanged;
 
+    Task TryRestoreLoginAsync();
 }

@@ -1,3 +1,5 @@
+using FyreWorksPM.ViewModels.Creation;
+
 namespace FyreWorksPM.Pages.Creation;
 
 /// <summary>
@@ -5,8 +7,9 @@ namespace FyreWorksPM.Pages.Creation;
 /// </summary>
 public partial class RegisterPage : ContentPage
 {
-    public RegisterPage()
+    public RegisterPage(RegisterViewModel vm)
     {
         InitializeComponent();
+        BindingContext = vm;
     }
 }

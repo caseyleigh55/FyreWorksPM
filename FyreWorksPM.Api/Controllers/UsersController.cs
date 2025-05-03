@@ -7,6 +7,7 @@ using System.Text;
 using FyreWorksPM.DataAccess.Data;
 using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.Api.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FyreWorksPM.Api.Controllers;
 
@@ -29,6 +30,7 @@ public class UsersController : ControllerBase
     /// <summary>
     /// Returns a full list of users. 🔐 TEMP FOR DEBUGGING ONLY.
     /// </summary>
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()
     {

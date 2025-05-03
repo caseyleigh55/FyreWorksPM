@@ -46,9 +46,13 @@ public class LoginViewModel : ViewModelBase
             return false;
         }
 
-        // Optionally: Navigate to main app shell or home page on success
-        await _nav.GoToAsync("//home"); // or "//dashboard", etc.
+        // ✅ Swap Shell right here
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            Application.Current.MainPage = App.Services.GetRequiredService<AppShell>();
+        });
 
         return true;
     }
+
 }

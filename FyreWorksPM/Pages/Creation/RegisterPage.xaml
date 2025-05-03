@@ -7,5 +7,7 @@
 
     <VerticalStackLayout Padding="30" Spacing="20">
         <Label Text="Registration coming soon!" HorizontalOptions="Center" VerticalOptions="Center" />
+        <Button Text="Back to Login"
+        Command="{Binding GoToLoginCommand}" />
     </VerticalStackLayout>
 </ContentPage>

@@ -51,6 +51,9 @@ public class AuthService : IAuthService
 
         _token = result.Token;
 
+        // 🔐 Save to secure storage
+        await SecureStorage.SetAsync("auth_token", _token);
+
         // 🔐 Set the token as default Authorization header
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
@@ -59,14 +62,17 @@ public class AuthService : IAuthService
         return true;
     }
 
-    public Task LogoutAsync()
+    public async Task LogoutAsync()
     {
         IsLoggedIn = false;
         _token = null;
         _httpClient.DefaultRequestHeaders.Authorization = null;
 
+        SecureStorage.Remove("auth_token");
+
+
         AuthStateChanged?.Invoke(this, new AuthStateChangedEventArgs(false));
-        return Task.CompletedTask;
+        return;
     }
 
     private class LoginResult
@@ -74,4 +80,23 @@ public class AuthService : IAuthService
         public string? Token { get; set; }
         public DateTime Expiration { get; set; }
     }
+
+    public async Task TryRestoreLoginAsync()
+    {
+        System.Diagnostics.Debug.WriteLine("[AUTH] TryRestoreLoginAsync started");
+
+        var savedToken = await SecureStorage.GetAsync("auth_token");
+
+        System.Diagnostics.Debug.WriteLine($"[AUTH] Restored token: {_token}");
+
+        if (!string.IsNullOrWhiteSpace(savedToken))
+        {
+            _token = savedToken;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+            IsLoggedIn = true;
+            AuthStateChanged?.Invoke(this, new AuthStateChangedEventArgs(true));
+        }
+        System.Diagnostics.Debug.WriteLine("[AUTH] TryRestoreLoginAsync finished");
+    }
+
 }

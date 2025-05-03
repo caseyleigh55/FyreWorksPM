@@ -1,7 +1,8 @@
-﻿using Microsoft.Maui.Controls;
+﻿using FyreWorksPM;
 using FyreWorksPM.ViewModels.Foundation;
 using FyreWorksPM.Services.Navigation; // 👈 New!
 using FyreWorksPM.Pages.Creation;
+using FyreWorksPM.Services.Auth;
 
 namespace FyreWorksPM.Pages.Foundation;
 
@@ -10,9 +11,11 @@ namespace FyreWorksPM.Pages.Foundation;
 /// </summary>
 public partial class LoginPage : ContentPage
 {
+    private readonly IAuthService _authService;
     private readonly LoginViewModel _vm;
     private readonly AppShell _appShell;
     private readonly INavigationService _nav; // 👈 Injected navigation service
+    
 
     // 👇 Parameterless constructor for XAML preview/fallback
     public LoginPage() : this(
@@ -26,6 +29,7 @@ public partial class LoginPage : ContentPage
     public LoginPage(LoginViewModel vm, AppShell appShell, INavigationService nav)
     {
         InitializeComponent();
+        
 
         _vm = vm ?? throw new ArgumentNullException(nameof(vm));
         _appShell = appShell ?? throw new ArgumentNullException(nameof(appShell));
@@ -35,26 +39,7 @@ public partial class LoginPage : ContentPage
         BindingContext = _vm;
     }
 
-    /// <summary>
-    /// Called when the Login button is clicked.
-    /// Attempts login and swaps to the authenticated AppShell on success.
-    /// </summary>
-    private async void OnLoginClicked(object sender, EventArgs e)
-    {
-        bool success = await _vm.LoginAsync();
-
-        if (!success)
-        {
-            await DisplayAlert("Login Failed", "Invalid credentials", "OK");
-            return;
-        }
-
-        // 🔄 Swap out shell to the main authenticated view
-        Application.Current.MainPage = _appShell;
-
-        await Task.Delay(50); // Let the UI settle
-        await _nav.GoToAsync("//home"); // 👈 Clean navigation
-    }
+   
 
     /// <summary>
     /// Called when the Register button is clicked.

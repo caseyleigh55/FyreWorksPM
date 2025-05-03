@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // =====================
 // JWT Auth Configuration 🔐
 // =====================
-var jwtKey = builder.Configuration["Jwt:Key"] ?? "SuperSecretKeyYouShouldChange"; // Replace in appsettings.json later
+var jwtKey = builder.Configuration["Jwt:Key"] ?? "SuperSecretKeyYouShouldChange";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "FyreWorksPMApi";
 
 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
@@ -22,7 +22,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // for dev only!
+    options.RequireHttpsMetadata = false; // For development only
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -36,14 +36,14 @@ builder.Services.AddAuthentication(options =>
 });
 
 // =====================
-// Swagger + Bearer Support
+// Swagger + Bearer Support 🧪
 // =====================
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "FyreWorksPM API", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme.\r\n\r\nEnter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer abc123\"",
+        Description = "JWT Authorization header using the Bearer scheme.\r\n\r\nEnter 'Bearer' [space] and then your token.\r\n\r\nExample: \"Bearer abc123\"",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
@@ -80,12 +80,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.MapOpenApi();
+    app.MapOpenApi(); // << moved inside dev check
 }
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication(); // 🔐 Add BEFORE UseAuthorization!
+app.UseAuthentication(); // 🔐 Before UseAuthorization
 app.UseAuthorization();
 
 app.MapControllers();

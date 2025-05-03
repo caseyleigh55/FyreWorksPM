@@ -16,7 +16,7 @@ public class NavigationService : INavigationService
     }
 
     public async Task GoToAsync(string route, bool animate = true)
-    {
+    {        
         await Shell.Current.GoToAsync(route, animate);
     }
 

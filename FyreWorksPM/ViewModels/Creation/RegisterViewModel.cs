@@ -23,17 +23,25 @@ public class RegisterViewModel : ViewModelBase
 
     // Command bound to the registration button
     public ICommand RegisterCommand { get; }
+    public ICommand GoToLoginCommand { get; }
 
     /// <summary>
     /// Constructor for RegisterViewModel.
     /// Injects DB context and navigation service via DI.
     /// </summary>
-    public RegisterViewModel(ApplicationDbContext db, INavigationService navigation)
+    public RegisterViewModel(INavigationService navigation)
     {
-        _db = db;
+       
         _navigation = navigation;
 
         RegisterCommand = new Command(async () => await RegisterAsync());
+        GoToLoginCommand = new Command(async () => await ReturnToLogin());
+
+    }
+
+    private async Task ReturnToLogin()
+    {
+        await _navigation.GoToAsync("//login");
     }
 
     /// <summary>
@@ -88,4 +96,6 @@ public class RegisterViewModel : ViewModelBase
         // 🔄 Navigate to login page using the navigation service
         await _navigation.GoToAsync("login");
     }
+
+    
 }
