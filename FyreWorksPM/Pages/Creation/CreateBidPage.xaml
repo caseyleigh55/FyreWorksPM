@@ -22,15 +22,16 @@
 
                     <!-- Bid Number -->                    
                     <Entry 
-                          Text="{Binding BidNumber}" 
-                          Placeholder="Bid Number (e.g. B-001)" 
-                          IsReadOnly="True" 
-                          BackgroundColor="Black"
-                          TextColor="White"/>
-
+                        Text="{Binding BidNumber}" 
+                        Placeholder="Bid Number (e.g. B-001)" 
+                        IsReadOnly="True" 
+                        BackgroundColor="Black"
+                        TextColor="White"/>
+                    
                     <!-- Project Name -->
-                    <Entry Placeholder="Project Name"
-                           Text="{Binding JobName}" />
+                    <Entry
+                        Placeholder="Project Name"
+                        Text="{Binding ProjectName, Mode=TwoWay}" />
 
                     <!-- Client Picker + Add Client Button -->
                     <Grid ColumnDefinitions="3*,Auto" ColumnSpacing="10">

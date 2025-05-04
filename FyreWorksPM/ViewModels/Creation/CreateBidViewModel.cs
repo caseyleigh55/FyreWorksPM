@@ -133,8 +133,8 @@ public partial class CreateBidViewModel : ViewModelBase
         SaveBidCommand = new RelayCommand(async () => await SaveBidAsync());
 
 
-        // Load initial data in parallel
-        _ = InitializeAsync();
+        // Call async init safely
+        Task.Run(async () => await InitializeAsync());
     }
 
     private async Task InitializeAsync()
@@ -237,9 +237,17 @@ public partial class CreateBidViewModel : ViewModelBase
 
     private async Task SaveBidAsync()
     {
+        
         if (string.IsNullOrWhiteSpace(BidNumber) || string.IsNullOrWhiteSpace(ProjectName) || SelectedClient == null)
         {
-            await Shell.Current.DisplayAlert("Missing Info", "Please fill in all required fields.", "OK");
+
+            //await Shell.Current.DisplayAlert("Missing Info", "Please fill in all required fields.", "OK");
+            await Shell.Current.DisplayAlert(
+    "Missing Info",
+    $"Fields:\nBidNumber: '{BidNumber}'\nProjectName: '{ProjectName}'\nClient: '{SelectedClient?.Name}'",
+    "OK");
+
+
             return;
         }
 
