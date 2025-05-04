@@ -3,6 +3,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using FyreWorksPM.DataAccess.Data;
 using FyreWorksPM.DataAccess.Data.Models;
+using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.Pages.Creation;
 using FyreWorksPM.Services.Client;
 using FyreWorksPM.Services.Item;
@@ -41,11 +42,11 @@ public partial class CreateBidViewModel : ViewModelBase
     /// </summary>
     public ObservableCollection<ClientModel> Clients { get; set; } = new();
 
-    public ObservableCollection<ItemModel> AvailableItems { get; set; } = new();
+    public ObservableCollection<ItemDto> AvailableItems { get; set; } = new();
     public ObservableCollection<BidLineItemModel> LineItems { get; set; } = new();
 
-    private ItemModel _selectedItemFromLibrary;
-    public ItemModel SelectedItemFromLibrary
+    private ItemDto _selectedItemFromLibrary;
+    public ItemDto SelectedItemFromLibrary
     {
         get => _selectedItemFromLibrary;
         set
@@ -56,7 +57,7 @@ public partial class CreateBidViewModel : ViewModelBase
                 LineItems.Add(new BidLineItemModel
                 {
                     ItemName = value.Name,
-                    UnitCost = value.UnitCost,
+                    UnitCost = 0,
                     Quantity = 1,
                     MarkupPercent = 0
                 });
@@ -174,9 +175,8 @@ public partial class CreateBidViewModel : ViewModelBase
     /// </summary>
     private async Task OpenItemLibraryAsync()
     {
-        var db = new ApplicationDbContextFactory().CreateDbContext(Array.Empty<string>());
-        var itemService = new ItemService(db);
-        var itemTypeService = new ItemTypeService(db);
+        var itemService = App.Services.GetRequiredService<IItemService>();
+        var itemTypeService = App.Services.GetRequiredService<IItemTypeService>();
         var vm = new CreateItemsViewModel(itemService, itemTypeService);
 
         await Shell.Current.Navigation.PushAsync(new CreateItemsPage(vm, item =>

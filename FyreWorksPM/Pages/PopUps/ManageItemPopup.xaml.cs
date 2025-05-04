@@ -1,4 +1,6 @@
 using FyreWorksPM.ViewModels.Solitary;
+using FyreWorksPM.Services.Item;
+using FyreWorksPM.DataAccess.DTO;
 
 namespace FyreWorksPM.Pages.PopUps;
 
@@ -9,18 +11,15 @@ namespace FyreWorksPM.Pages.PopUps;
 public partial class ManageItemPopup : ContentPage
 {
     /// <summary>
-    /// Initializes the popup and sets its binding context.
+    /// Initializes the popup with the item to edit and post-save callback.
+    /// Resolves the item service via DI.
     /// </summary>
-    /// <param name="viewModel">The ViewModel used to edit the selected item.</param>
-    public ManageItemPopup(ManageItemPopupViewModel viewModel)
+    public ManageItemPopup(ItemDto item, Func<Task> onSaved, IItemService service)
     {
-        InitializeComponent();
+        InitializeComponent();        
 
-        // Directly bind the passed ViewModel to this popup's context
-        BindingContext = viewModel;
-
-        // If you wanted to prevent edits from auto-updating the original object
-        // you could bind to a copy of the ViewModel here instead.
+        // Set up the ViewModel
+        BindingContext = new ManageItemPopupViewModel(item, onSaved, service);
     }
 
     /// <summary>

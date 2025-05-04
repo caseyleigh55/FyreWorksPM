@@ -46,14 +46,23 @@ public static class MauiProgram
 
         builder.Services.AddHttpClient<RegisterViewModel>(); // ⚠️ Used to inject HttpClient into RegisterViewModel
 
+        builder.Services.AddHttpClient<IItemTypeService, ItemTypeService>(client =>
+        {
+            client.BaseAddress = new Uri(ApiConfig.BaseUrl);
+        });
+    
+        builder.Services.AddHttpClient<IItemService, ItemService>(client =>
+        {
+            client.BaseAddress = new Uri(ApiConfig.BaseUrl);
+        });
+
+
         // ============================
         // 🔧 Core Services
         // ============================
         builder.Services.AddSingleton<App>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
-        builder.Services.AddSingleton<ILoadingService, LoadingService>();
-        builder.Services.AddSingleton<IItemService, ItemService>();
-        builder.Services.AddSingleton<IItemTypeService, ItemTypeService>();
+        builder.Services.AddSingleton<ILoadingService, LoadingService>();        
 
         // ============================
         // 🐚 Shells
@@ -73,9 +82,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<ServicePage>();
 
         // Creation Pages
-        builder.Services.AddSingleton<CreateBidPage>();
-        builder.Services.AddSingleton<CreateClientPage>();
-        builder.Services.AddSingleton<CreateItemsPage>();
+        builder.Services.AddTransient<CreateBidPage>();
+        builder.Services.AddTransient<CreateClientPage>();
+        builder.Services.AddTransient<CreateItemsPage>();
         builder.Services.AddTransient<RegisterPage>();
 
         // Pop-Up Pages
@@ -101,13 +110,13 @@ public static class MauiProgram
         builder.Services.AddSingleton<ServicePageViewModel>();
 
         // Creation ViewModels
-        builder.Services.AddSingleton<CreateBidViewModel>();
-        builder.Services.AddSingleton<CreateClientViewModel>();
-        builder.Services.AddSingleton<CreateItemsViewModel>();
+        builder.Services.AddTransient<CreateBidViewModel>();
+        builder.Services.AddTransient<CreateClientViewModel>();
+        builder.Services.AddTransient<CreateItemsViewModel>();
 
         // Pop-Up ViewModels
-        builder.Services.AddSingleton<ManageItemPopupViewModel>();
-        builder.Services.AddSingleton<ManageItemTypesPopupViewModel>();
+        builder.Services.AddTransient<ManageItemPopupViewModel>();
+        builder.Services.AddTransient<ManageItemTypesPopupViewModel>();
 
         // ============================
         // 🏁 Build & Return

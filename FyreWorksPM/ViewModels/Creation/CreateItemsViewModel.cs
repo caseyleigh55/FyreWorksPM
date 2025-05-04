@@ -3,33 +3,31 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
-using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.Services.Item;
 using FyreWorksPM.Pages.PopUps;
 using FyreWorksPM.ViewModels.Solitary;
+using FyreWorksPM.DataAccess.DTO;
+using Microsoft.Maui.ApplicationModel;
+using System.Xml.Linq;
 
 namespace FyreWorksPM.ViewModels.Creation;
 
 /// <summary>
 /// ViewModel for creating, displaying, filtering, and managing items.
-/// Interacts with IItemService and IItemTypeService instead of direct database access.
+/// Now fully API-powered using DTOs.
 /// </summary>
 public partial class CreateItemsViewModel : INotifyPropertyChanged
 {
     private readonly IItemService _itemService;
     private readonly IItemTypeService _itemTypeService;
 
-    /// <summary>
-    /// Callback to notify parent page when an item is selected.
-    /// </summary>
-    public Action<ItemModel>? ItemSelectedCallback { get; set; }
+    public Action<ItemDto>? ItemSelectedCallback { get; set; }
 
     public CreateItemsViewModel(IItemService itemService, IItemTypeService itemTypeService)
     {
         _itemService = itemService;
         _itemTypeService = itemTypeService;
 
-        // Load initial data
         _ = LoadItemTypesAsync();
         _ = LoadItemsAsync();
     }
@@ -41,8 +39,8 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
     public string SelectedItemType { get => _selectedItemType; set { SetProperty(ref _selectedItemType, value); FilterItems(); } }
     public string SearchText { get => _searchText; set { SetProperty(ref _searchText, value); FilterItems(); } }
 
-    private ItemModel? _selectedItem;
-    public ItemModel? SelectedItem
+    private ItemDto? _selectedItem;
+    public ItemDto? SelectedItem
     {
         get => _selectedItem;
         set
@@ -54,8 +52,8 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
         }
     }
 
-    public ObservableCollection<ItemModel> Items { get; set; } = new();
-    public ObservableCollection<ItemModel> FilteredItems { get; set; } = new();
+    public ObservableCollection<ItemDto> Items { get; set; } = new();
+    public ObservableCollection<ItemDto> FilteredItems { get; set; } = new();
     public ObservableCollection<string> ItemTypes { get; set; } = new();
     public ObservableCollection<string> FilteredItemTypes { get; set; } = new();
 
@@ -83,9 +81,6 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
 
     #region ========== Filtering Logic ==========
 
-    /// <summary>
-    /// Filters the item type suggestions as the user types.
-    /// </summary>
     public void FilterItemTypeSuggestions(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -106,15 +101,12 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
         AreSuggestionsVisible = FilteredItemTypes.Any();
     }
 
-    /// <summary>
-    /// Filters the displayed list of items based on search and selected type.
-    /// </summary>
     private void FilterItems()
     {
         var filtered = Items
             .Where(i =>
                 (string.IsNullOrWhiteSpace(SearchText) || i.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) &&
-                (string.IsNullOrWhiteSpace(SelectedItemType) || (i.ItemType != null && i.ItemType.Name == SelectedItemType)))
+                (string.IsNullOrWhiteSpace(SelectedItemType) || i.ItemTypeName == SelectedItemType))
             .ToList();
 
         FilteredItems.Clear();
@@ -122,9 +114,6 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
             FilteredItems.Add(item);
     }
 
-    /// <summary>
-    /// Selects an item type from the suggestion list.
-    /// </summary>
     private void SelectItemType(string type)
     {
         SelectedItemType = type;
@@ -141,9 +130,6 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
 
     #region ========== Data Loading ==========
 
-    /// <summary>
-    /// Loads available item types.
-    /// </summary>
     private async Task LoadItemTypesAsync()
     {
         var types = await _itemTypeService.GetAllItemTypeNamesAsync();
@@ -158,24 +144,24 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
         });
     }
 
-    /// <summary>
-    /// Loads all items into the Items collection.
-    /// </summary>
     private async Task LoadItemsAsync()
     {
         var items = await _itemService.GetAllItemsAsync();
 
-        Items = new ObservableCollection<ItemModel>(items);
-        FilterItems();
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            Items.Clear();
+            foreach (var item in items)
+                Items.Add(item);
+
+            FilterItems();
+        });
     }
 
     #endregion
 
     #region ========== Add / Remove / Edit Items ==========
 
-    /// <summary>
-    /// Adds a new item using the service layer.
-    /// </summary>
     private async Task AddItemAsync()
     {
         if (string.IsNullOrWhiteSpace(Name) ||
@@ -185,16 +171,14 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
             return;
         }
 
-        await _itemService.AddItemAsync(new ItemModel
+        var dto = new CreateItemDto
         {
             Name = Name,
             Description = Description,
-            ItemType = new ItemTypeModel
-            {
-                Name = SelectedItemType,
-                Items = new List<ItemModel>() // Required property, even if it's empty
-            }
-        });
+            ItemTypeName = SelectedItemType
+        };
+
+        await _itemService.AddItemAsync(dto);
 
         await LoadItemsAsync();
         await LoadItemTypesAsync();
@@ -204,19 +188,8 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
         SelectedItemType = string.Empty;
 
         FilterItemTypeSuggestions(string.Empty);
-
-        // Focus back on name field if available
-        if (Application.Current.MainPage is Shell shell &&
-            shell.CurrentPage is not null &&
-            shell.CurrentPage.BindingContext is CreateItemsViewModel vm)
-        {
-            // You can optionally implement a Focus method on your page
-        }
     }
 
-    /// <summary>
-    /// Removes the currently selected item.
-    /// </summary>
     private async Task RemoveSelectedItemAsync()
     {
         if (SelectedItem == null)
@@ -231,16 +204,13 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
         await LoadItemTypesAsync();
     }
 
-    /// <summary>
-    /// Edits the currently selected item via popup.
-    /// </summary>
     [RelayCommand]
     private async Task EditSelectedItemAsync()
     {
         if (SelectedItem == null)
             return;
 
-        var popup = new ManageItemPopup(new ManageItemPopupViewModel(
+        var popup = new ManageItemPopup(
             SelectedItem,
             async () =>
             {
@@ -248,10 +218,12 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
                 await LoadItemTypesAsync();
                 FilterItemTypeSuggestions(SearchText);
                 FilterItems();
-            }));
+            },
+            _itemService); // 👈 this is the missing 3rd parameter!
 
         await Shell.Current.Navigation.PushAsync(popup);
     }
+
 
     #endregion
 

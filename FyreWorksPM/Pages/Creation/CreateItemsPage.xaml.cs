@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Input;
 using Windows.System;
 #endif
 
+using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.ViewModels.Creation;
 
 namespace FyreWorksPM.Pages.Creation;
@@ -11,7 +12,7 @@ namespace FyreWorksPM.Pages.Creation;
 public partial class CreateItemsPage : ContentPage
 {
     private int _suggestionIndex = -1;
-    private readonly Action<ItemModel>? _onItemSelected;
+    private readonly Action<ItemDto>? _onItemSelected;
 
 
     /// <summary>
@@ -19,7 +20,7 @@ public partial class CreateItemsPage : ContentPage
     /// </summary>
     /// <param name="vm">The ItemsViewModel for this page.</param>
     /// <param name="onItemSelected">Optional callback to fire when an item is selected from the list.</param>
-    public CreateItemsPage(CreateItemsViewModel vm, Action<ItemModel>? onItemSelected = null)
+    public CreateItemsPage(CreateItemsViewModel vm, Action<ItemDto>? onItemSelected = null)
     {
         InitializeComponent();
         BindingContext = vm;
@@ -48,7 +49,7 @@ public partial class CreateItemsPage : ContentPage
     /// Fires callback and optionally closes the page.
     /// </summary>
     /// <param name="item">The item selected by the user.</param>
-    private async void OnItemSelectedInternal(ItemModel item)
+    private async void OnItemSelectedInternal(ItemDto item)
     {
         _onItemSelected?.Invoke(item);
         await Shell.Current.Navigation.PopAsync();

@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using FyreWorksPM.DataAccess.Data;
-using FyreWorksPM.DataAccess.Data.Models;
+using FyreWorksPM.DataAccess.DTO;
+using FyreWorksPM.Services.Item;
 
 namespace FyreWorksPM.ViewModels.Solitary;
 
@@ -30,27 +30,26 @@ public partial class ManageItemPopupViewModel : ObservableObject
 
     #endregion
 
-    private readonly ItemModel _item;
+    private readonly ItemDto _item;
     private readonly Func<Task> _onSaved;
+    private readonly IItemService _itemService;
 
     /// <summary>
-    /// Constructor for popup ViewModel. Takes the item being edited and a callback for post-save refresh.
+    /// Constructor for popup ViewModel. Takes the item being edited, a callback, and the injected item service.
     /// </summary>
-    /// <param name="item">The item to be edited.</param>
-    /// <param name="onSaved">Callback executed after a successful save (usually triggers a UI refresh).</param>
-    public ManageItemPopupViewModel(ItemModel item, Func<Task> onSaved)
+    public ManageItemPopupViewModel(ItemDto item, Func<Task> onSaved, IItemService itemService)
     {
         _item = item;
         _onSaved = onSaved;
+        _itemService = itemService;
 
         name = item.Name;
         description = item.Description;
-        itemTypeName = item.ItemType?.Name ?? string.Empty;
+        itemTypeName = item.ItemTypeName;
     }
 
     /// <summary>
-    /// Saves changes made to the item and its associated type.
-    /// Adds new item types if they don't already exist.
+    /// Saves changes made to the item using the API.
     /// Triggers a UI refresh and closes the popup.
     /// </summary>
     [RelayCommand]
@@ -58,30 +57,19 @@ public partial class ManageItemPopupViewModel : ObservableObject
     {
         _item.Name = Name;
         _item.Description = Description;
+        _item.ItemTypeName = ItemTypeName;
 
-        using var db = new ApplicationDbContextFactory().CreateDbContext(Array.Empty<string>());
-
-        // Look up or create the ItemType
-        var existingType = db.ItemTypes.FirstOrDefault(t => t.Name.ToLower() == ItemTypeName.ToLower());
-        if (existingType == null)
+        // Call the API via IItemService
+        var dto = new CreateItemDto
         {
-            existingType = new ItemTypeModel
-            {
-                Name = ItemTypeName,
-                Items = new List<ItemModel>()
-            };
+            Name = _item.Name,
+            Description = _item.Description,
+            ItemTypeName = _item.ItemTypeName
+        };
 
-            db.ItemTypes.Add(existingType);
-            await db.SaveChangesAsync(); // Save to assign Id
-        }
+        await _itemService.UpdateItemAsync(_item.Id, dto);
 
-        // Link item to the type
-        _item.ItemType = existingType;
-
-        db.Items.Update(_item);
-        await db.SaveChangesAsync();
-
-        // Trigger the refresh callback from ItemsViewModel
+        // Notify parent to refresh the list
         if (_onSaved != null)
             await _onSaved.Invoke();
 

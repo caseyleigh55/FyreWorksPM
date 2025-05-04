@@ -1,18 +1,17 @@
 using FyreWorksPM.DataAccess.Data;
+using FyreWorksPM.Services.Item;
 using FyreWorksPM.ViewModels.Solitary;
 
 namespace FyreWorksPM.Pages.PopUps;
 
 public partial class ManageItemTypesPopup : ContentPage
 {
-    public ManageItemTypesPopup()
+    private readonly IItemTypeService _service;
+
+    public ManageItemTypesPopup(IItemTypeService service)
     {
         InitializeComponent();
-
-        // Manually wire up the service
-        var db = new ApplicationDbContextFactory().CreateDbContext(Array.Empty<string>());
-        var service = new ItemTypeService(db);
-
+        _service = service;
         BindingContext = new ManageItemTypesPopupViewModel(service);
     }
 }

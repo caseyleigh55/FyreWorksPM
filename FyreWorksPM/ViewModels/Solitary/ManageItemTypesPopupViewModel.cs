@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input;
 using FyreWorksPM.DataAccess.Data.Models;
+using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.Services.Item;
 
 namespace FyreWorksPM.ViewModels.Solitary;
@@ -18,7 +19,8 @@ public partial class ManageItemTypesPopupViewModel
     /// <summary>
     /// Observable collection of item types bound to the UI.
     /// </summary>
-    public ObservableCollection<ItemTypeModel> ItemTypes { get; set; } = new();
+    public ObservableCollection<ItemTypeDto> ItemTypes { get; set; } = new();
+
 
     /// <summary>
     /// Constructor that initializes the ViewModel and loads item types.
@@ -55,10 +57,10 @@ public partial class ManageItemTypesPopupViewModel
     [RelayCommand]
     private void AddNewType()
     {
-        ItemTypes.Add(new ItemTypeModel
+        ItemTypes.Add(new ItemTypeDto
         {
-            Name = string.Empty,
-            Items = new List<ItemModel>()
+            Id = 0, // optional, since it's new
+            Name = string.Empty
         });
     }
 
@@ -67,21 +69,22 @@ public partial class ManageItemTypesPopupViewModel
     /// </summary>
     /// <param name="itemType">The item type to save.</param>
     [RelayCommand]
-    private async Task Save(ItemTypeModel itemType)
+    private async Task Save(ItemTypeDto itemType)
     {
         if (!string.IsNullOrWhiteSpace(itemType.Name))
         {
             await _itemTypeService.UpdateItemTypeAsync(itemType);
-            await LoadItemTypesAsync(); // Optional: Refresh the list after save
+            await LoadItemTypesAsync();
         }
     }
+
 
     /// <summary>
     /// Deletes the specified item type by ID.
     /// </summary>
     /// <param name="itemType">The item type to delete.</param>
     [RelayCommand]
-    private async Task Delete(ItemTypeModel itemType)
+    private async Task Delete(ItemTypeDto itemType)
     {
         await _itemTypeService.DeleteItemTypeAsync(itemType.Id);
         ItemTypes.Remove(itemType);

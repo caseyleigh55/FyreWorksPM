@@ -1,15 +1,39 @@
-﻿using FyreWorksPM.DataAccess.Data.Models;
+﻿using FyreWorksPM.DataAccess.DTO;
 
-namespace FyreWorksPM.Services.Item
+namespace FyreWorksPM.Services.Item;
+
+/// <summary>
+/// Contract for interacting with item types via API.
+/// </summary>
+public interface IItemTypeService
 {
-    public interface IItemTypeService
-    {
-        Task<List<ItemTypeModel>> GetAllItemTypesAsync();
-        Task<List<string>> GetAllItemTypeNamesAsync();
+    /// <summary>
+    /// Gets all item types.
+    /// </summary>
+    Task<List<ItemTypeDto>> GetAllItemTypesAsync();
 
-        Task<ItemTypeModel?> GetItemTypeByIdAsync(int id);
-        Task AddItemTypeAsync(ItemTypeModel itemType);
-        Task UpdateItemTypeAsync(ItemTypeModel itemType);
-        Task DeleteItemTypeAsync(int id);
-    }
+    /// <summary>
+    /// Gets a list of item type names.
+    /// </summary>
+    Task<List<string>> GetAllItemTypeNamesAsync();
+
+    /// <summary>
+    /// Gets a single item type by ID.
+    /// </summary>
+    Task<ItemTypeDto?> GetItemTypeByIdAsync(int id);
+
+    /// <summary>
+    /// Adds a new item type.
+    /// </summary>
+    Task AddItemTypeAsync(ItemTypeDto itemType);
+
+    /// <summary>
+    /// Updates an existing item type.
+    /// </summary>
+    Task UpdateItemTypeAsync(ItemTypeDto itemType);
+
+    /// <summary>
+    /// Deletes an item type by ID.
+    /// </summary>
+    Task DeleteItemTypeAsync(int id);
 }

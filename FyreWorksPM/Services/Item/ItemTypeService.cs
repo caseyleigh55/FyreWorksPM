@@ -1,54 +1,90 @@
-﻿using FyreWorksPM.DataAccess.Data;
+﻿using System.Net.Http.Json;
 using FyreWorksPM.DataAccess.Data.Models;
-using FyreWorksPM.Services.Item;
-using Microsoft.EntityFrameworkCore;
+using FyreWorksPM.DataAccess.DTO;
 
+namespace FyreWorksPM.Services.Item;
+
+/// <summary>
+/// API-based implementation of IItemTypeService using HttpClient.
+/// </summary>
 public class ItemTypeService : IItemTypeService
 {
-    private readonly ApplicationDbContext _db;
+    private readonly HttpClient _http;
 
-    public ItemTypeService(ApplicationDbContext db)
+    public ItemTypeService(HttpClient http)
     {
-        _db = db;
+        _http = http;
     }
 
+    /// <summary>
+    /// Returns all item type DTOs from the API.
+    /// </summary>
+    public async Task<List<ItemTypeDto>> GetAllItemTypesAsync()
+    {
+        var response = await _http.GetAsync("api/itemtypes");
+        response.EnsureSuccessStatusCode();
+
+        var types = await response.Content.ReadFromJsonAsync<List<ItemTypeDto>>();
+        return types ?? new List<ItemTypeDto>();
+    }
+
+    /// <summary>
+    /// Returns just the names of all item types.
+    /// </summary>
     public async Task<List<string>> GetAllItemTypeNamesAsync()
     {
-        return await _db.ItemTypes
-            .Select(t => t.Name)
-            .Distinct()
-            .ToListAsync();
+        var types = await GetAllItemTypesAsync();
+        return types.Select(t => t.Name).Distinct().ToList();
     }
 
-    public async Task<List<ItemTypeModel>> GetAllItemTypesAsync()
+    /// <summary>
+    /// Gets one item type by ID.
+    /// </summary>
+    public async Task<ItemTypeDto?> GetItemTypeByIdAsync(int id)
     {
-        return await _db.ItemTypes.ToListAsync();
+        var response = await _http.GetAsync($"api/itemtypes/{id}");
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        return await response.Content.ReadFromJsonAsync<ItemTypeDto>();
     }
 
-    public async Task<ItemTypeModel?> GetItemTypeByIdAsync(int id)
+    /// <summary>
+    /// Adds a new item type via API.
+    /// </summary>
+    public async Task AddItemTypeAsync(ItemTypeDto itemType)
     {
-        return await _db.ItemTypes.FindAsync(id);
+        var dto = new CreateItemTypeDto { Name = itemType.Name };
+        var response = await _http.PostAsJsonAsync("api/itemtypes", dto);
+        response.EnsureSuccessStatusCode();
     }
 
-    public async Task AddItemTypeAsync(ItemTypeModel itemType)
+    /// <summary>
+    /// Updates an item type by ID.
+    /// </summary>
+    public async Task UpdateItemTypeAsync(ItemTypeDto itemType)
     {
-        _db.ItemTypes.Add(itemType);
-        await _db.SaveChangesAsync();
+        var dto = new CreateItemTypeDto { Name = itemType.Name };
+        var response = await _http.PutAsJsonAsync($"api/itemtypes/{itemType.Id}", dto);
+        response.EnsureSuccessStatusCode();
     }
 
-    public async Task UpdateItemTypeAsync(ItemTypeModel itemType)
-    {
-        _db.ItemTypes.Update(itemType);
-        await _db.SaveChangesAsync();
-    }
-
+    /// <summary>
+    /// Deletes an item type by ID.
+    /// </summary>
     public async Task DeleteItemTypeAsync(int id)
     {
-        var itemType = await _db.ItemTypes.FindAsync(id);
-        if (itemType != null)
-        {
-            _db.ItemTypes.Remove(itemType);
-            await _db.SaveChangesAsync();
-        }
+        var response = await _http.DeleteAsync($"api/itemtypes/{id}");
+        response.EnsureSuccessStatusCode();
+    }
+
+    public Task AddItemTypeAsync(ItemTypeModel itemType)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task UpdateItemTypeAsync(ItemTypeModel itemType)
+    {
+        throw new NotImplementedException();
     }
 }

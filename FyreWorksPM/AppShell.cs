@@ -34,51 +34,47 @@ public partial class AppShell : Shell
     private void BuildShellLayout()
     {
         // 🏠 Home Page Tab
-        var homePage = App.Services.GetRequiredService<HomePage>();
         Items.Add(new ShellContent
         {
             Title = "Home",
-            Content = homePage,
+            ContentTemplate = new DataTemplate(() =>
+                App.Services.GetRequiredService<HomePage>()),
             Route = "home"
         });
 
         // 🧾 Bids Page Tab
-        var bidsPage = App.Services.GetRequiredService<BidsPage>();
         Items.Add(new ShellContent
         {
             Title = "Bids",
-            Content = bidsPage,
+            ContentTemplate = new DataTemplate(() =>
+                App.Services.GetRequiredService<BidsPage>()),
             Route = "bids"
         });
 
-        //=============================================================
-        //
-        // 🧪 TEMP: Expose CreateItemsPage directly for manual testing
-        //
-        //=============================================================
-        var itemsPage = App.Services.GetRequiredService<CreateItemsPage>();
+        // 🧪 TEMP: CreateItemsPage Tab
         Items.Add(new ShellContent
         {
-            Title = "🔧 Manage Items (Temp)",
-            Content = itemsPage,
-            Route = "createitems" // still register route in case we navigate programmatically later
+            Title = "🔧 CreateItems (Temp)",
+            ContentTemplate = new DataTemplate(() =>
+                App.Services.GetRequiredService<CreateItemsPage>()),
+            Route = "createitems"
         });
 
         // 🛠 Projects Tab
-        var projectsPage = App.Services.GetRequiredService<ProjectsPage>();
         Items.Add(new ShellContent
         {
             Title = "Projects",
-            Content = projectsPage,
+            ContentTemplate = new DataTemplate(() =>
+                App.Services.GetRequiredService<ProjectsPage>()),
             Route = "projects"
         });
 
         // 🔧 Services Tab
-        var servicePage = App.Services.GetRequiredService<ServicePage>();
         Items.Add(new ShellContent
         {
             Title = "Services",
-            Content = servicePage,
+            ContentTemplate = new DataTemplate(() =>
+                App.Services.GetRequiredService<ServicePage>()),
             Route = "services"
         });
 
@@ -89,12 +85,11 @@ public partial class AppShell : Shell
             Command = new Command(async () =>
             {
                 await _authService.LogoutAsync();
-
-                // 🔄 Reset to LoginShell after logout
                 Application.Current.MainPage = new LoginShell(_authService);
             })
         });
     }
+
 
     // ===============================
     // 🧭 Route Registration
