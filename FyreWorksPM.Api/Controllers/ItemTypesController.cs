@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using FyreWorksPM.DataAccess.Data;
 using FyreWorksPM.DataAccess.Data.Models;
-using FyreWorksPM.Api.DTO;
+using FyreWorksPM.DataAccess.DTO;
 
 namespace FyreWorksPM.Api.Controllers;
 

@@ -11,6 +11,7 @@ using FyreWorksPM.Services.Navigation;
 using FyreWorksPM.Services.Common;
 using FyreWorksPM.Configuration;
 using FyreWorksPM.Services.Item;
+using FyreWorksPM.Services.Client;
 
 namespace FyreWorksPM;
 
@@ -52,6 +53,11 @@ public static class MauiProgram
         });
     
         builder.Services.AddHttpClient<IItemService, ItemService>(client =>
+        {
+            client.BaseAddress = new Uri(ApiConfig.BaseUrl);
+        });
+
+        builder.Services.AddHttpClient<IClientService, ClientService>(client =>
         {
             client.BaseAddress = new Uri(ApiConfig.BaseUrl);
         });

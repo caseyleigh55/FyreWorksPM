@@ -11,11 +11,8 @@ public class ItemService : IItemService
     private readonly HttpClient _http;
 
     public ItemService(HttpClient http)
-    {
-        if (http.BaseAddress == null)
-            throw new InvalidOperationException("HttpClient BaseAddress is not set! DI may be misconfigured.");
+    {        
         _http = http;
-        Console.WriteLine($"BaseAddress: {_http?.BaseAddress}");
     }
 
     /// <summary>

@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
-using FyreWorksPM.DataAccess.Data;
 using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.Pages.Creation;
@@ -28,19 +27,18 @@ public partial class CreateBidViewModel : ViewModelBase
     // ========================================
 
     public string JobName { get => Get<string>(); set => Set(value); }
-    public DateTime CreatedDate { get => Get<DateTime>(); set => Set(value); }
-
-    private ClientModel _selectedClient;
-    public ClientModel SelectedClient
-    {
-        get => _selectedClient;
-        set => Set(value);
-    }
+    public DateTime CreatedDate { get => Get<DateTime>(); set => Set(value); }  
 
     /// <summary>
     /// List of clients for the client picker or autocomplete.
     /// </summary>
-    public ObservableCollection<ClientModel> Clients { get; set; } = new();
+    public ObservableCollection<ClientDto> Clients { get; set; } = new();
+
+    public ClientDto? SelectedClient
+    {
+        get => Get<ClientDto>();
+        set => Set(value);
+    }
 
     public ObservableCollection<ItemDto> AvailableItems { get; set; } = new();
     public ObservableCollection<BidLineItemModel> LineItems { get; set; } = new();
@@ -198,7 +196,7 @@ public partial class CreateBidViewModel : ViewModelBase
     /// Called when a new client is created.
     /// Refreshes the client list and selects the new one.
     /// </summary>
-    public async Task OnClientAddedAsync(ClientModel newClient)
+    public async Task OnClientAddedAsync(ClientDto newClient)
     {
         await LoadClientsAsync();
 

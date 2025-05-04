@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using FyreWorksPM.DataAccess.Data.Models;
+using FyreWorksPM.DataAccess.DTO; // <-- Use DTOs, not EF Models
 using FyreWorksPM.Services.Client;
 
 namespace FyreWorksPM.ViewModels.Creation
@@ -14,7 +14,7 @@ namespace FyreWorksPM.ViewModels.Creation
         // ============ Private Members ===============
         // ============================================
 
-        private readonly IClientService _clientService;       
+        private readonly IClientService _clientService;
 
         // ============================================
         // ============ Public Properties =============
@@ -23,8 +23,7 @@ namespace FyreWorksPM.ViewModels.Creation
         /// <summary>
         /// Optional callback to notify when a new client is successfully added.
         /// </summary>
-        public Func<ClientModel, Task> ClientAddedCallback { get; set; }
-
+        public Func<ClientDto, Task> ClientAddedCallback { get; set; }
 
         /// <summary>
         /// Name of the client.
@@ -56,7 +55,6 @@ namespace FyreWorksPM.ViewModels.Creation
             // ClientAddedCallback will be assigned manually later!
         }
 
-
         // ============================================
         // ============ Commands ======================
         // ============================================
@@ -77,8 +75,8 @@ namespace FyreWorksPM.ViewModels.Creation
                 return;
             }
 
-            // Create the new client model
-            var newClient = new ClientModel
+            // Create the new client DTO
+            var newClientDto = new CreateClientDto
             {
                 Name = ClientName,
                 Contact = ContactName,
@@ -86,12 +84,23 @@ namespace FyreWorksPM.ViewModels.Creation
                 Phone = Phone
             };
 
-            // Save client to database
-            await _clientService.AddClientAsync(newClient);
+            // Save client via API
+            await _clientService.AddClientAsync(newClientDto);
 
-            // Fire callback to notify parent page (before closing)
+            // Optional: You could fetch the newly added client if your API supports returning it
+            // For now, just fire the callback if set
             if (ClientAddedCallback != null)
-                await ClientAddedCallback.Invoke(newClient);
+            {
+                var clientList = await _clientService.GetAllClientsAsync();
+                var addedClient = clientList.LastOrDefault(c =>
+                    c.Name == ClientName &&
+                    c.Contact == ContactName &&
+                    c.Email == Email &&
+                    c.Phone == Phone);
+
+                if (addedClient != null)
+                    await ClientAddedCallback.Invoke(addedClient);
+            }
 
             // Show success confirmation
             await Shell.Current.DisplayAlert("Success", "Client added successfully!", "OK");

@@ -51,6 +51,24 @@ public partial class AppShell : Shell
             Route = "bids"
         });
 
+        // 🧾 Create Bids Page Tab
+        Items.Add(new ShellContent
+        {
+            Title = "CreateBid",
+            ContentTemplate = new DataTemplate(() =>
+                App.Services.GetRequiredService<CreateBidPage>()),
+            Route = "createbid"
+        });
+
+        //🧪 TEMP: CreateClientPage Tab
+        Items.Add(new ShellContent
+        {
+            Title = "CreateClient",
+            ContentTemplate = new DataTemplate(() =>
+                App.Services.GetRequiredService<CreateClientPage>()),
+            Route = "createclient"
+        });
+
         // 🧪 TEMP: CreateItemsPage Tab
         Items.Add(new ShellContent
         {
@@ -104,6 +122,8 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("home", typeof(HomePage));
         Routing.RegisterRoute("bids", typeof(BidsPage));
         Routing.RegisterRoute("createitems", typeof(CreateItemsPage));
+        Routing.RegisterRoute("createclient", typeof(CreateClientPage));
+        Routing.RegisterRoute("createBid", typeof(CreateBidPage));
         Routing.RegisterRoute("projects", typeof(ProjectsPage));
         Routing.RegisterRoute("services", typeof(ServicePage));
         Routing.RegisterRoute("register", typeof(RegisterPage)); // Used by LoginShell
