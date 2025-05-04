@@ -30,7 +30,7 @@ namespace FyreWorksPM.Services.Client
         /// Updates an existing client's information.
         /// </summary>
         /// <param name="client">The client with updated info.</param>
-        Task UpdateClientAsync(ClientDto client);
+        Task UpdateClientAsync(int id, UpdateClientDto client);
 
         /// <summary>
         /// Deletes a client by ID.

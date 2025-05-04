@@ -95,23 +95,23 @@ public class ClientService : IClientService
         response.EnsureSuccessStatusCode();
     }
 
-    Task<List<ClientDto>> IClientService.GetAllClientsAsync()
-    {
-        throw new NotImplementedException();
-    }
+    //Task<List<ClientDto>> IClientService.GetAllClientsAsync()
+    //{
+    //    throw new NotImplementedException();
+    //}
 
-    Task<ClientDto?> IClientService.GetClientByIdAsync(int id)
-    {
-        throw new NotImplementedException();
-    }
+    //Task<ClientDto?> IClientService.GetClientByIdAsync(int id)
+    //{
+    //    throw new NotImplementedException();
+    //}
 
-    public Task AddClientAsync(ClientDto client)
-    {
-        throw new NotImplementedException();
-    }
+    //public Task AddClientAsync(ClientDto client)
+    //{
+    //    throw new NotImplementedException();
+    //}
 
-    public Task UpdateClientAsync(ClientDto client)
-    {
-        throw new NotImplementedException();
-    }
+    //public Task UpdateClientAsync(ClientDto client)
+    //{
+    //    throw new NotImplementedException();
+    //}
 }

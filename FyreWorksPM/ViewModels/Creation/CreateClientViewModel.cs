@@ -85,12 +85,13 @@ namespace FyreWorksPM.ViewModels.Creation
             };
 
             // Save client via API
-            await _clientService.AddClientAsync(newClientDto);
+            var createdClient = await _clientService.AddClientAsync(newClientDto);
 
             // Optional: You could fetch the newly added client if your API supports returning it
             // For now, just fire the callback if set
             if (ClientAddedCallback != null)
             {
+                await ClientAddedCallback.Invoke(createdClient);
                 var clientList = await _clientService.GetAllClientsAsync();
                 var addedClient = clientList.LastOrDefault(c =>
                     c.Name == ClientName &&

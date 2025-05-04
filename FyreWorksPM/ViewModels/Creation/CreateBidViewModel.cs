@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.Pages.Creation;
+using FyreWorksPM.Services.Bid;
 using FyreWorksPM.Services.Client;
 using FyreWorksPM.Services.Item;
 
@@ -21,6 +22,7 @@ public partial class CreateBidViewModel : ViewModelBase
     private readonly IClientService _clientService;
     private readonly IItemService _itemService;
     private readonly IItemTypeService _itemTypeService;
+    private readonly IBidService _bidService;
 
     // ========================================
     // ============== Properties =============
@@ -39,6 +41,20 @@ public partial class CreateBidViewModel : ViewModelBase
         get => Get<ClientDto>();
         set => Set(value);
     }
+
+    public string BidNumber
+    {
+        get => Get<string>();
+        set => Set(value);
+    }
+
+    public string ProjectName
+    {
+        get => Get<string>();
+        set => Set(value);
+    }
+
+
 
     public ObservableCollection<ItemDto> AvailableItems { get; set; } = new();
     public ObservableCollection<BidLineItemModel> LineItems { get; set; } = new();
@@ -86,6 +102,8 @@ public partial class CreateBidViewModel : ViewModelBase
     public ICommand AddLineItemCommand { get; }
     public ICommand OpenItemLibraryCommand { get; }
     public ICommand AddNewClientCommand { get; }
+    public IRelayCommand SaveBidCommand { get; }
+
 
     /// <summary>
     /// Event raised to open the CreateClientPage popup.
@@ -97,10 +115,12 @@ public partial class CreateBidViewModel : ViewModelBase
     // ========================================
 
     public CreateBidViewModel(
+        IBidService bidService,
         IClientService clientService,
         IItemService itemService,
         IItemTypeService itemTypeService)
     {
+        _bidService = bidService;
         _clientService = clientService;
         _itemService = itemService;
         _itemTypeService = itemTypeService;
@@ -110,6 +130,8 @@ public partial class CreateBidViewModel : ViewModelBase
         OpenItemLibraryCommand = new RelayCommand(async () => await OpenItemLibraryAsync());
         AddLineItemCommand = new RelayCommand(AddLineItem);
         AddNewClientCommand = new RelayCommand(async () => await OnRequestAddNewClient());
+        SaveBidCommand = new RelayCommand(async () => await SaveBidAsync());
+
 
         // Load initial data in parallel
         _ = InitializeAsync();
@@ -117,6 +139,8 @@ public partial class CreateBidViewModel : ViewModelBase
 
     private async Task InitializeAsync()
     {
+        var nextBidNumber = await _bidService.GetNextBidNumberAsync();
+        BidNumber = nextBidNumber;
         await Task.WhenAll(LoadClientsAsync(), LoadItemsAsync());
     }
 
@@ -210,4 +234,33 @@ public partial class CreateBidViewModel : ViewModelBase
             }
         });
     }
+
+    private async Task SaveBidAsync()
+    {
+        if (string.IsNullOrWhiteSpace(BidNumber) || string.IsNullOrWhiteSpace(ProjectName) || SelectedClient == null)
+        {
+            await Shell.Current.DisplayAlert("Missing Info", "Please fill in all required fields.", "OK");
+            return;
+        }
+
+        var newBid = new CreateBidDto
+        {
+            BidNumber = BidNumber,
+            ProjectName = ProjectName,
+            ClientId = SelectedClient.Id,
+            CreatedDate = CreatedDate
+        };
+
+        try
+        {
+            await _bidService.CreateBidAsync(newBid);
+            await Shell.Current.DisplayAlert("Success", "Bid saved successfully.", "OK");
+            await Shell.Current.Navigation.PopAsync(); // Or whatever your page closing method is
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Error", $"Could not save bid: {ex.Message}", "OK");
+        }
+    }
+
 }

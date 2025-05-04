@@ -41,5 +41,11 @@ public class ApplicationDbContext : DbContext
     /// </summary>
     public DbSet<ClientModel> Clients { get; set; } = default!;
 
+    /// <summary>
+    /// Table for Bid categories.
+    /// </summary>
+    public DbSet<BidModel> Bids { get; set; }
+
+
     #endregion    
 }

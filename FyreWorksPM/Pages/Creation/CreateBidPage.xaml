@@ -20,9 +20,13 @@
                            FontAttributes="Bold,Italic"
                            TextColor="White" />
 
-                    <!-- Bid Number -->
-                    <Entry Placeholder="Bid Number (e.g. B-001)"
-                           Text="{Binding BidNumber}" />
+                    <!-- Bid Number -->                    
+                    <Entry 
+                          Text="{Binding BidNumber}" 
+                          Placeholder="Bid Number (e.g. B-001)" 
+                          IsReadOnly="True" 
+                          BackgroundColor="Black"
+                          TextColor="White"/>
 
                     <!-- Project Name -->
                     <Entry Placeholder="Project Name"
@@ -36,7 +40,7 @@
                                 Title="Select Client"
                                 ItemsSource="{Binding Clients}"
                                 ItemDisplayBinding="{Binding Name}"
-                                SelectedItem="{Binding SelectedClient}" />
+                                SelectedItem="{Binding SelectedClient, Mode=TwoWay}" />
 
                         <Button Grid.Column="1"
                                 Text="➕ New Client" 
@@ -47,6 +51,17 @@
 
                     <!-- Created Date -->
                     <DatePicker Date="{Binding CreatedDate}" />
+
+                    <Button 
+                            Text="Save Bid"
+                            Command="{Binding SaveBidCommand}"
+                            BackgroundColor="#8e6dc0"
+                            TextColor="White"
+                            Margin="10,20"
+                            CornerRadius="8"
+                            FontAttributes="Bold"/>
+
+
                 </VerticalStackLayout>
             </Border>
 
