@@ -14,11 +14,19 @@
             <Border Stroke="White" BackgroundColor="Black" StrokeThickness="1" Padding="15">
                 <VerticalStackLayout Spacing="10">
 
-                    <Label Text="Bid Information" 
+                    <Grid ColumnDefinitions="3*,Auto" ColumnSpacing="10">
+                    <Label Grid.Column="0" 
+                           Text="Bid Information" 
                            TextDecorations="Underline"
                            FontSize="18"
                            FontAttributes="Bold,Italic"
                            TextColor="White" />
+                        
+                    <HorizontalStackLayout Grid.Column="1"  Spacing="10" VerticalOptions="Center">
+                        <CheckBox IsChecked="{Binding IsActive, Mode=TwoWay}" />
+                        <Label Text="Bid Active" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    </Grid>
 
                     <!-- Bid Number -->                    
                     <Entry 

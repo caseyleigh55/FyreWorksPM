@@ -1,18 +1,85 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
-    x:Class="FyreWorksPM.Pages.Foundation.BidsPage"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Bids">
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FyreWorksPM.Pages.Foundation.BidsPage"
+             Title="Bids">
+    
+    <ScrollView>
+        
+        <VerticalStackLayout Padding="20" Spacing="25">
 
-    <VerticalStackLayout Padding="20" Spacing="20" VerticalOptions="Center">
-        <Label Text="📄 Bids Page"
-               FontSize="24"
-               FontAttributes="Bold"
-               HorizontalOptions="Center" />
+            <!-- 🔥 Active Bids Section -->
+            <Frame BorderColor="DarkGray" CornerRadius="10" Padding="10" HeightRequest="300">
+                <VerticalStackLayout>
+                    <Label Text="🔥 Active Bids" FontSize="18" FontAttributes="Bold" />
 
-        <Label Text="List your bids here..." 
-               FontSize="18"
-               HorizontalOptions="Center" />
-    </VerticalStackLayout>
+                    <!-- Scrollable collection of active bids -->
+                    <ScrollView>
+                        <CollectionView x:Name="ActiveBidsCollectionView"
+                                        SelectionMode="Single"
+                                        ItemsSource="{Binding ActiveBids}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Frame BorderColor="LightGray" Padding="10" Margin="5">
+                                        <Label Text="{Binding ProjectName}" />
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </ScrollView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- ➕ Create New Bid Button (centered between both sections) -->
+            <Button Text="➕ Create New Bid"
+                    Command="{Binding CreateNewBidCommand}"
+                    HorizontalOptions="Center" />
+
+            <!-- ❄️ Inactive Bids Section -->
+            <Frame BorderColor="DarkGray" CornerRadius="10" Padding="10" HeightRequest="300">
+                <VerticalStackLayout>
+                    <Label Text="❄️ Inactive Bids" FontSize="18" FontAttributes="Bold" />
+
+                    <!-- Scrollable collection of inactive bids -->
+                    <ScrollView>
+                        <CollectionView x:Name="InactiveBidsCollectionView"
+                                        SelectionMode="Single"
+                                        ItemsSource="{Binding InactiveBids}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Frame BorderColor="LightGray" Padding="10" Margin="5">
+                                        <Label Text="{Binding ProjectName}" />
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </ScrollView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Bottom Button Row: Edit on Left, Convert on Right -->
+            <Grid ColumnDefinitions="*,*"
+                  Padding="0,10,0,0"
+                  VerticalOptions="End"
+                  HorizontalOptions="FillAndExpand">
+
+                <!-- ✏️ Edit Selected Bid -->
+                <Button Grid.Column="0"
+                        Text="✏️ Edit Selected"
+                        Command="{Binding EditSelectedBidCommand}"
+                        IsEnabled="{Binding SelectedBid, Converter={StaticResource NullToBoolConverter}}"
+                        HorizontalOptions="Start" />
+
+                <!-- 🚀 Convert to Project -->
+                <Button Grid.Column="1"
+                        Text="🚀 Convert to Project"
+                        Command="{Binding ConvertToProjectCommand}"
+                        IsEnabled="{Binding SelectedBid, Converter={StaticResource NullToBoolConverter}}"
+                        HorizontalOptions="End" />
+
+            </Grid>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
 </ContentPage>

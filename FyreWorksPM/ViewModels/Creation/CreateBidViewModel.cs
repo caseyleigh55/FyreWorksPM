@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.Pages.Creation;
@@ -28,6 +29,8 @@ public partial class CreateBidViewModel : ViewModelBase
     // ============== Properties =============
     // ========================================
 
+    [ObservableProperty]
+    private bool isActive = true; // Default to true
     public string JobName { get => Get<string>(); set => Set(value); }
     public DateTime CreatedDate { get => Get<DateTime>(); set => Set(value); }  
 
@@ -131,8 +134,7 @@ public partial class CreateBidViewModel : ViewModelBase
         AddLineItemCommand = new RelayCommand(AddLineItem);
         AddNewClientCommand = new RelayCommand(async () => await OnRequestAddNewClient());
         SaveBidCommand = new RelayCommand(async () => await SaveBidAsync());
-
-
+        
         // Call async init safely
         Task.Run(async () => await InitializeAsync());
     }
@@ -256,7 +258,8 @@ public partial class CreateBidViewModel : ViewModelBase
             BidNumber = BidNumber,
             ProjectName = ProjectName,
             ClientId = SelectedClient.Id,
-            CreatedDate = CreatedDate
+            CreatedDate = CreatedDate,
+            IsActive = this.IsActive // ← Add this line
         };
 
         try

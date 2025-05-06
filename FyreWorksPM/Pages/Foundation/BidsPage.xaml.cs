@@ -1,3 +1,5 @@
+using FyreWorksPM.ViewModels.Foundation;
+
 namespace FyreWorksPM.Pages.Foundation;
 
 /// <summary>
@@ -5,8 +7,9 @@ namespace FyreWorksPM.Pages.Foundation;
 /// </summary>
 public partial class BidsPage : ContentPage
 {
-    public BidsPage()
+    public BidsPage(BidsPageViewModel vm)
     {
         InitializeComponent();
+        BindingContext = vm;
     }
 }

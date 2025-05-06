@@ -47,7 +47,7 @@ public partial class AppShell : Shell
         {
             Title = "Bids",
             ContentTemplate = new DataTemplate(() =>
-                App.Services.GetRequiredService<BidsPage>()),
+            App.Services.GetRequiredService<BidsPage>()),
             Route = "bids"
         });
 

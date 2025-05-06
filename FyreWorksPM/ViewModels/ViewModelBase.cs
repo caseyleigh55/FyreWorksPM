@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace FyreWorksPM.ViewModels
 {
@@ -12,7 +13,7 @@ namespace FyreWorksPM.ViewModels
     /// Uses a backing dictionary for dynamic property storage.
     /// Implements INotifyPropertyChanged to update UI bindings automatically.
     /// </summary>
-    public class ViewModelBase : INotifyPropertyChanged
+    public class ViewModelBase : ObservableObject
     {
         // Backing store for all property values
         private readonly Dictionary<string, object?> _values = new();

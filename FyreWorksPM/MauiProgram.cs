@@ -52,7 +52,7 @@ public static class MauiProgram
         {
             client.BaseAddress = new Uri(ApiConfig.BaseUrl);
         });
-    
+
         builder.Services.AddHttpClient<IItemService, ItemService>(client =>
         {
             client.BaseAddress = new Uri(ApiConfig.BaseUrl);
@@ -68,13 +68,12 @@ public static class MauiProgram
             client.BaseAddress = new Uri(ApiConfig.BaseUrl);
         });
 
-
         // ============================
         // 🔧 Core Services
         // ============================
         builder.Services.AddSingleton<App>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
-        builder.Services.AddSingleton<ILoadingService, LoadingService>();        
+        builder.Services.AddSingleton<ILoadingService, LoadingService>();
 
         // ============================
         // 🐚 Shells
@@ -83,43 +82,17 @@ public static class MauiProgram
         builder.Services.AddSingleton<LoginShell>();
 
         // ============================
-        // 📄 Pages
-        // ============================
-
-        // Foundation Pages
-        builder.Services.AddSingleton<BidsPage>();
-        builder.Services.AddSingleton<HomePage>();
-        builder.Services.AddSingleton<LoginPage>();
-        builder.Services.AddSingleton<ProjectsPage>();
-        builder.Services.AddSingleton<ServicePage>();
-
-        // Creation Pages
-        builder.Services.AddTransient<CreateBidPage>();
-        builder.Services.AddTransient<CreateClientPage>();
-        builder.Services.AddTransient<CreateItemsPage>();
-        builder.Services.AddTransient<RegisterPage>();
-
-        // Pop-Up Pages
-        builder.Services.AddSingleton<ManageItemPopup>();
-        builder.Services.AddSingleton<ManageItemTypesPopup>();
-
-        // Solitary Pages
-        builder.Services.AddSingleton<SelectedBidPage>();
-        builder.Services.AddSingleton<SelectedProjectPage>();
-        builder.Services.AddSingleton<SelectedTicketPage>();
-
-        // ============================
         // 🧠 ViewModels
         // ============================
 
         // Foundation ViewModels
-        builder.Services.AddSingleton<AppShellViewModel>();
-        builder.Services.AddSingleton<BidsPageViewModel>();
-        builder.Services.AddSingleton<HomePageViewModel>();
-        builder.Services.AddSingleton<LoginShellViewModel>();
+        builder.Services.AddTransient<AppShellViewModel>();
+        builder.Services.AddTransient<BidsPageViewModel>();
+        builder.Services.AddTransient<HomePageViewModel>();
+        builder.Services.AddTransient<LoginShellViewModel>();
         builder.Services.AddTransient<LoginViewModel>();
-        builder.Services.AddSingleton<ProjectsPageViewModel>();
-        builder.Services.AddSingleton<ServicePageViewModel>();
+        builder.Services.AddTransient<ProjectsPageViewModel>();
+        builder.Services.AddTransient<ServicePageViewModel>();
 
         // Creation ViewModels
         builder.Services.AddTransient<CreateBidViewModel>();
@@ -129,6 +102,63 @@ public static class MauiProgram
         // Pop-Up ViewModels
         builder.Services.AddTransient<ManageItemPopupViewModel>();
         builder.Services.AddTransient<ManageItemTypesPopupViewModel>();
+
+        // ============================
+        // 📄 Pages (DI-resolved with ViewModels where needed)
+        // ============================
+
+        // Foundation Pages
+        builder.Services.AddTransient<BidsPage>(provider =>
+        {
+            var vm = provider.GetRequiredService<BidsPageViewModel>();
+            return new BidsPage(vm);
+        });
+        builder.Services.AddTransient<HomePage>();
+        
+        builder.Services.AddTransient<LoginPage>();
+
+        builder.Services.AddTransient<ProjectsPage>(provider =>
+        {
+            var vm = provider.GetRequiredService<ProjectsPageViewModel>();
+            return new ProjectsPage(vm);
+        });
+        builder.Services.AddTransient<ServicePage>(provider =>
+        {
+            var vm = provider.GetRequiredService<ServicePageViewModel>();
+            return new ServicePage(vm);
+        });
+
+        // Creation Pages
+        builder.Services.AddTransient<CreateBidPage>(provider =>
+        {
+            var vm = provider.GetRequiredService<CreateBidViewModel>();
+            var clientPage = provider.GetRequiredService<CreateClientPage>();
+            return new CreateBidPage(vm, clientPage);
+        });
+
+        builder.Services.AddTransient<CreateClientPage>(provider =>
+        {
+            var vm = provider.GetRequiredService<CreateClientViewModel>();
+            return new CreateClientPage(vm);
+        });
+        builder.Services.AddTransient<CreateItemsPage>(provider =>
+        {
+            var vm = provider.GetRequiredService<CreateItemsViewModel>();
+            return new CreateItemsPage(vm);
+        });
+        builder.Services.AddTransient<RegisterPage>();
+
+        // Pop-Up Pages
+        builder.Services.AddTransient<ManageItemPopup>();
+
+        builder.Services.AddTransient<ManageItemTypesPopup>();
+
+        // Solitary Pages
+        builder.Services.AddTransient<SelectedBidPage>();
+        builder.Services.AddTransient<SelectedProjectPage>();
+        builder.Services.AddTransient<SelectedTicketPage>();
+
+        
 
         // ============================
         // 🏁 Build & Return
