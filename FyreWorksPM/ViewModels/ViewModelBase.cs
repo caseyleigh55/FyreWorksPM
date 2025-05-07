@@ -13,8 +13,11 @@ namespace FyreWorksPM.ViewModels
     /// Uses a backing dictionary for dynamic property storage.
     /// Implements INotifyPropertyChanged to update UI bindings automatically.
     /// </summary>
-    public class ViewModelBase : ObservableObject
+    public abstract class ViewModelBase : ObservableObject, IViewModelLifecycle
     {
+        public virtual Task OnAppearingAsync() => Task.CompletedTask;
+        public virtual Task OnDisappearingAsync() => Task.CompletedTask;
+
         // Backing store for all property values
         private readonly Dictionary<string, object?> _values = new();
 
@@ -62,6 +65,6 @@ namespace FyreWorksPM.ViewModels
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        }       
     }
 }

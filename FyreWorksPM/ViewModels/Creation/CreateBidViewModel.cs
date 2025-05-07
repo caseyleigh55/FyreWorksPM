@@ -45,11 +45,15 @@ public partial class CreateBidViewModel : ViewModelBase
         set => Set(value);
     }
 
-    public string BidNumber
-    {
-        get => Get<string>();
-        set => Set(value);
-    }
+    [ObservableProperty]
+    private string bidNumber;
+
+
+    //public string BidNumber
+    //{
+    //    get => Get<string>();
+    //    set => Set(value);
+    //}
 
     public string ProjectName
     {
@@ -177,16 +181,53 @@ public partial class CreateBidViewModel : ViewModelBase
         AddLineItemCommand = new RelayCommand(AddLineItem);
         AddNewClientCommand = new RelayCommand(async () => await OnRequestAddNewClient());
         SaveBidCommand = new RelayCommand(async () => await SaveBidAsync());
-        
-        // Call async init safely
+
         Task.Run(async () => await InitializeAsync());
+
     }
 
     private async Task InitializeAsync()
     {
-        var nextBidNumber = await _bidService.GetNextBidNumberAsync();
-        BidNumber = nextBidNumber;
-        await Task.WhenAll(LoadClientsAsync(), LoadItemsAsync());
+        await ResetFormAsync();
+
+        BidNumber = await _bidService.GetNextBidNumberAsync();
+
+        await Task.WhenAll(
+            LoadClientsAsync(),
+            LoadItemsAsync()
+        );
+    }
+
+
+    public override async Task OnAppearingAsync()
+    {
+        await InitializeAsync();
+    }
+
+    public Task ResetFormAsync()
+    {
+        ProjectName = string.Empty;
+        SelectedClient = null;
+        CreatedDate = DateTime.Today;
+        IsActive = true;
+
+        // Site Info
+        ScopeOfWork = string.Empty;
+        AddressLine1 = string.Empty;
+        AddressLine2 = string.Empty;
+        City = string.Empty;
+        State = string.Empty;
+        ZipCode = string.Empty;
+        ParcelNumber = string.Empty;
+        Jurisdiction = string.Empty;
+        BuildingArea = 0;
+        NumberOfStories = 0;
+        OccupancyGroup = string.Empty;
+        OccupantLoad = 0;
+        ConstructionType = string.Empty;
+        IsSprinklered = false;
+
+        return Task.CompletedTask;
     }
 
     // ========================================
@@ -226,7 +267,7 @@ public partial class CreateBidViewModel : ViewModelBase
     // ========================================
     // ============== Logic Helpers ==========
     // ========================================
-
+       
     /// <summary>
     /// Adds a new blank line item to the bid.
     /// </summary>

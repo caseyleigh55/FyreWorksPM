@@ -106,6 +106,9 @@ public class LoginViewModel : ViewModelBase
                 Application.Current.MainPage = App.Services.GetRequiredService<AppShell>();
             });
 
+            // 👇 Force shell to go to the home tab
+            await Shell.Current.GoToAsync("//home");
+
             return true;
         }
         finally

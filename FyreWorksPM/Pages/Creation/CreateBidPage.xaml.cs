@@ -24,6 +24,15 @@ public partial class CreateBidPage : ContentPage
         _viewModel.RequestAddNewClient = OpenCreateClientPopupAsync;
     }
 
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is IViewModelLifecycle vm)
+            await vm.OnAppearingAsync();
+    }
+
+
     /// <summary>
     /// Opens the CreateClientPage as a modal and hooks the callback for when a new client is added.
     /// </summary>
