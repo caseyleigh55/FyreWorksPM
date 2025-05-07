@@ -54,7 +54,6 @@ namespace FyreWorksPM.Api.Controllers
         }
 
 
-        // POST: api/bids
         [HttpPost]
         public async Task<ActionResult<BidDto>> CreateBid([FromBody] CreateBidDto dto)
         {
@@ -66,12 +65,33 @@ namespace FyreWorksPM.Api.Controllers
                 nextNum = int.Parse(match.Groups[1].Value) + 1;
             }
 
+            // 🌱 Map SiteInfoDto → SiteInfoModel
+            var siteInfo = new SiteInfoModel
+            {
+                ScopeOfWork = dto.SiteInfo.ScopeOfWork,
+                AddressLine1 = dto.SiteInfo.AddressLine1,
+                AddressLine2 = dto.SiteInfo.AddressLine2,
+                City = dto.SiteInfo.City,
+                State = dto.SiteInfo.State,
+                ZipCode = dto.SiteInfo.ZipCode,
+                ParcelNumber = dto.SiteInfo.ParcelNumber,
+                Jurisdiction = dto.SiteInfo.Jurisdiction,
+                BuildingArea = dto.SiteInfo.BuildingArea,
+                NumberOfStories = dto.SiteInfo.NumberOfStories,
+                OccupancyGroup = dto.SiteInfo.OccupancyGroup,
+                OccupantLoad = dto.SiteInfo.OccupantLoad,
+                ConstructionType = dto.SiteInfo.ConstructionType,
+                IsSprinklered = dto.SiteInfo.IsSprinklered
+            };
+
             var bid = new BidModel
             {
                 BidNumber = $"B-{nextNum.ToString("D3")}",
                 ProjectName = dto.ProjectName,
                 ClientId = dto.ClientId,
-                CreatedDate = dto.CreatedDate
+                CreatedDate = dto.CreatedDate,
+                IsActive = dto.IsActive,
+                SiteInfo = siteInfo // 👈 Link the site info
             };
 
             _db.Bids.Add(bid);
@@ -84,9 +104,11 @@ namespace FyreWorksPM.Api.Controllers
                 ProjectName = bid.ProjectName,
                 ClientId = bid.ClientId,
                 CreatedDate = bid.CreatedDate,
-                IsActive = dto.IsActive // ← Add this
+                IsActive = bid.IsActive
+                // You could return SiteInfo as well later in BidDto if needed
             });
         }
+
 
         // PUT: api/bids/{id}
         [HttpPut("{id}")]

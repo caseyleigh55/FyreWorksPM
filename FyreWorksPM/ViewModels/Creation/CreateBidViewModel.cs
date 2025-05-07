@@ -57,6 +57,49 @@ public partial class CreateBidViewModel : ViewModelBase
         set => Set(value);
     }
 
+    [ObservableProperty]
+    private string scopeOfWork;
+
+    [ObservableProperty]
+    private string addressLine1;
+
+    [ObservableProperty]
+    private string addressLine2;
+
+    [ObservableProperty]
+    private string city;
+
+    [ObservableProperty]
+    private string state;
+
+    [ObservableProperty]
+    private string zipCode;
+
+    [ObservableProperty]
+    private string parcelNumber;
+
+    [ObservableProperty]
+    private string jurisdiction;
+
+    [ObservableProperty]
+    private double buildingArea;
+
+    [ObservableProperty]
+    private int numberOfStories;
+
+    [ObservableProperty]
+    private string occupancyGroup;
+
+    [ObservableProperty]
+    private int occupantLoad;
+
+    [ObservableProperty]
+    private string constructionType;
+
+    [ObservableProperty]
+    private bool isSprinklered;
+
+
 
 
     public ObservableCollection<ItemDto> AvailableItems { get; set; } = new();
@@ -259,7 +302,25 @@ public partial class CreateBidViewModel : ViewModelBase
             ProjectName = ProjectName,
             ClientId = SelectedClient.Id,
             CreatedDate = CreatedDate,
-            IsActive = this.IsActive // ← Add this line
+            IsActive = this.IsActive,
+
+            SiteInfo = new SiteInfoDto
+            {
+                ScopeOfWork = ScopeOfWork,
+                AddressLine1 = AddressLine1,
+                AddressLine2 = AddressLine2,
+                City = City,
+                State = State,
+                ZipCode = ZipCode,
+                ParcelNumber = ParcelNumber,
+                Jurisdiction = Jurisdiction,
+                BuildingArea = BuildingArea,
+                NumberOfStories = NumberOfStories,
+                OccupancyGroup = OccupancyGroup,
+                OccupantLoad = OccupantLoad,
+                ConstructionType = ConstructionType,
+                IsSprinklered = IsSprinklered
+            }
         };
 
         try
