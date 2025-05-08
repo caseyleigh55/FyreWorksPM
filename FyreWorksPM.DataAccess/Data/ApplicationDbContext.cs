@@ -19,6 +19,14 @@ public class ApplicationDbContext : DbContext
     {
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<BidModel>().ToTable("BidInfo");
+        modelBuilder.Entity<SiteInfoModel>().ToTable("BidSiteInfo");
+
+        base.OnModelCreating(modelBuilder);
+    }
+
     #region DbSets
 
     /// <summary>
@@ -44,7 +52,12 @@ public class ApplicationDbContext : DbContext
     /// <summary>
     /// Table for Bid categories.
     /// </summary>
-    public DbSet<BidModel> Bids { get; set; }
+    public DbSet<BidModel> BidInfo { get; set; } = default!;
+
+    /// <summary>
+    /// Table for Bid categories.
+    /// </summary>
+    public DbSet<BidModel> BidSiteInfo { get; set; } = default!;
 
 
     #endregion    

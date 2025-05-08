@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 
 namespace FyreWorksPM.Api.Controllers
 {
-    // In your BidsController.cs
 
     [ApiController]
     [Route("api/[controller]")]
@@ -24,7 +23,7 @@ namespace FyreWorksPM.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<BidDto>> GetBid(int id)
         {
-            var bid = await _db.Bids.Include(b => b.Client)
+            var bid = await _db.BidInfo.Include(b => b.Client)
                                      .FirstOrDefaultAsync(b => b.Id == id);
             if (bid == null) return NotFound();
 
@@ -42,7 +41,7 @@ namespace FyreWorksPM.Api.Controllers
         [HttpGet("next-number")]
         public async Task<ActionResult<string>> GetNextBidNumber()
         {
-            var lastBid = await _db.Bids.OrderByDescending(b => b.Id).FirstOrDefaultAsync();
+            var lastBid = await _db.BidInfo.OrderByDescending(b => b.Id).FirstOrDefaultAsync();
             int nextNum = 1;
 
             if (lastBid != null && Regex.Match(lastBid.BidNumber, @"B-(\d{3})") is Match match && match.Success)
@@ -57,7 +56,7 @@ namespace FyreWorksPM.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<BidDto>> CreateBid([FromBody] CreateBidDto dto)
         {
-            var lastBid = await _db.Bids.OrderByDescending(b => b.Id).FirstOrDefaultAsync();
+            var lastBid = await _db.BidInfo.OrderByDescending(b => b.Id).FirstOrDefaultAsync();
             int nextNum = 1;
 
             if (lastBid != null && Regex.Match(lastBid.BidNumber, @"B-(\d{3})") is Match match && match.Success)
@@ -94,7 +93,8 @@ namespace FyreWorksPM.Api.Controllers
                 SiteInfo = siteInfo // 👈 Link the site info
             };
 
-            _db.Bids.Add(bid);
+            _db.BidInfo.Add(bid);
+            
             await _db.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetBid), new { id = bid.Id }, new BidDto
@@ -114,7 +114,7 @@ namespace FyreWorksPM.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBid(int id, [FromBody] UpdateBidDto dto)
         {
-            var bid = await _db.Bids.FindAsync(id);
+            var bid = await _db.BidInfo.FindAsync(id);
             if (bid == null) return NotFound();
 
             bid.ProjectName = dto.ProjectName;
@@ -129,10 +129,10 @@ namespace FyreWorksPM.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBid(int id)
         {
-            var bid = await _db.Bids.FindAsync(id);
+            var bid = await _db.BidInfo.FindAsync(id);
             if (bid == null) return NotFound();
 
-            _db.Bids.Remove(bid);
+            _db.BidInfo.Remove(bid);
             await _db.SaveChangesAsync();
             return NoContent();
         }

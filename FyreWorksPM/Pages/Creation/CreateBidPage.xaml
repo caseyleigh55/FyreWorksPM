@@ -182,7 +182,7 @@
                         <Entry Grid.Row="4" Grid.Column="1" Text="{Binding State}" />
 
                         <Label Grid.Row="5" Grid.Column="0" Text="Zip Code" />
-                        <Entry Grid.Row="5" Grid.Column="1" Text="{Binding Zip}" />
+                        <Entry Grid.Row="5" Grid.Column="1" Text="{Binding ZipCode}" />
 
                         <Label Grid.Row="6" Grid.Column="0" Text="Parcel Number" />
                         <Entry Grid.Row="6" Grid.Column="1" Text="{Binding ParcelNumber}" />
@@ -194,7 +194,7 @@
                         <Entry Grid.Row="8" Grid.Column="1" Text="{Binding BuildingArea}" Keyboard="Numeric" />
 
                         <Label Grid.Row="9" Grid.Column="0" Text="Number of Stories" />
-                        <Entry Grid.Row="9" Grid.Column="1" Text="{Binding Stories}" Keyboard="Numeric" />
+                        <Entry Grid.Row="9" Grid.Column="1" Text="{Binding NumberOfStories}" Keyboard="Numeric" />
 
                         <Label Grid.Row="10" Grid.Column="0" Text="Occupancy Group" />
                         <Entry Grid.Row="10" Grid.Column="1" Text="{Binding OccupancyGroup}" />
