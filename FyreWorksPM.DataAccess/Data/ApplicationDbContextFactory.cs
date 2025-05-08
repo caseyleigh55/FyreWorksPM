@@ -20,8 +20,13 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
 
         // Must match the connection string in MauiProgram.cs
         optionsBuilder.UseSqlServer(
-            "Server=(localdb)\\MSSQLLocalDB;Database=FyreWorksPMDb;Trusted_Connection=True;"
-        );
+                        "Server=tcp:fyreworkspmserver.database.windows.net,1433;" +
+                        "Initial Catalog=FyreWorksPM;Persist Security Info=False;" +
+                        "User ID=ccagle;Password=NakedD!sc0753;" +
+                        "MultipleActiveResultSets=False;Encrypt=True;" +
+                        "TrustServerCertificate=False;Connection Timeout=30;"
+                        );
+
 
         return new ApplicationDbContext(optionsBuilder.Options);
     }

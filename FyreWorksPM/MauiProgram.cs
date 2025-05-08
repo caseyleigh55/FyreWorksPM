@@ -13,6 +13,9 @@ using FyreWorksPM.Configuration;
 using FyreWorksPM.Services.Item;
 using FyreWorksPM.Services.Client;
 using FyreWorksPM.Services.Bid;
+using FyreWorksPM.DataAccess.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace FyreWorksPM;
 
@@ -71,6 +74,10 @@ public static class MauiProgram
         // ============================
         // 🔧 Core Services
         // ============================
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
         builder.Services.AddSingleton<App>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
         builder.Services.AddSingleton<ILoadingService, LoadingService>();
