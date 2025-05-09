@@ -62,6 +62,47 @@ public class ItemsController : ControllerBase
         return Ok(dto);
     }
 
+    //// ================================================
+    //// ✅ POST: api/items
+    //// Adds a new item with linked ItemType
+    //// ================================================
+    //[HttpPost]
+    //public async Task<ActionResult> CreateItem([FromBody] CreateItemDto dto)
+    //{
+    //    if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.ItemTypeName))
+    //    {
+    //        return BadRequest("Item name and item type are required.");
+    //    }
+
+    //    // Check if the item type exists, or create it
+    //    var itemType = await _db.ItemTypes
+    //        .FirstOrDefaultAsync(t => t.Name == dto.ItemTypeName);
+
+    //    if (itemType == null)
+    //    {
+    //        itemType = new ItemTypeModel
+    //        {
+    //            Name = dto.ItemTypeName,
+    //            Items = new List<ItemModel>() // required to satisfy `required` modifier
+    //        };
+
+    //        _db.ItemTypes.Add(itemType);
+    //        await _db.SaveChangesAsync();
+    //    }
+
+    //    var item = new ItemModel
+    //    {
+    //        Name = dto.Name,
+    //        Description = dto.Description,
+    //        ItemTypeId = itemType.Id
+    //    };
+
+    //    _db.Items.Add(item);
+    //    await _db.SaveChangesAsync();
+
+    //    return CreatedAtAction(nameof(GetItem), new { id = item.Id }, item);
+    //}
+
     // ================================================
     // ✅ POST: api/items
     // Adds a new item with linked ItemType
@@ -69,39 +110,57 @@ public class ItemsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateItem([FromBody] CreateItemDto dto)
     {
-        if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.ItemTypeName))
+        try
         {
-            return BadRequest("Item name and item type are required.");
-        }
-
-        // Check if the item type exists, or create it
-        var itemType = await _db.ItemTypes
-            .FirstOrDefaultAsync(t => t.Name == dto.ItemTypeName);
-
-        if (itemType == null)
-        {
-            itemType = new ItemTypeModel
+            if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.ItemTypeName))
             {
-                Name = dto.ItemTypeName,
-                Items = new List<ItemModel>() // required to satisfy `required` modifier
+                return BadRequest("Item name and item type are required.");
+            }
+
+            // Check if the item type exists, or create it
+            var itemType = await _db.ItemTypes
+                .FirstOrDefaultAsync(t => t.Name == dto.ItemTypeName);
+
+            if (itemType == null)
+            {
+                itemType = new ItemTypeModel
+                {
+                    Name = dto.ItemTypeName,
+                    Items = new List<ItemModel>() // ensure not null
+                };
+
+                _db.ItemTypes.Add(itemType);
+                await _db.SaveChangesAsync();
+            }
+
+            var item = new ItemModel
+            {
+                Name = dto.Name,
+                Description = dto.Description,
+                ItemTypeId = itemType.Id
             };
 
-            _db.ItemTypes.Add(itemType);
+            _db.Items.Add(item);
             await _db.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetItem), new { id = item.Id }, item);
         }
-
-        var item = new ItemModel
+        catch (DbUpdateException dbEx)
         {
-            Name = dto.Name,
-            Description = dto.Description,
-            ItemTypeId = itemType.Id
-        };
-
-        _db.Items.Add(item);
-        await _db.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetItem), new { id = item.Id }, item);
+            var msg = $"💥 DB Update failed: {dbEx.Message}\n" +
+                      $"{dbEx.InnerException?.Message}";
+            Console.WriteLine(msg);
+            return StatusCode(500, msg);
+        }
+        catch (Exception ex)
+        {
+            var msg = $"💥 Unexpected error: {ex.Message}\n" +
+                      $"{ex.InnerException?.Message}";
+            Console.WriteLine(msg);
+            return StatusCode(500, msg);
+        }
     }
+
 
     // ================================================
     // ✅ PUT: api/items/{id}

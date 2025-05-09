@@ -76,7 +76,14 @@ builder.Services.AddSwaggerGen(c =>
 // ==============================
 // 🧩 Services & Infrastructure
 // ==============================
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(opts =>
+    {
+        opts.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        opts.JsonSerializerOptions.WriteIndented = true; // Optional: pretty-print JSON
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

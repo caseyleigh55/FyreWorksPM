@@ -81,7 +81,7 @@ public class BidLineItemModel : INotifyPropertyChanged
             {
                 // ✅ Autofill name and cost from selected item
                 ItemName = value.Name;
-                UnitCost = value.UnitCost;
+                //UnitCost = value.UnitCost;
             }
         }
     }

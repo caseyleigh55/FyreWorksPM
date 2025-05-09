@@ -74,8 +74,8 @@ public static class MauiProgram
         // ============================
         // 🔧 Core Services
         // ============================
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+        //builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        //options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
         builder.Services.AddSingleton<App>();

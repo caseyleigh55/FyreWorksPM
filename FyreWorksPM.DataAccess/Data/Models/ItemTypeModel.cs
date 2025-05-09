@@ -19,5 +19,6 @@ public class ItemTypeModel
     /// <summary>
     /// Navigation property for items associated with this type.
     /// </summary>
-    public virtual required ICollection<ItemModel> Items { get; set; }
+    public virtual ICollection<ItemModel> Items { get; set; } = new List<ItemModel>();
+
 }

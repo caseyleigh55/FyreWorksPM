@@ -37,16 +37,16 @@ public class ItemModel : INotifyPropertyChanged
 
     private decimal unitCost = 0;
 
-    /// <summary>
-    /// Default unit cost of the item.
-    /// This value is pulled into bids when the item is selected,
-    /// but can be overridden on a per-bid basis.
-    /// </summary>
-    public decimal UnitCost
-    {
-        get => unitCost;
-        set => SetProperty(ref unitCost, value);
-    }
+    ///// <summary>
+    ///// Default unit cost of the item.
+    ///// This value is pulled into bids when the item is selected,
+    ///// but can be overridden on a per-bid basis.
+    ///// </summary>
+    //public decimal? UnitCost
+    //{
+    //    get => unitCost;
+    //    set => SetProperty(ref unitCost, value);
+    //}
 
     private ItemTypeModel? itemType;
 
