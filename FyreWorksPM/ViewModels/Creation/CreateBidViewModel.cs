@@ -25,6 +25,87 @@ public partial class CreateBidViewModel : ViewModelBase
     private readonly IItemTypeService _itemTypeService;
     private readonly IBidService _bidService;
 
+
+    // ===========================
+    // 🔧 Task Lists
+    // ===========================
+
+    public ObservableCollection<BidTaskViewModel> AdminTasks { get; } = new();
+    public ObservableCollection<BidTaskViewModel> EngineeringTasks { get; } = new();
+
+    // ===========================
+    // 🧮 Total Calculations
+    // ===========================
+
+    public decimal AdminCostTotal => AdminTasks.Sum(t => t.Cost);
+    public decimal AdminSaleTotal => AdminTasks.Sum(t => t.Sale);
+
+    public decimal EngineeringCostTotal => EngineeringTasks.Sum(t => t.Cost);
+    public decimal EngineeringSaleTotal => EngineeringTasks.Sum(t => t.Sale);
+
+    // ===========================
+    // ➕ Add / ❌ Remove Task Commands
+    // ===========================
+
+    [RelayCommand]
+    private void AddAdminTask()
+    {
+        var task = new BidTaskViewModel();
+        AdminTasks.Add(task);
+        task.PropertyChanged += (_, __) => RaiseAdminTotalsChanged();
+        RaiseAdminTotalsChanged();
+    }
+
+    [RelayCommand]
+    private void RemoveAdminTask(BidTaskViewModel task)
+    {
+        if (AdminTasks.Contains(task))
+        {
+            AdminTasks.Remove(task);
+            task.PropertyChanged -= (_, __) => RaiseAdminTotalsChanged();
+            RaiseAdminTotalsChanged();
+        }
+    }
+
+    [RelayCommand]
+    private void AddEngineeringTask()
+    {
+        var task = new BidTaskViewModel();
+        EngineeringTasks.Add(task);
+        task.PropertyChanged += (_, __) => RaiseEngineeringTotalsChanged();
+        RaiseEngineeringTotalsChanged();
+    }
+
+    [RelayCommand]
+    private void RemoveEngineeringTask(BidTaskViewModel task)
+    {
+        if (EngineeringTasks.Contains(task))
+        {
+            EngineeringTasks.Remove(task);
+            task.PropertyChanged -= (_, __) => RaiseEngineeringTotalsChanged();
+            RaiseEngineeringTotalsChanged();
+        }
+    }
+
+    // ===========================
+    // 🔁 Raise Totals Manually
+    // ===========================
+
+    private void RaiseAdminTotalsChanged()
+    {
+        OnPropertyChanged(nameof(AdminCostTotal));
+        OnPropertyChanged(nameof(AdminSaleTotal));
+    }
+
+    private void RaiseEngineeringTotalsChanged()
+    {
+        OnPropertyChanged(nameof(EngineeringCostTotal));
+        OnPropertyChanged(nameof(EngineeringSaleTotal));
+    }
+
+
+
+
     // ========================================
     // ============== Properties =============
     // ========================================
@@ -181,6 +262,10 @@ public partial class CreateBidViewModel : ViewModelBase
         AddLineItemCommand = new RelayCommand(AddLineItem);
         AddNewClientCommand = new RelayCommand(async () => await OnRequestAddNewClient());
         SaveBidCommand = new RelayCommand(async () => await SaveBidAsync());
+
+        // Initialize collections and hook up dynamic updates
+        AdminTasks.CollectionChanged += (s, e) => RaiseAdminTotalsChanged();
+        EngineeringTasks.CollectionChanged += (s, e) => RaiseEngineeringTotalsChanged();
 
         Task.Run(async () => await InitializeAsync());
 

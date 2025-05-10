@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="FyreWorksPM.Pages.Creation.CreateBidPage"
+    x:Name="CreateBid"
     Title="New Bid">
 
     <ScrollView>
@@ -223,12 +224,12 @@
                            FontSize="18"
                            TextColor="White" />
 
-                    <!-- ===== ADMIN TASKS ===== -->
+                    <!-- ===== ADMIN TASKS ===== --><!--
                     <Label Text="Administration Task List"
                            FontAttributes="Bold"
                            TextColor="White" />
 
-                    <!-- Admin Tasks with fix to avoid scrunching -->
+                    --><!-- Admin Tasks with fix to avoid scrunching --><!--
                     <VerticalStackLayout>
                         <CollectionView ItemsSource="{Binding AdminTasks}"
                                         ItemsLayout="VerticalList">
@@ -245,28 +246,97 @@
                         </CollectionView>
                     </VerticalStackLayout>
 
-                    <!-- Admin Buttons -->
+                    --><!-- Admin Buttons --><!--
                     <HorizontalStackLayout Spacing="10">
                         <Button Text="➕ Add Task" Command="{Binding AddAdminTaskCommand}" BackgroundColor="MediumPurple" TextColor="White" />
                         <Button Text="🗑️ Delete Task" Command="{Binding RemoveAdminTaskCommand}" BackgroundColor="DarkRed" TextColor="White" />
                     </HorizontalStackLayout>
 
-                    <!-- == Admin Subtotals == -->
+                    --><!-- == Admin Subtotals == --><!--
                     <Grid ColumnDefinitions="2*,*"      
                           RowDefinitions="Auto,Auto"      
                           Padding="0,10,0,0"      
                           RowSpacing="6">
 
-                        <!-- Admin Cost Total -->
+                        --><!-- Admin Cost Total --><!--
                         <Label Text="Admin Cost Total:" Grid.Row="0" Grid.Column="0" />
                         <Label Text="{Binding AdminCostTotal, StringFormat='${0:F2}'}"           
                                Grid.Row="0" Grid.Column="1" />
 
-                        <!-- Admin Sale Total -->
+                        --><!-- Admin Sale Total --><!--
                         <Label Text="Admin Sale Total:" Grid.Row="1" Grid.Column="0" />
                         <Label Text="{Binding AdminSaleTotal, StringFormat='${0:F2}'}"           
                                Grid.Row="1" Grid.Column="1" />
-                    </Grid>
+                    </Grid>-->
+
+
+                    <VerticalStackLayout Padding="10">
+                        <Label Text="Administration Task List" FontSize="Medium" />
+
+                        <!-- Add Task Button -->
+                        <Button Text="Add Task" Command="{Binding AddAdminTaskCommand}" />
+                        
+
+
+                        <!-- Task List -->
+                        <CollectionView ItemsSource="{Binding AdminTasks}">
+                            <CollectionView.Header>
+                                <Grid ColumnDefinitions="7*,1.5*,1.5*,Auto" Padding="5,0" ColumnSpacing="10">
+                                    <Label Grid.Column="0" Text="Task" TextColor="White" FontAttributes="Bold" VerticalTextAlignment="Center"/>
+                                    <Label Grid.Column="1" Text="Cost" TextColor="Red" FontAttributes="Bold" HorizontalTextAlignment="Start" VerticalTextAlignment="Center"/>
+                                    <Label Grid.Column="2" Text="Sale" TextColor="Orange" FontAttributes="Bold" HorizontalTextAlignment="Start" VerticalTextAlignment="Center"/>
+                                    <Button Grid.Column="3" WidthRequest="40" Text="❌" TextColor="Red" BackgroundColor="Transparent" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                </Grid>
+                            </CollectionView.Header>
+
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="7*,1.5*,1.5*,Auto" Padding="5" ColumnSpacing="10">
+                                        <!-- Task -->
+                                        <Entry Grid.Column="0" Placeholder="Task Name" Text="{Binding Name}" />
+
+                                        <!-- Cost -->
+                                        <Grid Grid.Column="1" ColumnDefinitions="Auto,*" VerticalOptions="Center">
+                                            <Label Text="$" TextColor="Red" VerticalOptions="Center" />
+                                            <Entry Text="{Binding Cost}" Keyboard="Numeric" Placeholder="0.00"
+                           BackgroundColor="Transparent"
+                           TextColor="Red"
+                           PlaceholderColor="Red"/>
+                                        </Grid>
+
+                                        <!-- Sale -->
+                                        <Grid Grid.Column="2" ColumnDefinitions="Auto,*" VerticalOptions="Center">
+                                            <Label Text="$" TextColor="Orange" VerticalOptions="Center" />
+                                            <Entry Text="{Binding Sale}" Keyboard="Numeric" Placeholder="0.00"
+                           BackgroundColor="Transparent"
+                           TextColor="Orange"
+                           PlaceholderColor="Orange"/>
+                                        </Grid>
+
+                                        <!-- Delete -->
+                                        <Button Grid.Column="3"
+                        Text="❌"
+                        Command="{Binding BindingContext.RemoveAdminTaskCommand, Source={x:Reference CreateBid}}"
+                        CommandParameter="{Binding .}"
+                        WidthRequest="40"
+                        HeightRequest="40"
+                        BackgroundColor="SlateBlue"
+                        CornerRadius="8"
+                        Padding="0"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+
+                        <!-- Totals -->
+                        <HorizontalStackLayout>
+                            <Label Text="{Binding AdminCostTotal, StringFormat='Total Cost: {0:C}'}" />
+                            <Label Text="{Binding AdminSaleTotal, StringFormat='Total Sale: {0:C}'}" Margin="20,0,0,0" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+
+
 
                     <!-- ===== ENGINEERING TASKS ===== -->
                     <Label Text="Engineering Task List"               
