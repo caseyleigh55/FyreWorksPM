@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.Services.Item;
 
@@ -10,33 +10,21 @@ namespace FyreWorksPM.ViewModels.Solitary;
 /// ViewModel for managing all ItemTypes, allowing creation, editing, and deletion.
 /// Interacts with the item type service and backs a management popup.
 /// </summary>
-public partial class ManageItemTypesPopupViewModel
+public partial class ManageItemTypesPopupViewModel : ObservableObject
 {
-    #region ============== Fields and Constructor =====================
-
     private readonly IItemTypeService _itemTypeService;
 
-    /// <summary>
-    /// Observable collection of item types bound to the UI.
-    /// </summary>
-    public ObservableCollection<ItemTypeDto> ItemTypes { get; set; } = new();
+    [ObservableProperty]
+    private ObservableCollection<ItemTypeDto> itemTypes = new();
 
-
-    /// <summary>
-    /// Constructor that initializes the ViewModel and loads item types.
-    /// </summary>
     public ManageItemTypesPopupViewModel(IItemTypeService itemTypeService)
     {
         _itemTypeService = itemTypeService;
         _ = LoadItemTypesAsync();
     }
 
-    #endregion
-
-    #region ============== Data Loading ==============================
-
     /// <summary>
-    /// Loads all item types from the database.
+    /// Loads all item types from the database and refreshes the observable collection.
     /// </summary>
     private async Task LoadItemTypesAsync()
     {
@@ -47,10 +35,6 @@ public partial class ManageItemTypesPopupViewModel
             ItemTypes.Add(type);
     }
 
-    #endregion
-
-    #region ============== Commands ===================================
-
     /// <summary>
     /// Adds a new item type entry with an empty name (user-editable).
     /// </summary>
@@ -59,7 +43,7 @@ public partial class ManageItemTypesPopupViewModel
     {
         ItemTypes.Add(new ItemTypeDto
         {
-            Id = 0, // optional, since it's new
+            Id = 0,
             Name = string.Empty
         });
     }
@@ -69,7 +53,7 @@ public partial class ManageItemTypesPopupViewModel
     /// </summary>
     /// <param name="itemType">The item type to save.</param>
     [RelayCommand]
-    private async Task Save(ItemTypeDto itemType)
+    private async Task SaveAsync(ItemTypeDto itemType)
     {
         if (!string.IsNullOrWhiteSpace(itemType.Name))
         {
@@ -78,17 +62,14 @@ public partial class ManageItemTypesPopupViewModel
         }
     }
 
-
     /// <summary>
     /// Deletes the specified item type by ID.
     /// </summary>
     /// <param name="itemType">The item type to delete.</param>
     [RelayCommand]
-    private async Task Delete(ItemTypeDto itemType)
+    private async Task DeleteAsync(ItemTypeDto itemType)
     {
         await _itemTypeService.DeleteItemTypeAsync(itemType.Id);
         ItemTypes.Remove(itemType);
     }
-
-    #endregion
 }

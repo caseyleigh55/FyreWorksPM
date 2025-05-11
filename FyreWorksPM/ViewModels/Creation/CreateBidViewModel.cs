@@ -1,221 +1,76 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
 using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.Pages.Creation;
 using FyreWorksPM.Services.Bid;
 using FyreWorksPM.Services.Client;
 using FyreWorksPM.Services.Item;
+using Microsoft.Maui.ApplicationModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace FyreWorksPM.ViewModels.Creation;
 
 /// <summary>
-/// ViewModel for managing a bid form, including line items, client list, and item library lookup.
+/// ViewModel for creating and managing bids, tasks, and site info.
 /// </summary>
-public partial class CreateBidViewModel : ViewModelBase
+public partial class CreateBidViewModel : ObservableObject
 {
-    // ========================================
-    // ============== Services ===============
-    // ========================================
-
+    // ========== Services ==========
     private readonly IClientService _clientService;
     private readonly IItemService _itemService;
     private readonly IItemTypeService _itemTypeService;
     private readonly IBidService _bidService;
 
-
-    // ===========================
-    // 🔧 Task Lists
-    // ===========================
-
-    public ObservableCollection<BidTaskViewModel> AdminTasks { get; } = new();
-    public ObservableCollection<BidTaskViewModel> EngineeringTasks { get; } = new();
-
-    // ===========================
-    // 🧮 Total Calculations
-    // ===========================
-
-    public decimal AdminCostTotal => AdminTasks.Sum(t => t.Cost);
-    public decimal AdminSaleTotal => AdminTasks.Sum(t => t.Sale);
-
-    public decimal EngineeringCostTotal => EngineeringTasks.Sum(t => t.Cost);
-    public decimal EngineeringSaleTotal => EngineeringTasks.Sum(t => t.Sale);
-
-    public decimal AdminEngCostTotal => AdminCostTotal + EngineeringCostTotal;
-    public decimal AdminEngSaleTotal => AdminSaleTotal + EngineeringSaleTotal;
-
-    // ===========================
-    // ➕ Add / ❌ Remove Task Commands
-    // ===========================
-
-    private void Task_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    public CreateBidViewModel(
+        IBidService bidService,
+        IClientService clientService,
+        IItemService itemService,
+        IItemTypeService itemTypeService)
     {
-        if (sender is BidTaskViewModel task &&
-            (e.PropertyName == nameof(BidTaskViewModel.Cost) || e.PropertyName == nameof(BidTaskViewModel.Sale)))
-        {
-            if (AdminTasks.Contains(task))
-            {
-                RaiseAdminTotalsChanged();
-            }
-            else if (EngineeringTasks.Contains(task))
-            {
-                RaiseEngineeringTotalsChanged();
-            }
-        }
+        _bidService = bidService;
+        _clientService = clientService;
+        _itemService = itemService;
+        _itemTypeService = itemTypeService;
+
+        CreatedDate = DateTime.Today;
+
+        AdminTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseAdminTotalsChanged);
+        EngineeringTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseEngineeringTotalsChanged);
+
+        Task.Run(async () => await InitializeAsync());
     }
 
-    [RelayCommand]
-    private void AddAdminTask()
-    {
-        var task = new BidTaskViewModel();
-        task.PropertyChanged += Task_PropertyChanged;
-        AdminTasks.Add(task);
-        RaiseAdminTotalsChanged();
-    }
+    // ========== Observables ==========
 
-    [RelayCommand]
-    private void RemoveAdminTask(BidTaskViewModel task)
-    {
-        if (AdminTasks.Contains(task))
-        {
-            task.PropertyChanged -= Task_PropertyChanged;
-            AdminTasks.Remove(task);
-            RaiseAdminTotalsChanged();
-        }
-    }
+    [ObservableProperty] private bool isActive = true;
+    [ObservableProperty] private string bidNumber = string.Empty;
+    [ObservableProperty] private string scopeOfWork = string.Empty;
+    [ObservableProperty] private string addressLine1 = string.Empty;
+    [ObservableProperty] private string addressLine2 = string.Empty;
+    [ObservableProperty] private string city = string.Empty;
+    [ObservableProperty] private string state = string.Empty;
+    [ObservableProperty] private string zipCode = string.Empty;
+    [ObservableProperty] private string parcelNumber = string.Empty;
+    [ObservableProperty] private string jurisdiction = string.Empty;
+    [ObservableProperty] private double buildingArea;
+    [ObservableProperty] private int numberOfStories;
+    [ObservableProperty] private string occupancyGroup = string.Empty;
+    [ObservableProperty] private int occupantLoad;
+    [ObservableProperty] private string constructionType = string.Empty;
+    [ObservableProperty] private bool isSprinklered;
+    [ObservableProperty] private string jobName = string.Empty;
+    [ObservableProperty] private DateTime createdDate;
+    [ObservableProperty] private string projectName = string.Empty;
+    [ObservableProperty] private decimal materialMarkup;
+    [ObservableProperty] private decimal laborSubtotal;
+    [ObservableProperty] private decimal laborMarkup;
+    [ObservableProperty] private ClientDto? selectedClient;
 
-    [RelayCommand]
-    private void AddEngineeringTask()
-    {
-        var task = new BidTaskViewModel();
-        task.PropertyChanged += Task_PropertyChanged;
-        EngineeringTasks.Add(task);
-        RaiseEngineeringTotalsChanged();
-    }
-
-    [RelayCommand]
-    private void RemoveEngineeringTask(BidTaskViewModel task)
-    {
-        if (EngineeringTasks.Contains(task))
-        {
-            task.PropertyChanged -= Task_PropertyChanged;
-            EngineeringTasks.Remove(task);
-            RaiseEngineeringTotalsChanged();
-        }
-    }
-
-
-    // ===========================
-    // 🔁 Raise Totals Manually
-    // ===========================
-
-    private void RaiseAdminTotalsChanged()
-    {
-        System.Diagnostics.Debug.WriteLine($"AdminCostTotal: {AdminCostTotal}, AdminSaleTotal: {AdminSaleTotal}");
-        OnPropertyChanged(nameof(AdminCostTotal));
-        OnPropertyChanged(nameof(AdminSaleTotal));
-        OnPropertyChanged(nameof(AdminEngCostTotal));
-        OnPropertyChanged(nameof(AdminEngSaleTotal));
-    }
-
-    private void RaiseEngineeringTotalsChanged()
-    {
-        System.Diagnostics.Debug.WriteLine($"EngineeringCostTotal: {EngineeringCostTotal}, EngineeringSaleTotal: {EngineeringSaleTotal}");
-        OnPropertyChanged(nameof(EngineeringCostTotal));
-        OnPropertyChanged(nameof(EngineeringSaleTotal));
-        OnPropertyChanged(nameof(AdminEngCostTotal));
-        OnPropertyChanged(nameof(AdminEngSaleTotal));
-    }
-
-
-
-
-    // ========================================
-    // ============== Properties =============
-    // ========================================
-
-    [ObservableProperty]
-    private bool isActive = true; // Default to true
-    public string JobName { get => Get<string>(); set => Set(value); }
-    public DateTime CreatedDate { get => Get<DateTime>(); set => Set(value); }  
-
-    /// <summary>
-    /// List of clients for the client picker or autocomplete.
-    /// </summary>
-    public ObservableCollection<ClientDto> Clients { get; set; } = new();
-
-    public ClientDto? SelectedClient
-    {
-        get => Get<ClientDto>();
-        set => Set(value);
-    }
-
-    [ObservableProperty]
-    private string bidNumber;
-
-
-    //public string BidNumber
-    //{
-    //    get => Get<string>();
-    //    set => Set(value);
-    //}
-
-    public string ProjectName
-    {
-        get => Get<string>();
-        set => Set(value);
-    }
-
-    [ObservableProperty]
-    private string scopeOfWork;
-
-    [ObservableProperty]
-    private string addressLine1;
-
-    [ObservableProperty]
-    private string addressLine2;
-
-    [ObservableProperty]
-    private string city;
-
-    [ObservableProperty]
-    private string state;
-
-    [ObservableProperty]
-    private string zipCode;
-
-    [ObservableProperty]
-    private string parcelNumber;
-
-    [ObservableProperty]
-    private string jurisdiction;
-
-    [ObservableProperty]
-    private double buildingArea;
-
-    [ObservableProperty]
-    private int numberOfStories;
-
-    [ObservableProperty]
-    private string occupancyGroup;
-
-    [ObservableProperty]
-    private int occupantLoad;
-
-    [ObservableProperty]
-    private string constructionType;
-
-    [ObservableProperty]
-    private bool isSprinklered;
-
-
-
-
-    public ObservableCollection<ItemDto> AvailableItems { get; set; } = new();
-    public ObservableCollection<BidLineItemModel> LineItems { get; set; } = new();
+    public ObservableCollection<ClientDto> Clients { get; } = new();
+    public ObservableCollection<ItemDto> AvailableItems { get; } = new();
+    public ObservableCollection<BidLineItemModel> LineItems { get; } = new();
 
     private ItemDto _selectedItemFromLibrary;
     public ItemDto SelectedItemFromLibrary
@@ -242,229 +97,89 @@ public partial class CreateBidViewModel : ViewModelBase
         }
     }
 
-    // ========================================
-    // ============== Totals =================
-    // ========================================
-
-    public decimal MaterialMarkup { get => Get<decimal>(); set { if (Set(value)) OnPropertyChanged(nameof(GrandTotal)); } }
-    public decimal LaborSubtotal { get => Get<decimal>(); set { if (Set(value)) OnPropertyChanged(nameof(GrandTotal)); } }
-    public decimal LaborMarkup { get => Get<decimal>(); set { if (Set(value)) OnPropertyChanged(nameof(GrandTotal)); } }
-
     public decimal MaterialSubtotal => LineItems.Sum(i => i.TotalCost);
     public decimal GrandTotal => MaterialSubtotal * (1 + (MaterialMarkup / 100)) + LaborSubtotal * (1 + (LaborMarkup / 100));
 
-    // ========================================
-    // ============== Commands ===============
-    // ========================================
+    public ObservableCollection<BidTaskViewModel> AdminTasks { get; } = new();
+    public ObservableCollection<BidTaskViewModel> EngineeringTasks { get; } = new();
 
-    public ICommand AddLineItemCommand { get; }
-    public ICommand OpenItemLibraryCommand { get; }
-    public ICommand AddNewClientCommand { get; }
-    public IRelayCommand SaveBidCommand { get; }
+    public decimal AdminCostTotal => AdminTasks.Sum(t => t.Cost);
+    public decimal AdminSaleTotal => AdminTasks.Sum(t => t.Sale);
+    public decimal EngineeringCostTotal => EngineeringTasks.Sum(t => t.Cost);
+    public decimal EngineeringSaleTotal => EngineeringTasks.Sum(t => t.Sale);
+    public decimal AdminEngCostTotal => AdminCostTotal + EngineeringCostTotal;
+    public decimal AdminEngSaleTotal => AdminSaleTotal + EngineeringSaleTotal;
 
-
-    /// <summary>
-    /// Event raised to open the CreateClientPage popup.
-    /// </summary>
-    public Func<Task> RequestAddNewClient { get; set; }
-
-    // ========================================
-    // ============== Constructor ============
-    // ========================================
-
-    public CreateBidViewModel(
-        IBidService bidService,
-        IClientService clientService,
-        IItemService itemService,
-        IItemTypeService itemTypeService)
+    private void HookTaskHandlers(System.Collections.Specialized.NotifyCollectionChangedEventArgs e, Action raiseTotals)
     {
-        _bidService = bidService;
-        _clientService = clientService;
-        _itemService = itemService;
-        _itemTypeService = itemTypeService;
-
-        CreatedDate = DateTime.Today;
-
-        OpenItemLibraryCommand = new RelayCommand(async () => await OpenItemLibraryAsync());
-        AddLineItemCommand = new RelayCommand(AddLineItem);
-        AddNewClientCommand = new RelayCommand(async () => await OnRequestAddNewClient());
-        SaveBidCommand = new RelayCommand(async () => await SaveBidAsync());
-
-        // Initialize collections and hook up dynamic updates
-        AdminTasks.CollectionChanged += (s, e) =>
+        if (e.NewItems != null)
         {
-            if (e.NewItems != null)
-            {
-                foreach (BidTaskViewModel item in e.NewItems)
-                    item.PropertyChanged += (_, __) => RaiseAdminTotalsChanged();
-            }
+            foreach (BidTaskViewModel item in e.NewItems)
+                item.PropertyChanged += (_, __) => raiseTotals();
+        }
+        raiseTotals();
+    }
 
-            RaiseAdminTotalsChanged();
-        };
+    private void RaiseAdminTotalsChanged()
+    {
+        OnPropertyChanged(nameof(AdminCostTotal));
+        OnPropertyChanged(nameof(AdminSaleTotal));
+        OnPropertyChanged(nameof(AdminEngCostTotal));
+        OnPropertyChanged(nameof(AdminEngSaleTotal));
+    }
 
-        EngineeringTasks.CollectionChanged += (s, e) =>
+    private void RaiseEngineeringTotalsChanged()
+    {
+        OnPropertyChanged(nameof(EngineeringCostTotal));
+        OnPropertyChanged(nameof(EngineeringSaleTotal));
+        OnPropertyChanged(nameof(AdminEngCostTotal));
+        OnPropertyChanged(nameof(AdminEngSaleTotal));
+    }
+
+    [RelayCommand] private void AddAdminTask() => AddTask(AdminTasks, RaiseAdminTotalsChanged);
+    [RelayCommand] private void RemoveAdminTask(BidTaskViewModel task) => RemoveTask(AdminTasks, task, RaiseAdminTotalsChanged);
+
+    [RelayCommand] private void AddEngineeringTask() => AddTask(EngineeringTasks, RaiseEngineeringTotalsChanged);
+    [RelayCommand] private void RemoveEngineeringTask(BidTaskViewModel task) => RemoveTask(EngineeringTasks, task, RaiseEngineeringTotalsChanged);
+
+    private void AddTask(ObservableCollection<BidTaskViewModel> tasks, Action raise)
+    {
+        var task = new BidTaskViewModel();
+        task.PropertyChanged += (_, __) => raise();
+        tasks.Add(task);
+        raise();
+    }
+
+    private void RemoveTask(ObservableCollection<BidTaskViewModel> tasks, BidTaskViewModel task, Action raise)
+    {
+        if (tasks.Contains(task))
         {
-            if (e.NewItems != null)
-            {
-                foreach (BidTaskViewModel item in e.NewItems)
-                    item.PropertyChanged += (_, __) => RaiseEngineeringTotalsChanged();
-            }
-
-            RaiseEngineeringTotalsChanged();
-        };
-
-        Task.Run(async () => await InitializeAsync());
-
+            task.PropertyChanged -= (_, __) => raise();
+            tasks.Remove(task);
+            raise();
+        }
     }
 
-    private async Task InitializeAsync()
+    [RelayCommand]
+    public async Task OpenItemLibraryAsync()
     {
-        await ResetFormAsync();
-
-        BidNumber = await _bidService.GetNextBidNumberAsync();
-
-        await Task.WhenAll(
-            LoadClientsAsync(),
-            LoadItemsAsync()
-        );
+        var vm = new CreateItemsViewModel(_itemService, _itemTypeService);
+        await Shell.Current.Navigation.PushAsync(new CreateItemsPage(vm, item => SelectedItemFromLibrary = item));
     }
 
-
-    public override async Task OnAppearingAsync()
-    {
-        await InitializeAsync();
-    }
-
-    public Task ResetFormAsync()
-    {
-        ProjectName = string.Empty;
-        SelectedClient = null;
-        CreatedDate = DateTime.Today;
-        IsActive = true;
-
-        // Site Info
-        ScopeOfWork = string.Empty;
-        AddressLine1 = string.Empty;
-        AddressLine2 = string.Empty;
-        City = string.Empty;
-        State = string.Empty;
-        ZipCode = string.Empty;
-        ParcelNumber = string.Empty;
-        Jurisdiction = string.Empty;
-        BuildingArea = 0;
-        NumberOfStories = 0;
-        OccupancyGroup = string.Empty;
-        OccupantLoad = 0;
-        ConstructionType = string.Empty;
-        IsSprinklered = false;
-
-        return Task.CompletedTask;
-    }
-
-    // ========================================
-    // ============== Data Loading ===========
-    // ========================================
-
-    /// <summary>
-    /// Loads the list of clients for the picker/autocomplete.
-    /// </summary>
-    public async Task LoadClientsAsync()
-    {
-        var clients = await _clientService.GetAllClientsAsync();
-
-        MainThread.BeginInvokeOnMainThread(() =>
-        {
-            Clients.Clear();
-            foreach (var client in clients)
-                Clients.Add(client);
-        });
-    }
-
-    /// <summary>
-    /// Loads the list of available items.
-    /// </summary>
-    private async Task LoadItemsAsync()
-    {
-        var items = await _itemService.GetAllItemsAsync();
-
-        MainThread.BeginInvokeOnMainThread(() =>
-        {
-            AvailableItems.Clear();
-            foreach (var item in items)
-                AvailableItems.Add(item);
-        });
-    }
-
-    // ========================================
-    // ============== Logic Helpers ==========
-    // ========================================
-       
-    /// <summary>
-    /// Adds a new blank line item to the bid.
-    /// </summary>
-    private void AddLineItem()
-    {
-        LineItems.Add(new BidLineItemModel());
-        OnPropertyChanged(nameof(MaterialSubtotal));
-        OnPropertyChanged(nameof(GrandTotal));
-    }
-
-    /// <summary>
-    /// Opens the item library page to select an item.
-    /// </summary>
-    private async Task OpenItemLibraryAsync()
-    {
-        var itemService = App.Services.GetRequiredService<IItemService>();
-        var itemTypeService = App.Services.GetRequiredService<IItemTypeService>();
-        var vm = new CreateItemsViewModel(itemService, itemTypeService);
-
-        await Shell.Current.Navigation.PushAsync(new CreateItemsPage(vm, item =>
-        {
-            SelectedItemFromLibrary = item;
-        }));
-    }
-
-    /// <summary>
-    /// Opens the popup for creating a new client.
-    /// </summary>
-    private async Task OnRequestAddNewClient()
+    [RelayCommand]
+    public async Task AddNewClientAsync()
     {
         if (RequestAddNewClient != null)
             await RequestAddNewClient.Invoke();
     }
 
-    /// <summary>
-    /// Called when a new client is created.
-    /// Refreshes the client list and selects the new one.
-    /// </summary>
-    public async Task OnClientAddedAsync(ClientDto newClient)
+    [RelayCommand]
+    public async Task SaveBidAsync()
     {
-        await LoadClientsAsync();
-
-        MainThread.BeginInvokeOnMainThread(() =>
-        {
-            var matchingClient = Clients.FirstOrDefault(c => c.Id == newClient.Id);
-            if (matchingClient != null)
-            {
-                SelectedClient = matchingClient;
-                OnPropertyChanged(nameof(SelectedClient));
-            }
-        });
-    }
-
-    private async Task SaveBidAsync()
-    {
-        
         if (string.IsNullOrWhiteSpace(BidNumber) || string.IsNullOrWhiteSpace(ProjectName) || SelectedClient == null)
         {
-
-            //await Shell.Current.DisplayAlert("Missing Info", "Please fill in all required fields.", "OK");
-            await Shell.Current.DisplayAlert(
-    "Missing Info",
-    $"Fields:\nBidNumber: '{BidNumber}'\nProjectName: '{ProjectName}'\nClient: '{SelectedClient?.Name}'",
-    "OK");
-
-
+            await Shell.Current.DisplayAlert("Missing Info", "Please fill in all required fields.", "OK");
             return;
         }
 
@@ -474,8 +189,7 @@ public partial class CreateBidViewModel : ViewModelBase
             ProjectName = ProjectName,
             ClientId = SelectedClient.Id,
             CreatedDate = CreatedDate,
-            IsActive = this.IsActive,
-
+            IsActive = IsActive,
             SiteInfo = new SiteInfoDto
             {
                 ScopeOfWork = ScopeOfWork,
@@ -499,7 +213,7 @@ public partial class CreateBidViewModel : ViewModelBase
         {
             await _bidService.CreateBidAsync(newBid);
             await Shell.Current.DisplayAlert("Success", "Bid saved successfully.", "OK");
-            await Shell.Current.Navigation.PopAsync(); // Or whatever your page closing method is
+            await Shell.Current.Navigation.PopAsync();
         }
         catch (Exception ex)
         {
@@ -507,4 +221,73 @@ public partial class CreateBidViewModel : ViewModelBase
         }
     }
 
+    public async Task OnAppearingAsync() => await InitializeAsync();
+
+    private async Task InitializeAsync()
+    {
+        await ResetFormAsync();
+        BidNumber = await _bidService.GetNextBidNumberAsync();
+        await Task.WhenAll(LoadClientsAsync(), LoadItemsAsync());
+    }
+
+    public Task ResetFormAsync()
+    {
+        ProjectName = string.Empty;
+        SelectedClient = null;
+        CreatedDate = DateTime.Today;
+        IsActive = true;
+        ScopeOfWork = string.Empty;
+        AddressLine1 = string.Empty;
+        AddressLine2 = string.Empty;
+        City = string.Empty;
+        State = string.Empty;
+        ZipCode = string.Empty;
+        ParcelNumber = string.Empty;
+        Jurisdiction = string.Empty;
+        BuildingArea = 0;
+        NumberOfStories = 0;
+        OccupancyGroup = string.Empty;
+        OccupantLoad = 0;
+        ConstructionType = string.Empty;
+        IsSprinklered = false;
+        return Task.CompletedTask;
+    }
+
+    public async Task LoadClientsAsync()
+    {
+        var clients = await _clientService.GetAllClientsAsync();
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            Clients.Clear();
+            foreach (var client in clients)
+                Clients.Add(client);
+        });
+    }
+
+    private async Task LoadItemsAsync()
+    {
+        var items = await _itemService.GetAllItemsAsync();
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            AvailableItems.Clear();
+            foreach (var item in items)
+                AvailableItems.Add(item);
+        });
+    }
+
+    public Func<Task>? RequestAddNewClient { get; set; }
+
+    public async Task OnClientAddedAsync(ClientDto newClient)
+    {
+        await LoadClientsAsync();
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            var matchingClient = Clients.FirstOrDefault(c => c.Id == newClient.Id);
+            if (matchingClient != null)
+            {
+                SelectedClient = matchingClient;
+                OnPropertyChanged(nameof(SelectedClient));
+            }
+        });
+    }
 }

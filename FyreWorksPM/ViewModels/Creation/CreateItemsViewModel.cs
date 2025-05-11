@@ -10,13 +10,22 @@ using FyreWorksPM.DataAccess.DTO;
 using Microsoft.Maui.ApplicationModel;
 using System.Xml.Linq;
 
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using FyreWorksPM.DataAccess.DTO;
+using FyreWorksPM.Pages.PopUps;
+using FyreWorksPM.Services.Item;
+using Microsoft.Maui.ApplicationModel;
+using System.Collections.ObjectModel;
+using static Azure.Core.HttpHeader;
+
 namespace FyreWorksPM.ViewModels.Creation;
 
 /// <summary>
 /// ViewModel for creating, displaying, filtering, and managing items.
-/// Now fully API-powered using DTOs.
+/// Fully refactored to use ObservableProperty and RelayCommand.
 /// </summary>
-public partial class CreateItemsViewModel : INotifyPropertyChanged
+public partial class CreateItemsViewModel : ObservableObject
 {
     private readonly IItemService _itemService;
     private readonly IItemTypeService _itemTypeService;
@@ -32,54 +41,90 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
         _ = LoadItemsAsync();
     }
 
-    #region ========== Bindable Properties ==========
+    // Observable properties for form input and filtering
+    [ObservableProperty] private string name = string.Empty;
+    [ObservableProperty] private string description = string.Empty;
+    [ObservableProperty] private string selectedItemType = string.Empty;
+    [ObservableProperty] private string searchText = string.Empty;
+    [ObservableProperty] private bool areSuggestionsVisible;
+    [ObservableProperty] private ItemDto? selectedItem;
 
-    public string Name { get => _name; set => SetProperty(ref _name, value); }
-    public string Description { get => _description; set => SetProperty(ref _description, value); }
-    public string SelectedItemType { get => _selectedItemType; set { SetProperty(ref _selectedItemType, value); FilterItems(); } }
-    public string SearchText { get => _searchText; set { SetProperty(ref _searchText, value); FilterItems(); } }
+    public ObservableCollection<ItemDto> Items { get; } = new();
+    public ObservableCollection<ItemDto> FilteredItems { get; } = new();
+    public ObservableCollection<string> ItemTypes { get; } = new();
+    public ObservableCollection<string> FilteredItemTypes { get; } = new();
 
-    private ItemDto? _selectedItem;
-    public ItemDto? SelectedItem
+    partial void OnSelectedItemChanged(ItemDto? value)
     {
-        get => _selectedItem;
-        set
-        {
-            if (SetProperty(ref _selectedItem, value))
+        RemoveSelectedItemCommand.NotifyCanExecuteChanged();
+    }
+
+    partial void OnSearchTextChanged(string value) => FilterItems();
+    partial void OnSelectedItemTypeChanged(string value) => FilterItems();
+
+    [RelayCommand(CanExecute = nameof(CanRemoveSelectedItem))]
+    private async Task RemoveSelectedItemAsync()
+    {
+        if (SelectedItem == null) return;
+
+        await _itemService.DeleteItemAsync(SelectedItem.Id);
+
+        Items.Remove(SelectedItem);
+        FilterItems();
+        SelectedItem = null;
+
+        await LoadItemTypesAsync();
+    }
+
+    private bool CanRemoveSelectedItem() => SelectedItem != null;
+
+    [RelayCommand]
+    private async Task AddItemAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Description) || string.IsNullOrWhiteSpace(SelectedItemType))
+            return;
+
+        var dto = new CreateItemDto { Name = Name, Description = Description, ItemTypeName = SelectedItemType };
+        await _itemService.AddItemAsync(dto);
+
+        await LoadItemsAsync();
+        await LoadItemTypesAsync();
+
+        Name = string.Empty;
+        Description = string.Empty;
+        SelectedItemType = string.Empty;
+        FilterItemTypeSuggestions(string.Empty);
+    }
+
+    [RelayCommand]
+    private async Task EditSelectedItemAsync()
+    {
+        if (SelectedItem == null) return;
+
+        var popup = new ManageItemPopup(
+            SelectedItem,
+            async () =>
             {
-                (RemoveSelectedItemCommand as Command)?.ChangeCanExecute();
-            }
-        }
+                await LoadItemsAsync();
+                await LoadItemTypesAsync();
+                FilterItemTypeSuggestions(SearchText);
+                FilterItems();
+            },
+            _itemService);
+
+        await Shell.Current.Navigation.PushAsync(popup);
     }
 
-    public ObservableCollection<ItemDto> Items { get; set; } = new();
-    public ObservableCollection<ItemDto> FilteredItems { get; set; } = new();
-    public ObservableCollection<string> ItemTypes { get; set; } = new();
-    public ObservableCollection<string> FilteredItemTypes { get; set; } = new();
-
-    private bool _areSuggestionsVisible;
-    public bool AreSuggestionsVisible
+    [RelayCommand]
+    private void SelectItemType(string type)
     {
-        get => _areSuggestionsVisible;
-        set => SetProperty(ref _areSuggestionsVisible, value);
+        SelectedItemType = type;
+        AreSuggestionsVisible = false;
+
+        var matchedItem = Items.FirstOrDefault(i => i.Name.Equals(type, StringComparison.OrdinalIgnoreCase));
+        if (matchedItem != null)
+            ItemSelectedCallback?.Invoke(matchedItem);
     }
-
-    private string _name = string.Empty;
-    private string _description = string.Empty;
-    private string _selectedItemType = string.Empty;
-    private string _searchText = string.Empty;
-
-    #endregion
-
-    #region ========== Commands ==========
-
-    public ICommand AddItemCommand => new Command(async () => await AddItemAsync());
-    public ICommand RemoveSelectedItemCommand => new Command(async () => await RemoveSelectedItemAsync());
-    public ICommand SelectItemTypeCommand => new Command<string>(SelectItemType);
-
-    #endregion
-
-    #region ========== Filtering Logic ==========
 
     public void FilterItemTypeSuggestions(string input)
     {
@@ -114,26 +159,9 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
             FilteredItems.Add(item);
     }
 
-    private void SelectItemType(string type)
-    {
-        SelectedItemType = type;
-        AreSuggestionsVisible = false;
-
-        var matchedItem = Items.FirstOrDefault(i => i.Name.Equals(type, StringComparison.OrdinalIgnoreCase));
-        if (matchedItem != null)
-        {
-            ItemSelectedCallback?.Invoke(matchedItem);
-        }
-    }
-
-    #endregion
-
-    #region ========== Data Loading ==========
-
     private async Task LoadItemTypesAsync()
     {
         var types = await _itemTypeService.GetAllItemTypeNamesAsync();
-
         MainThread.BeginInvokeOnMainThread(() =>
         {
             ItemTypes.Clear();
@@ -147,7 +175,6 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
     private async Task LoadItemsAsync()
     {
         var items = await _itemService.GetAllItemsAsync();
-
         MainThread.BeginInvokeOnMainThread(() =>
         {
             Items.Clear();
@@ -157,90 +184,5 @@ public partial class CreateItemsViewModel : INotifyPropertyChanged
             FilterItems();
         });
     }
-
-    #endregion
-
-    #region ========== Add / Remove / Edit Items ==========
-
-    private async Task AddItemAsync()
-    {
-        if (string.IsNullOrWhiteSpace(Name) ||
-            string.IsNullOrWhiteSpace(Description) ||
-            string.IsNullOrWhiteSpace(SelectedItemType))
-        {
-            return;
-        }
-
-        var dto = new CreateItemDto
-        {
-            Name = Name,
-            Description = Description,
-            ItemTypeName = SelectedItemType
-        };
-
-        await _itemService.AddItemAsync(dto);
-
-        await LoadItemsAsync();
-        await LoadItemTypesAsync();
-
-        Name = string.Empty;
-        Description = string.Empty;
-        SelectedItemType = string.Empty;
-
-        FilterItemTypeSuggestions(string.Empty);
-    }
-
-    private async Task RemoveSelectedItemAsync()
-    {
-        if (SelectedItem == null)
-            return;
-
-        await _itemService.DeleteItemAsync(SelectedItem.Id);
-
-        Items.Remove(SelectedItem);
-        FilterItems();
-        SelectedItem = null;
-
-        await LoadItemTypesAsync();
-    }
-
-    [RelayCommand]
-    private async Task EditSelectedItemAsync()
-    {
-        if (SelectedItem == null)
-            return;
-
-        var popup = new ManageItemPopup(
-            SelectedItem,
-            async () =>
-            {
-                await LoadItemsAsync();
-                await LoadItemTypesAsync();
-                FilterItemTypeSuggestions(SearchText);
-                FilterItems();
-            },
-            _itemService); // 👈 this is the missing 3rd parameter!
-
-        await Shell.Current.Navigation.PushAsync(popup);
-    }
-
-
-    #endregion
-
-    #region ========== INotifyPropertyChanged Boilerplate ==========
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    protected void OnPropertyChanged([CallerMemberName] string name = "") =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
-    protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string name = "")
-    {
-        if (EqualityComparer<T>.Default.Equals(storage, value)) return false;
-        storage = value;
-        OnPropertyChanged(name);
-        return true;
-    }
-
-    #endregion
 }
+
