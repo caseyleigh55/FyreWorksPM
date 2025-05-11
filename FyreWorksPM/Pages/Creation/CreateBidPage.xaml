@@ -2,9 +2,17 @@
 <ContentPage 
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:FyreWorksPM.Common.Converters;assembly=FyreWorksPM"
+
     x:Class="FyreWorksPM.Pages.Creation.CreateBidPage"
     x:Name="CreateBid"
     Title="New Bid">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:DecimalConverter x:Key="DecimalConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
@@ -81,10 +89,10 @@
             <Border Stroke="White" BackgroundColor="Black" StrokeThickness="1" Padding="15">
                 <VerticalStackLayout Spacing="15">
                     <Label Text="Totals Overview"
-   TextDecorations="Underline"
-   FontAttributes="Bold,Italic"
-   FontSize="18"
-   TextColor="White" />
+                           TextDecorations="Underline"
+                           FontAttributes="Bold,Italic"
+                           FontSize="18"
+                           TextColor="White" />
 
                     <!-- Side-by-side Totals -->
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="30">
@@ -118,12 +126,6 @@
                                 <Label Text="{Binding JourneymanOvernightHoursTotal, StringFormat='{0:P2}'}" Grid.Row="1" Grid.Column="3" />
 
                                 <Label Text="{Binding ApprenticeOvernightHoursTotal, StringFormat='{0:P2}'}" Grid.Row="2" Grid.Column="3" />
-
-
-                                <!--Start Here overnight hours-->
-
-
-
                             </Grid>
                         </VerticalStackLayout>
 
@@ -224,61 +226,22 @@
                            FontSize="18"
                            TextColor="White" />
 
-                    <!-- ===== ADMIN TASKS ===== --><!--
-                    <Label Text="Administration Task List"
-                           FontAttributes="Bold"
-                           TextColor="White" />
+                    <!-- ===== ADMIN TASKS ===== -->
 
-                    --><!-- Admin Tasks with fix to avoid scrunching --><!--
-                    <VerticalStackLayout>
-                        <CollectionView ItemsSource="{Binding AdminTasks}"
-                                        ItemsLayout="VerticalList">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid ColumnDefinitions="2*,*,*,*" ColumnSpacing="10" Padding="5">
-                                        <Entry Placeholder="Task Name" Text="{Binding Name}" Grid.Column="0" />
-                                        <Entry Placeholder="$0.00" Text="{Binding Cost}" Grid.Column="1" Keyboard="Numeric" />
-                                        <Entry Placeholder="0%" Text="{Binding MarkupPercent}" Grid.Column="2" Keyboard="Numeric" />
-                                        <Label Text="{Binding Sale, StringFormat='${0:F2}'}" Grid.Column="3" TextColor="LawnGreen" HorizontalTextAlignment="End" />
-                                    </Grid>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </VerticalStackLayout>
-
-                    --><!-- Admin Buttons --><!--
-                    <HorizontalStackLayout Spacing="10">
-                        <Button Text="➕ Add Task" Command="{Binding AddAdminTaskCommand}" BackgroundColor="MediumPurple" TextColor="White" />
-                        <Button Text="🗑️ Delete Task" Command="{Binding RemoveAdminTaskCommand}" BackgroundColor="DarkRed" TextColor="White" />
-                    </HorizontalStackLayout>
-
-                    --><!-- == Admin Subtotals == --><!--
-                    <Grid ColumnDefinitions="2*,*"      
-                          RowDefinitions="Auto,Auto"      
-                          Padding="0,10,0,0"      
-                          RowSpacing="6">
-
-                        --><!-- Admin Cost Total --><!--
-                        <Label Text="Admin Cost Total:" Grid.Row="0" Grid.Column="0" />
-                        <Label Text="{Binding AdminCostTotal, StringFormat='${0:F2}'}"           
-                               Grid.Row="0" Grid.Column="1" />
-
-                        --><!-- Admin Sale Total --><!--
-                        <Label Text="Admin Sale Total:" Grid.Row="1" Grid.Column="0" />
-                        <Label Text="{Binding AdminSaleTotal, StringFormat='${0:F2}'}"           
-                               Grid.Row="1" Grid.Column="1" />
-                    </Grid>-->
-
-
-                    <VerticalStackLayout Padding="10">
-                        <Label Text="Administration Task List" FontSize="Medium" />
+                    <VerticalStackLayout Padding="10" Spacing="10">
+                        <Label Text="Administration Task List"
+                               FontSize="Micro"
+                               TextDecorations="Underline"
+                               FontAttributes="Bold"               
+                               TextColor="White"               
+                               Margin="0,20,0,0" />
 
                         <!-- Add Task Button -->
-                        <Button Text="Add Task" Command="{Binding AddAdminTaskCommand}" />
                         
-
-
+                            <Button Text="Add Task" Command="{Binding AddAdminTaskCommand}" />
+                        
                         <!-- Task List -->
+                        
                         <CollectionView ItemsSource="{Binding AdminTasks}">
                             <CollectionView.Header>
                                 <Grid ColumnDefinitions="7*,1.5*,1.5*,Auto" Padding="5,0" ColumnSpacing="10">
@@ -297,32 +260,32 @@
 
                                         <!-- Cost -->
                                         <Grid Grid.Column="1" ColumnDefinitions="Auto,*" VerticalOptions="Center">
-                                            <Label Text="$" TextColor="Red" VerticalOptions="Center" />
-                                            <Entry Text="{Binding Cost}" Keyboard="Numeric" Placeholder="0.00"
-                           BackgroundColor="Transparent"
-                           TextColor="Red"
-                           PlaceholderColor="Red"/>
+                                            <Label Text="$" TextColor="White" VerticalOptions="Center" />
+                                            <Entry Text="{Binding Cost, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" Keyboard="Numeric" Placeholder="0.00"
+                                                   BackgroundColor="Transparent"
+                                                   TextColor="White"
+                                                   PlaceholderColor="White"/>
                                         </Grid>
 
                                         <!-- Sale -->
                                         <Grid Grid.Column="2" ColumnDefinitions="Auto,*" VerticalOptions="Center">
-                                            <Label Text="$" TextColor="Orange" VerticalOptions="Center" />
-                                            <Entry Text="{Binding Sale}" Keyboard="Numeric" Placeholder="0.00"
-                           BackgroundColor="Transparent"
-                           TextColor="Orange"
-                           PlaceholderColor="Orange"/>
+                                            <Label Text="$" TextColor="White" VerticalOptions="Center" />
+                                            <Entry Text="{Binding Sale, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" Keyboard="Numeric" Placeholder="0.00"
+                                                    BackgroundColor="Transparent"
+                                                    TextColor="White"
+                                                    PlaceholderColor="White"/>
                                         </Grid>
 
                                         <!-- Delete -->
                                         <Button Grid.Column="3"
-                        Text="❌"
-                        Command="{Binding BindingContext.RemoveAdminTaskCommand, Source={x:Reference CreateBid}}"
-                        CommandParameter="{Binding .}"
-                        WidthRequest="40"
-                        HeightRequest="40"
-                        BackgroundColor="SlateBlue"
-                        CornerRadius="8"
-                        Padding="0"/>
+                                                Text="❌"
+                                                Command="{Binding BindingContext.RemoveAdminTaskCommand, Source={x:Reference CreateBid}}"
+                                                CommandParameter="{Binding .}"
+                                                WidthRequest="40"
+                                                HeightRequest="40"
+                                                BackgroundColor="SlateBlue"
+                                                CornerRadius="8"
+                                                Padding="0"/>
                                     </Grid>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
@@ -330,65 +293,146 @@
 
 
                         <!-- Totals -->
-                        <HorizontalStackLayout>
-                            <Label Text="{Binding AdminCostTotal, StringFormat='Total Cost: {0:C}'}" />
-                            <Label Text="{Binding AdminSaleTotal, StringFormat='Total Sale: {0:C}'}" Margin="20,0,0,0" />
-                        </HorizontalStackLayout>
+                        <Grid ColumnDefinitions="7*,1.5*,1.5*,Auto" Padding="5" ColumnSpacing="10">
+                            <!-- Empty cell for Task column -->
+                            <Label Grid.Column="0" Text="Administration Totals:"/>
+
+                            <!-- Cost total -->
+                            <Label Grid.Column="1"
+                                   Text="{Binding Source={x:Reference CreateBid}, Path=BindingContext.AdminCostTotal, StringFormat='${0:F2}'}"
+                                   TextColor="Red"
+                                   FontAttributes="Bold"
+                                   HorizontalTextAlignment="Start" />
+
+                            <!-- Sale total -->
+                            <Label Grid.Column="2"
+                                   Text="{Binding AdminSaleTotal, StringFormat='${0:F2}'}"
+                                   TextColor="Orange"
+                                   FontAttributes="Bold"
+                                   HorizontalTextAlignment="Start" />
+
+                            <!-- Optional: Empty delete column -->
+                            <Button Grid.Column="3" WidthRequest="40" Text="" BackgroundColor="Transparent" />
+                        </Grid>
+
                     </VerticalStackLayout>
 
 
 
                     <!-- ===== ENGINEERING TASKS ===== -->
-                    <Label Text="Engineering Task List"               
-                           FontAttributes="Bold"               
-                           TextColor="White"               
-                           Margin="0,20,0,0" />
+                    <VerticalStackLayout Padding="10" Spacing="10">
+                        <Label Text="Engineering Task List"
+           FontSize="Micro"
+           TextDecorations="Underline"
+           FontAttributes="Bold"               
+           TextColor="White"               
+           Margin="0,0,0,0" />
 
-                    <!-- Engineering Tasks with same fix -->
-                    <VerticalStackLayout>
-                        <CollectionView ItemsSource="{Binding EngTasks}"
-                                        ItemsLayout="VerticalList" Margin="0,5">
+                        <!-- Add Task Button -->
+
+                        <Button Text="Add Task" Command="{Binding AddEngineeringTaskCommand}" />
+
+                        <!-- Task List -->
+
+                        <CollectionView ItemsSource="{Binding EngineeringTasks}">
+                            <CollectionView.Header>
+                                <Grid ColumnDefinitions="7*,1.5*,1.5*,Auto" Padding="5,0" ColumnSpacing="10">
+                                    <Label Grid.Column="0" Text="Task" TextColor="White" FontAttributes="Bold" VerticalTextAlignment="Center"/>
+                                    <Label Grid.Column="1" Text="Cost" TextColor="Red" FontAttributes="Bold" HorizontalTextAlignment="Start" VerticalTextAlignment="Center"/>
+                                    <Label Grid.Column="2" Text="Sale" TextColor="Orange" FontAttributes="Bold" HorizontalTextAlignment="Start" VerticalTextAlignment="Center"/>
+                                    <Button Grid.Column="3" WidthRequest="40" Text="❌" TextColor="Red" BackgroundColor="Transparent" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                </Grid>
+                            </CollectionView.Header>
+
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid ColumnDefinitions="2*,*,*,*" ColumnSpacing="10" Padding="5">
-                                        <Entry Placeholder="Task Name" Text="{Binding Name}" Grid.Column="0" />
-                                        <Entry Placeholder="$0.00" Text="{Binding Cost}" Grid.Column="1" Keyboard="Numeric" />
-                                        <Entry Placeholder="0%" Text="{Binding MarkupPercent}" Grid.Column="2" Keyboard="Numeric" />
-                                        <Label Text="{Binding Sale, StringFormat='${0:F2}'}" Grid.Column="3" TextColor="LawnGreen" HorizontalTextAlignment="End" />
+                                    <Grid ColumnDefinitions="7*,1.5*,1.5*,Auto" Padding="5" ColumnSpacing="10">
+                                        <!-- Task -->
+                                        <Entry Grid.Column="0" Placeholder="Task Name" Text="{Binding Name}" />
+
+                                        <!-- Cost -->
+                                        <Grid Grid.Column="1" ColumnDefinitions="Auto,*" VerticalOptions="Center">
+                                            <Label Text="$" TextColor="White" VerticalOptions="Center" />
+                                            <Entry Text="{Binding Cost, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" Keyboard="Numeric" Placeholder="0.00"
+                               BackgroundColor="Transparent"
+                               TextColor="White"
+                               PlaceholderColor="White"/>
+                                        </Grid>
+
+                                        <!-- Sale -->
+                                        <Grid Grid.Column="2" ColumnDefinitions="Auto,*" VerticalOptions="Center">
+                                            <Label Text="$" TextColor="White" VerticalOptions="Center" />
+                                            <Entry Text="{Binding Sale, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" Keyboard="Numeric" Placeholder="0.00"
+                                BackgroundColor="Transparent"
+                                TextColor="White"
+                                PlaceholderColor="White"/>
+                                        </Grid>
+
+                                        <!-- Delete -->
+                                        <Button Grid.Column="3"
+                            Text="❌"
+                            Command="{Binding BindingContext.RemoveEngineeringTaskCommand, Source={x:Reference CreateBid}}"
+                            CommandParameter="{Binding .}"
+                            WidthRequest="40"
+                            HeightRequest="40"
+                            BackgroundColor="SlateBlue"
+                            CornerRadius="8"
+                            Padding="0"/>
                                     </Grid>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
+
+
+                        <!-- Totals -->
+                        <Grid ColumnDefinitions="7*,1.5*,1.5*,Auto" Padding="5" ColumnSpacing="10">
+                            <!-- Empty cell for Task column -->
+                            <Label Grid.Column="0" Text="Engineering Totals:"/>
+
+                            <!-- Cost total -->
+                            <Label Grid.Column="1"
+               Text="{Binding EngineeringCostTotal, StringFormat='${0:F2}'}"
+               TextColor="Red" 
+               HorizontalTextAlignment="Start" />
+
+                            <!-- Sale total -->
+                            <Label Grid.Column="2"
+               Text="{Binding EngineeringSaleTotal, StringFormat='${0:F2}'}"
+               TextColor="Orange"
+               HorizontalTextAlignment="Start" />
+
+                            <!-- Optional: Empty delete column -->
+                            <Button Grid.Column="3" WidthRequest="40" Text="" BackgroundColor="Transparent" />
+                        </Grid>
+                        <!-- Combined Admin + Engineering Total -->
+                        <Grid ColumnDefinitions="7*,1.5*,1.5*,Auto" Padding="5" ColumnSpacing="10">
+                            <!-- Empty cell for Task column -->
+                            <Label Grid.Column="0" Text="Admin and Engineering Totals:" FontSize="Micro"
+TextDecorations="Underline"
+FontAttributes="Bold"               
+TextColor="White"               
+Margin="0,0,0,0"/>
+
+                            <!-- Cost total -->
+                            <Label Grid.Column="1"
+Text="{Binding AdminEngCostTotal, StringFormat='${0:F2}'}"
+                                   
+TextColor="Red"
+FontAttributes="Bold"
+HorizontalTextAlignment="Start" />
+
+                            <!-- Sale total -->
+                            <Label Grid.Column="2"
+Text="{Binding AdminEngSaleTotal, StringFormat='${0:F2}'}"
+TextColor="Orange"
+FontAttributes="Bold"
+HorizontalTextAlignment="Start" />
+
+                            <!-- Optional: Empty delete column -->
+                            <Button Grid.Column="3" WidthRequest="40" Text="" BackgroundColor="Transparent" />
+                        </Grid>
+
                     </VerticalStackLayout>
-
-                    <!-- Engineering Buttons -->
-                    <HorizontalStackLayout Spacing="10">
-                        <Button Text="➕ Add Task" Command="{Binding AddEngTaskCommand}" BackgroundColor="MediumPurple" TextColor="White" />
-                        <Button Text="🗑️ Delete Task" Command="{Binding RemoveEngTaskCommand}" BackgroundColor="DarkRed" TextColor="White" />
-                    </HorizontalStackLayout>
-
-                    <!-- == Engineering Subtotals == -->
-                    <Grid ColumnDefinitions="2*,*"    
-                          RowDefinitions="Auto,Auto"    
-                          Padding="0,10,0,0"      
-                          RowSpacing="6">
-
-                        <Label Text="Engineering Cost Total:" Grid.Row="0" Grid.Column="0" />
-                        <Label Text="{Binding EngCostTotal, StringFormat='${0:F2}'}"
-                               Grid.Row="0" Grid.Column="1" />
-
-                        <Label Text="Engineering Sale Total:" Grid.Row="1" Grid.Column="0" />
-                        <Label Text="{Binding EngSaleTotal, StringFormat='${0:F2}'}"
-                               Grid.Row="1" Grid.Column="1" />
-                    </Grid>
-
-                    <!-- Combined Admin + Engineering Total -->
-                    <Grid ColumnDefinitions="2*,*" Padding="0,15,0,0">
-                        <Label Text="Admin/Eng Combined Total:" FontAttributes="Bold" />
-                        <Label Text="{Binding AdminEngSaleTotal, StringFormat='${0:F2}'}"
-                               FontAttributes="Bold"
-                               TextColor="Lime" />
-                    </Grid>
                 </VerticalStackLayout>
             </Border>
 

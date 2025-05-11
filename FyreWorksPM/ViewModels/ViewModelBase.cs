@@ -58,13 +58,13 @@ namespace FyreWorksPM.ViewModels
             return true;
         }
 
-        /// <summary>
-        /// Triggers the PropertyChanged event for a property.
-        /// </summary>
-        /// <param name="propertyName">Auto-injected name of the property.</param>
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }       
+        ///// <summary>
+        ///// Triggers the PropertyChanged event for a property.
+        ///// </summary>
+        ///// <param name="propertyName">Auto-injected name of the property.</param>
+        //protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        //{
+        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        //}       
     }
 }

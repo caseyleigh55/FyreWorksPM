@@ -8,6 +8,7 @@ using FyreWorksPM.Pages.Creation;
 using FyreWorksPM.Services.Bid;
 using FyreWorksPM.Services.Client;
 using FyreWorksPM.Services.Item;
+using System.ComponentModel;
 
 namespace FyreWorksPM.ViewModels.Creation;
 
@@ -43,16 +44,35 @@ public partial class CreateBidViewModel : ViewModelBase
     public decimal EngineeringCostTotal => EngineeringTasks.Sum(t => t.Cost);
     public decimal EngineeringSaleTotal => EngineeringTasks.Sum(t => t.Sale);
 
+    public decimal AdminEngCostTotal => AdminCostTotal + EngineeringCostTotal;
+    public decimal AdminEngSaleTotal => AdminSaleTotal + EngineeringSaleTotal;
+
     // ===========================
     // ➕ Add / ❌ Remove Task Commands
     // ===========================
+
+    private void Task_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender is BidTaskViewModel task &&
+            (e.PropertyName == nameof(BidTaskViewModel.Cost) || e.PropertyName == nameof(BidTaskViewModel.Sale)))
+        {
+            if (AdminTasks.Contains(task))
+            {
+                RaiseAdminTotalsChanged();
+            }
+            else if (EngineeringTasks.Contains(task))
+            {
+                RaiseEngineeringTotalsChanged();
+            }
+        }
+    }
 
     [RelayCommand]
     private void AddAdminTask()
     {
         var task = new BidTaskViewModel();
+        task.PropertyChanged += Task_PropertyChanged;
         AdminTasks.Add(task);
-        task.PropertyChanged += (_, __) => RaiseAdminTotalsChanged();
         RaiseAdminTotalsChanged();
     }
 
@@ -61,8 +81,8 @@ public partial class CreateBidViewModel : ViewModelBase
     {
         if (AdminTasks.Contains(task))
         {
+            task.PropertyChanged -= Task_PropertyChanged;
             AdminTasks.Remove(task);
-            task.PropertyChanged -= (_, __) => RaiseAdminTotalsChanged();
             RaiseAdminTotalsChanged();
         }
     }
@@ -71,8 +91,8 @@ public partial class CreateBidViewModel : ViewModelBase
     private void AddEngineeringTask()
     {
         var task = new BidTaskViewModel();
+        task.PropertyChanged += Task_PropertyChanged;
         EngineeringTasks.Add(task);
-        task.PropertyChanged += (_, __) => RaiseEngineeringTotalsChanged();
         RaiseEngineeringTotalsChanged();
     }
 
@@ -81,11 +101,12 @@ public partial class CreateBidViewModel : ViewModelBase
     {
         if (EngineeringTasks.Contains(task))
         {
+            task.PropertyChanged -= Task_PropertyChanged;
             EngineeringTasks.Remove(task);
-            task.PropertyChanged -= (_, __) => RaiseEngineeringTotalsChanged();
             RaiseEngineeringTotalsChanged();
         }
     }
+
 
     // ===========================
     // 🔁 Raise Totals Manually
@@ -93,14 +114,20 @@ public partial class CreateBidViewModel : ViewModelBase
 
     private void RaiseAdminTotalsChanged()
     {
+        System.Diagnostics.Debug.WriteLine($"AdminCostTotal: {AdminCostTotal}, AdminSaleTotal: {AdminSaleTotal}");
         OnPropertyChanged(nameof(AdminCostTotal));
         OnPropertyChanged(nameof(AdminSaleTotal));
+        OnPropertyChanged(nameof(AdminEngCostTotal));
+        OnPropertyChanged(nameof(AdminEngSaleTotal));
     }
 
     private void RaiseEngineeringTotalsChanged()
     {
+        System.Diagnostics.Debug.WriteLine($"EngineeringCostTotal: {EngineeringCostTotal}, EngineeringSaleTotal: {EngineeringSaleTotal}");
         OnPropertyChanged(nameof(EngineeringCostTotal));
         OnPropertyChanged(nameof(EngineeringSaleTotal));
+        OnPropertyChanged(nameof(AdminEngCostTotal));
+        OnPropertyChanged(nameof(AdminEngSaleTotal));
     }
 
 
@@ -264,8 +291,27 @@ public partial class CreateBidViewModel : ViewModelBase
         SaveBidCommand = new RelayCommand(async () => await SaveBidAsync());
 
         // Initialize collections and hook up dynamic updates
-        AdminTasks.CollectionChanged += (s, e) => RaiseAdminTotalsChanged();
-        EngineeringTasks.CollectionChanged += (s, e) => RaiseEngineeringTotalsChanged();
+        AdminTasks.CollectionChanged += (s, e) =>
+        {
+            if (e.NewItems != null)
+            {
+                foreach (BidTaskViewModel item in e.NewItems)
+                    item.PropertyChanged += (_, __) => RaiseAdminTotalsChanged();
+            }
+
+            RaiseAdminTotalsChanged();
+        };
+
+        EngineeringTasks.CollectionChanged += (s, e) =>
+        {
+            if (e.NewItems != null)
+            {
+                foreach (BidTaskViewModel item in e.NewItems)
+                    item.PropertyChanged += (_, __) => RaiseEngineeringTotalsChanged();
+            }
+
+            RaiseEngineeringTotalsChanged();
+        };
 
         Task.Run(async () => await InitializeAsync());
 

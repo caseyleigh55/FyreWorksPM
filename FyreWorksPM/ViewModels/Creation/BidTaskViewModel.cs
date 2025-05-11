@@ -10,6 +10,12 @@ namespace FyreWorksPM.ViewModels.Creation
         [ObservableProperty]
         private decimal cost;
 
+        partial void OnCostChanged(decimal value)
+        {
+            System.Diagnostics.Debug.WriteLine($"Cost updated: {value}");
+        }
+
+
         [ObservableProperty]
         private decimal sale;
     }
