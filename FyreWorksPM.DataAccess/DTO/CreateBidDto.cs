@@ -1,4 +1,6 @@
-﻿public class CreateBidDto
+﻿using FyreWorksPM.DataAccess.DTO;
+
+public class CreateBidDto
 {
     public string BidNumber { get; set; } = string.Empty;
     public string ProjectName { get; set; } = string.Empty;
@@ -8,4 +10,8 @@
 
 
     public SiteInfoDto SiteInfo { get; set; } = new();
+
+    //Admin and Engineering Tasks Section
+    public List<CreateTaskDto> Tasks { get; set; }
+
 }

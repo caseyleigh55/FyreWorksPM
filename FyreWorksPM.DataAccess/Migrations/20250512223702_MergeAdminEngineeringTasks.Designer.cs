@@ -4,6 +4,7 @@ using FyreWorksPM.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FyreWorksPM.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250512223702_MergeAdminEngineeringTasks")]
+    partial class MergeAdminEngineeringTasks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,35 +60,6 @@ namespace FyreWorksPM.DataAccess.Migrations
                     b.HasIndex("SiteInfoId");
 
                     b.ToTable("BidInfo", (string)null);
-                });
-
-            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidTaskModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BidId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Cost")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Sale")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("TaskModelId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BidId");
-
-                    b.HasIndex("TaskModelId");
-
-                    b.ToTable("Tasks");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.ClientModel", b =>
@@ -142,6 +116,15 @@ namespace FyreWorksPM.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("BidId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Cost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Sale")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("TaskName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -151,7 +134,9 @@ namespace FyreWorksPM.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TaskTemplates");
+                    b.HasIndex("BidId");
+
+                    b.ToTable("Tasks");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.UserModel", b =>
@@ -287,7 +272,7 @@ namespace FyreWorksPM.DataAccess.Migrations
                     b.Navigation("SiteInfo");
                 });
 
-            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidTaskModel", b =>
+            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.TaskModel", b =>
                 {
                     b.HasOne("BidModel", "Bid")
                         .WithMany("Tasks")
@@ -295,15 +280,7 @@ namespace FyreWorksPM.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FyreWorksPM.DataAccess.Data.Models.TaskModel", "Task")
-                        .WithMany("BidTasks")
-                        .HasForeignKey("TaskModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Bid");
-
-                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("ItemModel", b =>
@@ -323,11 +300,6 @@ namespace FyreWorksPM.DataAccess.Migrations
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.ItemTypeModel", b =>
                 {
                     b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.TaskModel", b =>
-                {
-                    b.Navigation("BidTasks");
                 });
 #pragma warning restore 612, 618
         }

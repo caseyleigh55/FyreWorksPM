@@ -49,7 +49,7 @@ public static class MauiProgram
             client.BaseAddress = new Uri(ApiConfig.BaseUrl);
         });
 
-        builder.Services.AddHttpClient<RegisterViewModel>(); // ⚠️ Used to inject HttpClient into RegisterViewModel
+        builder.Services.AddHttpClient(); // ⚠️ default HttpClient Instance
 
         builder.Services.AddHttpClient<IItemTypeService, ItemTypeService>(client =>
         {
@@ -105,6 +105,7 @@ public static class MauiProgram
         builder.Services.AddTransient<CreateBidViewModel>();
         builder.Services.AddTransient<CreateClientViewModel>();
         builder.Services.AddTransient<CreateItemsViewModel>();
+        builder.Services.AddTransient<RegisterViewModel>();
 
         // Pop-Up ViewModels
         builder.Services.AddTransient<ManageItemPopupViewModel>();

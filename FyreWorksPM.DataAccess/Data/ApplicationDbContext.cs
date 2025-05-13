@@ -59,6 +59,18 @@ public class ApplicationDbContext : DbContext
     /// </summary>
     public DbSet<BidModel> BidSiteInfo { get; set; } = default!;
 
+    /// <summary>
+    /// Table for Bidtask categories.
+    /// </summary>
+    public DbSet<BidTaskModel> BidTasks { get; set; } = default!;
+
+    /// <summary>
+    /// Table for taskModel categories.
+    /// </summary>
+    public DbSet<TaskModel> TaskTemplates { get; set; } = default!;
+
+
+
 
     #endregion    
 }

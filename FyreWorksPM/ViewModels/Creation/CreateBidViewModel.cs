@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.DataAccess.DTO;
+using FyreWorksPM.DataAccess.Enums;
 using FyreWorksPM.Pages.Creation;
 using FyreWorksPM.Services.Bid;
 using FyreWorksPM.Services.Client;
@@ -9,6 +10,7 @@ using FyreWorksPM.Services.Item;
 using Microsoft.Maui.ApplicationModel;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace FyreWorksPM.ViewModels.Creation;
 
@@ -67,6 +69,9 @@ public partial class CreateBidViewModel : ObservableObject
     [ObservableProperty] private decimal laborSubtotal;
     [ObservableProperty] private decimal laborMarkup;
     [ObservableProperty] private ClientDto? selectedClient;
+
+    public ObservableCollection<BidTaskViewModel> Tasks { get; set; } = new();
+
 
     public ObservableCollection<ClientDto> Clients { get; } = new();
     public ObservableCollection<ItemDto> AvailableItems { get; } = new();
@@ -161,6 +166,41 @@ public partial class CreateBidViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void SaveTasks()
+    {
+        // Optional: log or validate tasks here
+        var validTasks = Tasks
+            .Where(t =>
+                !string.IsNullOrWhiteSpace(t.Name) &&
+                t.Cost >= 0 &&
+                t.Sale >= 0)
+            .ToList();
+
+        if (validTasks.Count == 0)
+        {
+            // You can show a message here if you want to warn the user
+            Debug.WriteLine("[SAVE TASKS] No valid tasks to save.");
+            return;
+        }
+
+        Debug.WriteLine($"[SAVE TASKS] Preparing {validTasks.Count} tasks for save...");
+
+        foreach (var task in validTasks)
+        {
+            Debug.WriteLine($"    • {task.Name}, Cost: {task.Cost}, Sale: {task.Sale}, Type: {task.Type}");
+            // You can also trim name or do deeper validation here
+        }
+
+        // The Tasks list is already in place; this method just confirms the state
+        // If you want to replace the list with validated tasks only:
+        Tasks.Clear();
+        foreach (var task in validTasks)
+            Tasks.Add(task);
+    }
+
+
+
+    [RelayCommand]
     public async Task OpenItemLibraryAsync()
     {
         var vm = new CreateItemsViewModel(_itemService, _itemTypeService);
@@ -177,12 +217,16 @@ public partial class CreateBidViewModel : ObservableObject
     [RelayCommand]
     public async Task SaveBidAsync()
     {
+        SaveTasks();
         if (string.IsNullOrWhiteSpace(BidNumber) || string.IsNullOrWhiteSpace(ProjectName) || SelectedClient == null)
         {
             await Shell.Current.DisplayAlert("Missing Info", "Please fill in all required fields.", "OK");
             return;
         }
-
+        foreach (var task in Tasks)
+        {
+            Debug.WriteLine($"[SAVE DEBUG] Task: {task.Name}, Cost: {task.Cost}, Sale: {task.Sale}, Type: {task.Type}");
+        }
         var newBid = new CreateBidDto
         {
             BidNumber = BidNumber,
@@ -206,7 +250,28 @@ public partial class CreateBidViewModel : ObservableObject
                 OccupantLoad = OccupantLoad,
                 ConstructionType = ConstructionType,
                 IsSprinklered = IsSprinklered
-            }
+            },
+
+            Tasks = AdminTasks.Select(t => new CreateTaskDto
+            {
+                TaskModelId = t.TaskModelId, // may be 0 if new
+                TaskName = t.Name,
+                Type = TaskType.Admin,
+                Cost = t.Cost,
+                Sale = t.Sale
+            })
+            .Concat(EngineeringTasks.Select(t => new CreateTaskDto
+            {
+                TaskModelId = t.TaskModelId, // may be 0 if new
+                TaskName = t.Name,
+                Type = TaskType.Engineering,
+                Cost = t.Cost,
+                Sale = t.Sale
+            })).ToList()
+
+
+
+
         };
 
         try

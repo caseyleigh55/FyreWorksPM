@@ -15,5 +15,12 @@ public class BidModel
     public SiteInfoModel? SiteInfo { get; set; }
     public int? SiteInfoId { get; set; }
 
+    // 💼 New hotness: Admin & Engineering Tasks
+    public List<BidTaskModel> Tasks { get; set; } = new();
+    
+
+
+
+
 
 }

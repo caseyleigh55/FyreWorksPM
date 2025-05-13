@@ -1,22 +1,23 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using FyreWorksPM.DataAccess.Enums;
 
 namespace FyreWorksPM.ViewModels.Creation
 {
     public partial class BidTaskViewModel : ObservableObject
     {
         [ObservableProperty]
+        private int taskModelId;
+
+        [ObservableProperty]
         private string name;
 
         [ObservableProperty]
         private decimal cost;
 
-        partial void OnCostChanged(decimal value)
-        {
-            System.Diagnostics.Debug.WriteLine($"Cost updated: {value}");
-        }
-
-
         [ObservableProperty]
         private decimal sale;
+
+        [ObservableProperty]
+        private TaskType type;
     }
 }

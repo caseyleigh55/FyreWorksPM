@@ -4,6 +4,7 @@ using FyreWorksPM.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FyreWorksPM.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250513011808_AddBidTaskModelAndLinkToTaskModel")]
+    partial class AddBidTaskModelAndLinkToTaskModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,7 +154,7 @@ namespace FyreWorksPM.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TaskTemplates");
+                    b.ToTable("TaskModel");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.UserModel", b =>
