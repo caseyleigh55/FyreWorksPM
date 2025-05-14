@@ -1,4 +1,6 @@
-﻿public class BidDto
+﻿using FyreWorksPM.DataAccess.DTO;
+
+public class BidDto
 {
     public int Id { get; set; }
     public string BidNumber { get; set; } = string.Empty;
@@ -11,4 +13,6 @@
     /// Indicates whether the bid is active or has been archived/inactivated.
     /// </summary>
     public bool IsActive { get; set; } = true;
+    public List<CreateBidTaskDto> Tasks { get; set; } = new();
+
 }

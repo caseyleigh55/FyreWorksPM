@@ -19,5 +19,9 @@ namespace FyreWorksPM.ViewModels.Creation
 
         [ObservableProperty]
         private TaskType type;
+
+        [ObservableProperty]
+        private string selectedTemplateName;
+
     }
 }

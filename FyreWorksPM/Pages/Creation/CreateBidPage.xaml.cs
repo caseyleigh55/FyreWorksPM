@@ -30,8 +30,16 @@ public partial class CreateBidPage : ContentPage
         base.OnAppearing();
 
         if (BindingContext is IViewModelLifecycle vm)
+        {
             await vm.OnAppearingAsync();
+        }
+
+        if (BindingContext is CreateBidViewModel bidVm)
+        {
+            await bidVm.LoadTaskTemplatesAsync();
+        }
     }
+
 
 
     /// <summary>

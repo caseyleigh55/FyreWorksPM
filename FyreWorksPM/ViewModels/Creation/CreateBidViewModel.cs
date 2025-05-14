@@ -7,6 +7,8 @@ using FyreWorksPM.Pages.Creation;
 using FyreWorksPM.Services.Bid;
 using FyreWorksPM.Services.Client;
 using FyreWorksPM.Services.Item;
+using FyreWorksPM.Services.Navigation;
+using FyreWorksPM.Services.Tasks;
 using Microsoft.Maui.ApplicationModel;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -24,24 +26,33 @@ public partial class CreateBidViewModel : ObservableObject
     private readonly IItemService _itemService;
     private readonly IItemTypeService _itemTypeService;
     private readonly IBidService _bidService;
+    private readonly ITaskService _taskService;
+    private readonly INavigationService _navigationService;
 
     public CreateBidViewModel(
         IBidService bidService,
         IClientService clientService,
         IItemService itemService,
-        IItemTypeService itemTypeService)
+        IItemTypeService itemTypeService,
+        ITaskService taskService,
+        INavigationService navigationService)
     {
         _bidService = bidService;
         _clientService = clientService;
         _itemService = itemService;
         _itemTypeService = itemTypeService;
+        _taskService = taskService;
+        _navigationService = navigationService;
 
         CreatedDate = DateTime.Today;
+
+        NavigateToCreateTasksCommand = new AsyncRelayCommand(NavigateToCreateTasksAsync);
 
         AdminTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseAdminTotalsChanged);
         EngineeringTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseEngineeringTotalsChanged);
 
         Task.Run(async () => await InitializeAsync());
+        
     }
 
     // ========== Observables ==========
@@ -69,8 +80,10 @@ public partial class CreateBidViewModel : ObservableObject
     [ObservableProperty] private decimal laborSubtotal;
     [ObservableProperty] private decimal laborMarkup;
     [ObservableProperty] private ClientDto? selectedClient;
+    
 
-    public ObservableCollection<BidTaskViewModel> Tasks { get; set; } = new();
+
+    public ObservableCollection<BidTaskViewModel> Tasks { get; set; } = new();   
 
 
     public ObservableCollection<ClientDto> Clients { get; } = new();
@@ -106,7 +119,14 @@ public partial class CreateBidViewModel : ObservableObject
     public decimal GrandTotal => MaterialSubtotal * (1 + (MaterialMarkup / 100)) + LaborSubtotal * (1 + (LaborMarkup / 100));
 
     public ObservableCollection<BidTaskViewModel> AdminTasks { get; } = new();
+    [ObservableProperty]
+    private ObservableCollection<string> allAdminTaskNames = new();
     public ObservableCollection<BidTaskViewModel> EngineeringTasks { get; } = new();
+    [ObservableProperty]
+    private ObservableCollection<string> allEngineeringTaskNames = new();
+
+    public IAsyncRelayCommand NavigateToCreateTasksCommand { get; }
+
 
     public decimal AdminCostTotal => AdminTasks.Sum(t => t.Cost);
     public decimal AdminSaleTotal => AdminTasks.Sum(t => t.Sale);
@@ -114,6 +134,19 @@ public partial class CreateBidViewModel : ObservableObject
     public decimal EngineeringSaleTotal => EngineeringTasks.Sum(t => t.Sale);
     public decimal AdminEngCostTotal => AdminCostTotal + EngineeringCostTotal;
     public decimal AdminEngSaleTotal => AdminSaleTotal + EngineeringSaleTotal;
+
+    private async Task NavigateToCreateTasksAsync()
+    {
+        await _navigationService.GoToAsync(nameof(CreateTasksPage));
+    }
+
+
+    [RelayCommand]
+    private async Task OpenTaskManagerAsync()
+    {
+        await _navigationService.PushPageAsync<CreateTasksPage>();
+    }
+
 
     private void HookTaskHandlers(System.Collections.Specialized.NotifyCollectionChangedEventArgs e, Action raiseTotals)
     {
@@ -252,22 +285,20 @@ public partial class CreateBidViewModel : ObservableObject
                 IsSprinklered = IsSprinklered
             },
 
-            Tasks = AdminTasks.Select(t => new CreateTaskDto
+            Tasks = AdminTasks.Select(t => new CreateBidTaskDto
             {
-                TaskModelId = t.TaskModelId, // may be 0 if new
-                TaskName = t.Name,
-                Type = TaskType.Admin,
+                TaskModelId = t.TaskModelId, // always valid now
                 Cost = t.Cost,
                 Sale = t.Sale
             })
-            .Concat(EngineeringTasks.Select(t => new CreateTaskDto
-            {
-                TaskModelId = t.TaskModelId, // may be 0 if new
-                TaskName = t.Name,
-                Type = TaskType.Engineering,
+            .Concat(EngineeringTasks.Select(t => new CreateBidTaskDto
+{
+                TaskModelId = t.TaskModelId,
                 Cost = t.Cost,
                 Sale = t.Sale
-            })).ToList()
+            }))
+            .ToList()
+
 
 
 
@@ -292,7 +323,18 @@ public partial class CreateBidViewModel : ObservableObject
     {
         await ResetFormAsync();
         BidNumber = await _bidService.GetNextBidNumberAsync();
-        await Task.WhenAll(LoadClientsAsync(), LoadItemsAsync());
+        await Task.WhenAll(LoadClientsAsync(), LoadItemsAsync(), LoadTaskTemplatesAsync());
+    }
+
+    public async Task LoadTaskTemplatesAsync()
+    {
+        var admin = await _taskService.GetTemplatesByTypeAsync(TaskType.Admin);
+        AllAdminTaskNames = new ObservableCollection<string>(admin.Select(t => t.TaskName).Distinct());
+
+
+        var eng = await _taskService.GetTemplatesByTypeAsync(TaskType.Engineering);
+        AllEngineeringTaskNames = new ObservableCollection<string>(eng.Select(t => t.TaskName).Distinct());
+
     }
 
     public Task ResetFormAsync()

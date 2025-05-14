@@ -66,7 +66,6 @@ namespace FyreWorksPM.Api.Controllers
                 nextNum = int.Parse(match.Groups[1].Value) + 1;
             }
 
-            // 🌱 Map SiteInfoDto → SiteInfoModel
             var siteInfo = new SiteInfoModel
             {
                 ScopeOfWork = dto.SiteInfo.ScopeOfWork,
@@ -85,43 +84,18 @@ namespace FyreWorksPM.Api.Controllers
                 IsSprinklered = dto.SiteInfo.IsSprinklered
             };
 
-            var debugIncomingDtoTaskCount = dto.Tasks?.Count ?? -1;
-
-
-            // 🎯 Mapping admin/engineering tasks
+            // 🎯 Task usage only, no creation
             var bidTasks = new List<BidTaskModel>();
 
             foreach (var t in dto.Tasks)
             {
-                TaskModel existingTemplate = null;
+                var template = await _db.TaskTemplates.FindAsync(t.TaskModelId);
+                if (template == null)
+                    return BadRequest($"Invalid TaskModelId: {t.TaskModelId}");
 
-                // Only look up/create if TaskModelId is 0
-                if (t.TaskModelId == 0)
-                {
-                    existingTemplate = await _db.TaskTemplates
-                        .FirstOrDefaultAsync(tm => tm.TaskName == t.TaskName && tm.Type == t.Type);
-
-                    if (existingTemplate == null)
-                    {
-                        existingTemplate = new TaskModel
-                        {
-                            TaskName = t.TaskName,
-                            Type = t.Type
-                        };
-
-                        _db.TaskTemplates.Add(existingTemplate);
-                        await _db.SaveChangesAsync(); // Get new ID
-                    }
-                }
-                else
-                {
-                    existingTemplate = await _db.TaskTemplates.FindAsync(t.TaskModelId);
-                }
-
-                // Create the actual usage entry
                 bidTasks.Add(new BidTaskModel
                 {
-                    TaskModelId = existingTemplate.Id,
+                    TaskModelId = template.Id,
                     Cost = t.Cost,
                     Sale = t.Sale
                 });
@@ -129,20 +103,16 @@ namespace FyreWorksPM.Api.Controllers
 
             var bid = new BidModel
             {
-                BidNumber = $"B-{nextNum.ToString("D3")}",
+                BidNumber = $"B-{nextNum:D3}",
                 ProjectName = dto.ProjectName,
                 ClientId = dto.ClientId,
                 CreatedDate = dto.CreatedDate,
                 IsActive = dto.IsActive,
-                SiteInfo = siteInfo, // 👈 Link the site info
-                Tasks = bidTasks,
-                
+                SiteInfo = siteInfo,
+                Tasks = bidTasks
             };
-            var debugTaskCount = bid.Tasks.Count;
-
 
             _db.BidInfo.Add(bid);
-            
             await _db.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetBid), new { id = bid.Id }, new BidDto
@@ -153,9 +123,9 @@ namespace FyreWorksPM.Api.Controllers
                 ClientId = bid.ClientId,
                 CreatedDate = bid.CreatedDate,
                 IsActive = bid.IsActive
-                // You could return SiteInfo as well later in BidDto if needed
             });
         }
+
 
 
         // PUT: api/bids/{id}

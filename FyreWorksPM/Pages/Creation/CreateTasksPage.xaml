@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FyreWorksPM.ViewModels.Creation"
+             xmlns:dto="clr-namespace:FyreWorksPM.DataAccess.DTO;assembly=FyreWorksPM.DataAccess"
+             x:Class="FyreWorksPM.Pages.Creation.CreateTasksPage"
+             x:DataType="vm:CreateTasksViewModel"
+             Title="Create Tasks">
+
+    <VerticalStackLayout Padding="10" Spacing="10">
+
+        <!-- Task Name -->
+        <Label Text="Task Name" FontAttributes="Bold" Margin="0,10,0,0"/>
+        <Entry Placeholder="Task Name"
+               Text="{Binding TaskName}" />
+
+        <!-- Cost -->
+        <Label Text="Cost" FontAttributes="Bold" Margin="0,10,0,0"/>
+        <Entry Placeholder="Cost"               
+               Text="{Binding DefaultCost}"
+               Keyboard="Numeric"/>
+        
+
+        <!-- Sale -->
+        <Label Text="Sale" FontAttributes="Bold" Margin="0,10,0,0"/>
+        <Entry Placeholder="Sale"
+               Keyboard="Numeric"
+               Text="{Binding DefaultSale}" />
+
+        <!-- Task Type Picker -->
+        <Label Text="Task Type" FontAttributes="Bold" Margin="0,10,0,0"/>
+        <Picker ItemsSource="{Binding TaskTypes}"
+                SelectedItem="{Binding SelectedTaskType}" />
+
+        <!-- Add Button -->
+        <Button Text="Add Task"
+                Command="{Binding AddTaskCommand}" />
+
+        <!-- Search -->
+        <Entry Placeholder="Search tasks..."
+               Text="{Binding SearchText}" />
+
+        <!-- Filtered Task List -->
+        <CollectionView ItemsSource="{Binding FilteredTasks}"
+                        SelectionMode="Single"
+                        SelectedItem="{Binding SelectedTask}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="dto:SavedTaskDto">
+                    <Frame Padding="5" Margin="2">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding TaskName}" FontAttributes="Bold" TextColor="Green"/>
+                            <Label Text="{Binding Type}" />
+                            <Label Text="{Binding DefaultCost, StringFormat='Cost: {0:C}'}" />
+                            <Label Text="{Binding DefaultSale, StringFormat='Sale: {0:C}'}" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Edit / Delete Buttons -->
+        <HorizontalStackLayout>
+            <Button Text="Edit Selected Task"
+                    BackgroundColor="Orange"
+                    Command="{Binding EditSelectedTaskCommand}" />
+
+            <Button Text="Delete Selected Task"
+                    BackgroundColor="DarkRed"
+                    TextColor="White"
+                    Command="{Binding DeleteSelectedTaskCommand}" />
+        </HorizontalStackLayout>
+
+    </VerticalStackLayout>
+</ContentPage>

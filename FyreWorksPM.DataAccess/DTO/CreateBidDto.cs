@@ -12,6 +12,6 @@ public class CreateBidDto
     public SiteInfoDto SiteInfo { get; set; } = new();
 
     //Admin and Engineering Tasks Section
-    public List<CreateTaskDto> Tasks { get; set; }
+    public List<CreateBidTaskDto> Tasks { get; set; } = new();
 
 }

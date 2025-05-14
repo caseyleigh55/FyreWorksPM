@@ -8,19 +8,11 @@ public partial class SearchableEntryView : ContentView
     {
         InitializeComponent();
         FilteredSuggestions = new ObservableCollection<string>();
+        ShowSuggestions = false;
     }
 
     public static readonly BindableProperty SuggestionsProperty =
         BindableProperty.Create(nameof(Suggestions), typeof(IEnumerable<string>), typeof(SearchableEntryView), propertyChanged: OnSuggestionsChanged);
-
-    public static readonly BindableProperty SelectedItemProperty =
-        BindableProperty.Create(nameof(SelectedItem), typeof(string), typeof(SearchableEntryView), defaultBindingMode: BindingMode.TwoWay);
-
-    public static readonly BindableProperty SearchTextProperty =
-        BindableProperty.Create(nameof(SearchText), typeof(string), typeof(SearchableEntryView), string.Empty, BindingMode.TwoWay);
-
-    public static readonly BindableProperty PlaceholderProperty =
-        BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(SearchableEntryView), "Search...");
 
     public IEnumerable<string> Suggestions
     {
@@ -28,11 +20,8 @@ public partial class SearchableEntryView : ContentView
         set => SetValue(SuggestionsProperty, value);
     }
 
-    public string SelectedItem
-    {
-        get => (string)GetValue(SelectedItemProperty);
-        set => SetValue(SelectedItemProperty, value);
-    }
+    public static readonly BindableProperty SearchTextProperty =
+        BindableProperty.Create(nameof(SearchText), typeof(string), typeof(SearchableEntryView), defaultBindingMode: BindingMode.TwoWay);
 
     public string SearchText
     {
@@ -40,54 +29,64 @@ public partial class SearchableEntryView : ContentView
         set => SetValue(SearchTextProperty, value);
     }
 
+    public static readonly BindableProperty SelectedItemProperty =
+        BindableProperty.Create(nameof(SelectedItem), typeof(string), typeof(SearchableEntryView), defaultBindingMode: BindingMode.TwoWay);
+
+    public string SelectedItem
+    {
+        get => (string)GetValue(SelectedItemProperty);
+        set => SetValue(SelectedItemProperty, value);
+    }
+
+    public static readonly BindableProperty PlaceholderProperty =
+        BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(SearchableEntryView), "Search...");
+
     public string Placeholder
     {
         get => (string)GetValue(PlaceholderProperty);
         set => SetValue(PlaceholderProperty, value);
     }
 
-    public ObservableCollection<string> FilteredSuggestions { get; private set; }
+    public ObservableCollection<string> FilteredSuggestions { get; set; }
 
-    public bool ShowSuggestions => FilteredSuggestions.Any();
+    public bool ShowSuggestions { get; set; }
 
     private static void OnSuggestionsChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (bindable is SearchableEntryView control && newValue is IEnumerable<string> newSuggestions)
+        if (bindable is SearchableEntryView view)
         {
-            control.UpdateFilteredSuggestions(control.SearchText);
+            view.UpdateFilter();
         }
     }
 
     private void OnTextChanged(object sender, TextChangedEventArgs e)
     {
-        UpdateFilteredSuggestions(e.NewTextValue);
+        SearchText = e.NewTextValue;
+        UpdateFilter();
     }
 
-    private void UpdateFilteredSuggestions(string input)
+    private void UpdateFilter()
     {
+        var query = SearchText?.ToLowerInvariant() ?? "";
+        var items = Suggestions?.Where(x => x != null && x.ToLowerInvariant().Contains(query)).Distinct().ToList() ?? new();
+
         FilteredSuggestions.Clear();
-
-        if (!string.IsNullOrWhiteSpace(input) && Suggestions != null)
+        foreach (var item in items)
         {
-            var filtered = Suggestions
-                .Where(s => s.Contains(input, StringComparison.OrdinalIgnoreCase))
-                .Distinct();
-
-            foreach (var suggestion in filtered)
-                FilteredSuggestions.Add(suggestion);
+            FilteredSuggestions.Add(item);
         }
 
-        SuggestionsView.IsVisible = FilteredSuggestions.Any();
+        ShowSuggestions = FilteredSuggestions.Count > 0;
+        SuggestionsView.IsVisible = ShowSuggestions;
     }
 
     private void OnSuggestionSelected(object sender, SelectionChangedEventArgs e)
     {
         if (e.CurrentSelection.FirstOrDefault() is string selected)
         {
-            SearchText = selected;
             SelectedItem = selected;
+            SearchText = selected;
             SuggestionsView.IsVisible = false;
-            SuggestionsView.SelectedItem = null;
         }
     }
 }

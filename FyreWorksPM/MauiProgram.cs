@@ -16,6 +16,7 @@ using FyreWorksPM.Services.Bid;
 using FyreWorksPM.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using FyreWorksPM.Services.Tasks;
 
 namespace FyreWorksPM;
 
@@ -71,6 +72,12 @@ public static class MauiProgram
             client.BaseAddress = new Uri(ApiConfig.BaseUrl);
         });
 
+        builder.Services.AddHttpClient<ITaskService, TaskService>(client =>
+        {
+            client.BaseAddress = new Uri(ApiConfig.BaseUrl);
+        });
+
+
         // ============================
         // 🔧 Core Services
         // ============================
@@ -81,6 +88,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<App>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
         builder.Services.AddSingleton<ILoadingService, LoadingService>();
+
 
         // ============================
         // 🐚 Shells
@@ -106,6 +114,7 @@ public static class MauiProgram
         builder.Services.AddTransient<CreateClientViewModel>();
         builder.Services.AddTransient<CreateItemsViewModel>();
         builder.Services.AddTransient<RegisterViewModel>();
+        builder.Services.AddTransient<CreateTasksViewModel>();
 
         // Pop-Up ViewModels
         builder.Services.AddTransient<ManageItemPopupViewModel>();
@@ -137,6 +146,8 @@ public static class MauiProgram
         });
 
         // Creation Pages
+        builder.Services.AddTransient<CreateTasksPage>();
+
         builder.Services.AddTransient<CreateBidPage>(provider =>
         {
             var vm = provider.GetRequiredService<CreateBidViewModel>();

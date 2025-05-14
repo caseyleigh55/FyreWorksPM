@@ -2,7 +2,7 @@
 {
     public enum TaskType
     {
-        Admin,
-        Engineering
+        Admin = 0,
+        Engineering = 1
     }
 }

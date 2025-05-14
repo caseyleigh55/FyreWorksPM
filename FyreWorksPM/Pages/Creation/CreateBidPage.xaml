@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:converters="clr-namespace:FyreWorksPM.Common.Converters;assembly=FyreWorksPM"
-
+    xmlns:controls="clr-namespace:FyreWorksPM.Controls"
     x:Class="FyreWorksPM.Pages.Creation.CreateBidPage"
     x:Name="CreateBid"
     Title="New Bid">
@@ -237,8 +237,17 @@
                                Margin="0,20,0,0" />
 
                         <!-- Add Task Button -->
-                        
-                            <Button Text="Add Task" Command="{Binding AddAdminTaskCommand}" />
+                        <Button 
+                            Text="Create New Task"
+                            Command="{Binding NavigateToCreateTasksCommand}"
+                            BackgroundColor="Purple"
+                            TextColor="White"
+                            Margin="10"
+                            HorizontalOptions="Center" />
+
+
+
+                        <Button Text="Add Task" Command="{Binding AddAdminTaskCommand}" />
                         
                         <!-- Task List -->
                         
@@ -256,7 +265,10 @@
                                 <DataTemplate>
                                     <Grid ColumnDefinitions="7*,1.5*,1.5*,Auto" Padding="5" ColumnSpacing="10">
                                         <!-- Task -->
-                                        <Entry Grid.Column="0" Placeholder="Task Name" Text="{Binding Name}" />
+                                        <controls:SearchableEntryView
+                                            Suggestions="{Binding Source={x:Reference CreateBid}, Path=BindingContext.AllAdminTaskNames}"
+                                            SearchText="{Binding Name, Mode=TwoWay}"
+                                            SelectedItem="{Binding SelectedTemplateName, Mode=TwoWay}" />
 
                                         <!-- Cost -->
                                         <Grid Grid.Column="1" ColumnDefinitions="Auto,*" VerticalOptions="Center">
