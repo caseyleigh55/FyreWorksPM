@@ -17,29 +17,40 @@ namespace FyreWorksPM.ViewModels.Creation
         public CreateTasksViewModel(ITaskService taskService)
         {
             _taskService = taskService;
+
             TaskTypes = new ObservableCollection<TaskType>((TaskType[])Enum.GetValues(typeof(TaskType)));
             SelectedTaskType = TaskType.Admin;
-
 
             LoadTasksCommand.Execute(null);
         }
 
+        // ----------------------------
         // Input Fields
+        // ----------------------------
         [ObservableProperty] private string taskName;
         [ObservableProperty] private decimal defaultCost;
         [ObservableProperty] private decimal defaultSale;
         [ObservableProperty] private TaskType selectedTaskType;
 
-        // UI Collections
+        // ----------------------------
+        // Collections
+        // ----------------------------
         public ObservableCollection<TaskType> TaskTypes { get; }
 
         public ObservableCollection<SavedTaskDto> AllTasks { get; } = new();
-        [ObservableProperty] private ObservableCollection<SavedTaskDto> filteredTasks = new();
 
+        [ObservableProperty]
+        private ObservableCollection<SavedTaskDto> filteredTasks = new();
+
+        // ----------------------------
+        // UI-Related State
+        // ----------------------------
         [ObservableProperty] private SavedTaskDto selectedTask;
         [ObservableProperty] private string searchText;
 
+        // ----------------------------
         // Load tasks from API
+        // ----------------------------
         [RelayCommand]
         private async Task LoadTasksAsync()
         {
@@ -57,23 +68,29 @@ namespace FyreWorksPM.ViewModels.Creation
             ApplyFilter();
         }
 
-        // Trigger filtering
+        // ----------------------------
+        // Filtering
+        // ----------------------------
         partial void OnSearchTextChanged(string value) => ApplyFilter();
         partial void OnSelectedTaskTypeChanged(TaskType value) => LoadTasksCommand.Execute(null);
 
         private void ApplyFilter()
         {
+            var query = SearchText?.ToLowerInvariant() ?? "";
+
             var filtered = AllTasks
-                .Where(t => string.IsNullOrWhiteSpace(SearchText) ||
-                            t.TaskName.Contains(SearchText, System.StringComparison.OrdinalIgnoreCase))
+                .Where(t => string.IsNullOrWhiteSpace(query) ||
+                            t.TaskName.ToLowerInvariant().Contains(query))
                 .ToList();
 
             filteredTasks.Clear();
-            foreach (var t in filtered)
-                filteredTasks.Add(t);
+            foreach (var task in filtered)
+                filteredTasks.Add(task);
         }
 
-        // Add new task template
+        // ----------------------------
+        // Add new task
+        // ----------------------------
         [RelayCommand]
         private async Task AddTaskAsync()
         {
@@ -97,7 +114,9 @@ namespace FyreWorksPM.ViewModels.Creation
             }
         }
 
-        // Delete selected
+        // ----------------------------
+        // Delete selected task
+        // ----------------------------
         [RelayCommand]
         private async Task DeleteSelectedTaskAsync()
         {
@@ -110,7 +129,9 @@ namespace FyreWorksPM.ViewModels.Creation
             SelectedTask = null;
         }
 
-        // Edit (reuses Add as Update)
+        // ----------------------------
+        // Edit selected task
+        // ----------------------------
         [RelayCommand]
         private async Task EditSelectedTaskAsync()
         {
@@ -126,7 +147,7 @@ namespace FyreWorksPM.ViewModels.Creation
             };
 
             await _taskService.UpdateTemplateAsync(SelectedTask.Id, dto);
-            await LoadTasksAsync(); // refresh list
+            await LoadTasksAsync(); // refresh the list
         }
 
         private void ClearForm()

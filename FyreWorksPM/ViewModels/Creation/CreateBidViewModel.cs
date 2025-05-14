@@ -80,7 +80,13 @@ public partial class CreateBidViewModel : ObservableObject
     [ObservableProperty] private decimal laborSubtotal;
     [ObservableProperty] private decimal laborMarkup;
     [ObservableProperty] private ClientDto? selectedClient;
-    
+
+
+    [ObservableProperty] private ObservableCollection<SavedTaskDto> taskTemplates;
+    [ObservableProperty] private SavedTaskDto selectedTemplateTask;
+    [ObservableProperty] private BidTaskModel currentTask;
+
+
 
 
     public ObservableCollection<BidTaskViewModel> Tasks { get; set; } = new();   
@@ -120,10 +126,10 @@ public partial class CreateBidViewModel : ObservableObject
 
     public ObservableCollection<BidTaskViewModel> AdminTasks { get; } = new();
     [ObservableProperty]
-    private ObservableCollection<string> allAdminTaskNames = new();
+    private ObservableCollection<SavedTaskDto> allAdminTaskNames = new();
     public ObservableCollection<BidTaskViewModel> EngineeringTasks { get; } = new();
     [ObservableProperty]
-    private ObservableCollection<string> allEngineeringTaskNames = new();
+    private ObservableCollection<SavedTaskDto> allEngineeringTaskNames = new();
 
     public IAsyncRelayCommand NavigateToCreateTasksCommand { get; }
 
@@ -157,6 +163,9 @@ public partial class CreateBidViewModel : ObservableObject
         }
         raiseTotals();
     }
+
+    
+
 
     private void RaiseAdminTotalsChanged()
     {
@@ -329,11 +338,11 @@ public partial class CreateBidViewModel : ObservableObject
     public async Task LoadTaskTemplatesAsync()
     {
         var admin = await _taskService.GetTemplatesByTypeAsync(TaskType.Admin);
-        AllAdminTaskNames = new ObservableCollection<string>(admin.Select(t => t.TaskName).Distinct());
+        AllAdminTaskNames = new ObservableCollection<SavedTaskDto>(admin);
 
 
         var eng = await _taskService.GetTemplatesByTypeAsync(TaskType.Engineering);
-        AllEngineeringTaskNames = new ObservableCollection<string>(eng.Select(t => t.TaskName).Distinct());
+        AllEngineeringTaskNames = new ObservableCollection<SavedTaskDto>(eng);
 
     }
 

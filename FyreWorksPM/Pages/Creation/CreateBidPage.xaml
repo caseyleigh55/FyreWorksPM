@@ -268,7 +268,7 @@
                                         <controls:SearchableEntryView
                                             Suggestions="{Binding Source={x:Reference CreateBid}, Path=BindingContext.AllAdminTaskNames}"
                                             SearchText="{Binding Name, Mode=TwoWay}"
-                                            SelectedItem="{Binding SelectedTemplateName, Mode=TwoWay}" />
+                                            SelectedItem="{Binding SelectedTemplateTaskName, Mode=TwoWay}" />
 
                                         <!-- Cost -->
                                         <Grid Grid.Column="1" ColumnDefinitions="Auto,*" VerticalOptions="Center">

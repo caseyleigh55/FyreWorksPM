@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.DataAccess.Enums;
+using System.Diagnostics;
 
 namespace FyreWorksPM.ViewModels.Creation
 {
@@ -22,6 +24,25 @@ namespace FyreWorksPM.ViewModels.Creation
 
         [ObservableProperty]
         private string selectedTemplateName;
+
+        [ObservableProperty]
+        private SavedTaskDto selectedTemplateTaskName;
+
+        partial void OnSelectedTemplateTaskNameChanged(SavedTaskDto value)
+        {
+            Debug.WriteLine($"🔥 Template selected: {value?.TaskName}");
+            if (value == null) return;
+
+            // Set the task name and prices based on the template
+            Name = value.TaskName;
+            Cost = value.DefaultCost;
+            Sale = value.DefaultSale;
+
+            OnPropertyChanged(nameof(Name));
+            OnPropertyChanged(nameof(Cost));
+            OnPropertyChanged(nameof(Sale));
+
+        }
 
     }
 }

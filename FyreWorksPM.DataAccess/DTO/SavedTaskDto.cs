@@ -9,5 +9,13 @@ namespace FyreWorksPM.DataAccess.DTO
         public TaskType Type { get; set; }
         public decimal DefaultCost { get; set; }
         public decimal DefaultSale { get; set; }
+
+        public override string ToString()
+        {
+            return TaskName;
+        }
+
     }
+
+
 }
