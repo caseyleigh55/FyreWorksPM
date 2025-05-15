@@ -360,7 +360,10 @@
                                 <DataTemplate>
                                     <Grid ColumnDefinitions="7*,1.5*,1.5*,Auto" Padding="5" ColumnSpacing="10">
                                         <!-- Task -->
-                                        <Entry Grid.Column="0" Placeholder="Task Name" Text="{Binding Name}" />
+                                        <controls:SearchableEntryView
+                                            Suggestions="{Binding Source={x:Reference CreateBid}, Path=BindingContext.AllEngineeringTaskNames}"
+                                            SearchText="{Binding Name, Mode=TwoWay}"
+                                            SelectedItem="{Binding SelectedTemplateTaskName, Mode=TwoWay}" />
 
                                         <!-- Cost -->
                                         <Grid Grid.Column="1" ColumnDefinitions="Auto,*" VerticalOptions="Center">

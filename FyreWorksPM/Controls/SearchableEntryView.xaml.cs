@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.Maui.Controls;
@@ -106,7 +106,15 @@ public partial class SearchableEntryView : ContentView
 
     private void ApplyFilter()
     {
-        var query = SearchText?.ToLowerInvariant() ?? "";
+        var query = SearchText?.ToLowerInvariant();
+
+        // 🛑 If no query, hide suggestions and bail out
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            FilteredSuggestions.Clear();
+            SuggestionsView.IsVisible = false;
+            return;
+        }
         var items = new List<object>();
 
         foreach (var item in Suggestions ?? Enumerable.Empty<object>())

@@ -338,11 +338,11 @@ public partial class CreateBidViewModel : ObservableObject
     public async Task LoadTaskTemplatesAsync()
     {
         var admin = await _taskService.GetTemplatesByTypeAsync(TaskType.Admin);
-        AllAdminTaskNames = new ObservableCollection<SavedTaskDto>(admin);
+        allAdminTaskNames = new ObservableCollection<SavedTaskDto>(admin);
 
 
         var eng = await _taskService.GetTemplatesByTypeAsync(TaskType.Engineering);
-        AllEngineeringTaskNames = new ObservableCollection<SavedTaskDto>(eng);
+        allEngineeringTaskNames = new ObservableCollection<SavedTaskDto>(eng);
 
     }
 
