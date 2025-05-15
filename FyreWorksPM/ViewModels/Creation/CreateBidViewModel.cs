@@ -294,24 +294,16 @@ public partial class CreateBidViewModel : ObservableObject
                 IsSprinklered = IsSprinklered
             },
 
-            Tasks = AdminTasks.Select(t => new CreateBidTaskDto
-            {
-                TaskModelId = t.TaskModelId, // always valid now
-                Cost = t.Cost,
-                Sale = t.Sale
-            })
-            .Concat(EngineeringTasks.Select(t => new CreateBidTaskDto
-{
-                TaskModelId = t.TaskModelId,
-                Cost = t.Cost,
-                Sale = t.Sale
-            }))
-            .ToList()
-
-
-
-
-
+            Tasks = AdminTasks
+                    .Concat(EngineeringTasks)
+                    .Select(t => new CreateBidTaskDto
+                    {
+                        TaskModelId = t.TaskModelId,
+                        TaskName = t.Name,
+                        Cost = t.Cost,
+                        Sale = t.Sale
+                    })
+                    .ToList()
         };
 
         try

@@ -37,6 +37,7 @@ namespace FyreWorksPM.ViewModels.Creation
             Name = value.TaskName;
             Cost = value.DefaultCost;
             Sale = value.DefaultSale;
+            TaskModelId = value.Id;
 
             OnPropertyChanged(nameof(Name));
             OnPropertyChanged(nameof(Cost));
