@@ -15,9 +15,9 @@ public partial class RegisterViewModel : ObservableObject
 {
     private readonly ILoadingService _loading;
     private readonly HttpClient _httpClient;
-    private readonly INavigationService _navigation;
+    private readonly INavigationServices _navigation;
 
-    public RegisterViewModel(HttpClient httpClient, INavigationService navigation, ILoadingService loading)
+    public RegisterViewModel(HttpClient httpClient, INavigationServices navigation, ILoadingService loading)
     {
         _httpClient = httpClient;
         _navigation = navigation;

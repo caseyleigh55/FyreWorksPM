@@ -7,6 +7,7 @@
              x:DataType="vm:CreateTasksViewModel"
              Title="Create Tasks">
 
+    <ScrollView>
     <VerticalStackLayout Padding="10" Spacing="10">
 
         <!-- Task Name -->
@@ -39,8 +40,10 @@
         <!-- Search -->
         <Entry Placeholder="Search tasks..."
                Text="{Binding SearchText}" />
-
-        <!-- Filtered Task List -->
+        
+            <!-- Filtered Task List -->
+            <Border MaximumHeightRequest="185">
+                <ScrollView>
         <CollectionView ItemsSource="{Binding FilteredTasks}"
                         SelectionMode="Single"
                         SelectedItem="{Binding SelectedTask}">
@@ -57,18 +60,32 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+                </ScrollView>
+            </Border>
 
-        <!-- Edit / Delete Buttons -->
-        <HorizontalStackLayout>
-            <Button Text="Edit Selected Task"
+
+            <!-- Edit / Delete Buttons -->
+        <Grid ColumnDefinitions="*,*,*">
+            <Button Grid.Column="0"
+                    Text="Edit Selected Task"
                     BackgroundColor="Orange"
                     Command="{Binding EditSelectedTaskCommand}" />
 
-            <Button Text="Delete Selected Task"
+            <Button Grid.Column="1"
+                    Text="Delete Selected Task"
                     BackgroundColor="DarkRed"
                     TextColor="White"
                     Command="{Binding DeleteSelectedTaskCommand}" />
-        </HorizontalStackLayout>
+
+            <Button  Grid.Column="2"              
+                    Text="Back" 
+                    BackgroundColor="Purple"
+                    TextColor="White"                 
+                    Clicked="OnBackClicked"/>
+
+
+        </Grid>
 
     </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

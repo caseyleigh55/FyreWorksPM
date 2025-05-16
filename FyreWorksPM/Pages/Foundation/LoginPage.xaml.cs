@@ -14,7 +14,7 @@ public partial class LoginPage : ContentPage
     private readonly IAuthService _authService;
     private readonly LoginViewModel _vm;
     private readonly AppShell _appShell;
-    private readonly INavigationService _nav; // 👈 Injected navigation service
+    private readonly INavigationServices _nav; // 👈 Injected navigation service
     
 
     // 👇 Parameterless constructor for XAML preview/fallback
@@ -26,7 +26,7 @@ public partial class LoginPage : ContentPage
     }
 
     // 👇 Constructor used by DI
-    public LoginPage(LoginViewModel vm, AppShell appShell, INavigationService nav)
+    public LoginPage(LoginViewModel vm, AppShell appShell, INavigationServices nav)
     {
         InitializeComponent();
         

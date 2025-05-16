@@ -18,6 +18,7 @@ using FyreWorksPM.Services.Item;
 using Microsoft.Maui.ApplicationModel;
 using System.Collections.ObjectModel;
 using static Azure.Core.HttpHeader;
+using FyreWorksPM.Services.Navigation;
 
 namespace FyreWorksPM.ViewModels.Creation;
 
@@ -29,13 +30,15 @@ public partial class CreateItemsViewModel : ObservableObject
 {
     private readonly IItemService _itemService;
     private readonly IItemTypeService _itemTypeService;
+    private readonly INavigationServices _navigationService;
 
     public Action<ItemDto>? ItemSelectedCallback { get; set; }
 
-    public CreateItemsViewModel(IItemService itemService, IItemTypeService itemTypeService)
+    public CreateItemsViewModel(IItemService itemService, IItemTypeService itemTypeService,INavigationServices navigationService)
     {
         _itemService = itemService;
         _itemTypeService = itemTypeService;
+        _navigationService = navigationService;
 
         _ = LoadItemTypesAsync();
         _ = LoadItemsAsync();
@@ -112,7 +115,10 @@ public partial class CreateItemsViewModel : ObservableObject
             },
             _itemService);
 
-        await Shell.Current.Navigation.PushAsync(popup);
+        await _navigationService.PushPageAsync<ManageItemPopup>();
+
+
+
     }
 
     [RelayCommand]

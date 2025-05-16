@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FyreWorksPM.DataAccess.DTO;
+using FyreWorksPM.Pages.PopUps;
 using FyreWorksPM.Services.Item;
 
 namespace FyreWorksPM.ViewModels.Solitary;
@@ -55,6 +56,8 @@ public partial class ManageItemPopupViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveAsync()
     {
+        var view = Shell.Current.CurrentPage as ManageItemPopup;
+        view?.MarkClosingInternally();
         _item.Name = Name;
         _item.Description = Description;
         _item.ItemTypeName = ItemTypeName;
@@ -73,7 +76,10 @@ public partial class ManageItemPopupViewModel : ObservableObject
         if (_onSaved != null)
             await _onSaved.Invoke();
 
-        // Close the popup
-        await Shell.Current.Navigation.PopAsync();
+        // Proceed with save logic
+        await Shell.Current.GoToAsync("..");
+
+        //// Close the popup
+        //await Shell.Current.Navigation.PopAsync();
     }
 }

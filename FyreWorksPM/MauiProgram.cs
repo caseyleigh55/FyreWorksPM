@@ -86,7 +86,7 @@ public static class MauiProgram
 
 
         builder.Services.AddSingleton<App>();
-        builder.Services.AddSingleton<INavigationService, NavigationService>();
+        builder.Services.AddSingleton<INavigationServices, NavigationService>();
         builder.Services.AddSingleton<ILoadingService, LoadingService>();
 
 

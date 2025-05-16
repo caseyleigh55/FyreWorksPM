@@ -27,7 +27,7 @@ public partial class CreateBidViewModel : ObservableObject
     private readonly IItemTypeService _itemTypeService;
     private readonly IBidService _bidService;
     private readonly ITaskService _taskService;
-    private readonly INavigationService _navigationService;
+    private readonly INavigationServices _navigationService;
 
     public CreateBidViewModel(
         IBidService bidService,
@@ -35,7 +35,7 @@ public partial class CreateBidViewModel : ObservableObject
         IItemService itemService,
         IItemTypeService itemTypeService,
         ITaskService taskService,
-        INavigationService navigationService)
+        INavigationServices navigationService)
     {
         _bidService = bidService;
         _clientService = clientService;
@@ -245,7 +245,7 @@ public partial class CreateBidViewModel : ObservableObject
     [RelayCommand]
     public async Task OpenItemLibraryAsync()
     {
-        var vm = new CreateItemsViewModel(_itemService, _itemTypeService);
+        var vm = new CreateItemsViewModel(_itemService, _itemTypeService,_navigationService);
         await Shell.Current.Navigation.PushAsync(new CreateItemsPage(vm, item => SelectedItemFromLibrary = item));
     }
 

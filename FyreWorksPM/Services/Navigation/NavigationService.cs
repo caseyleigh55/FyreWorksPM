@@ -7,7 +7,7 @@ namespace FyreWorksPM.Services.Navigation;
 /// Centralized navigation helper that abstracts away Shell and Navigation APIs.
 /// Allows ViewModels to perform navigation cleanly without knowing about the UI layer.
 /// </summary>
-public class NavigationService : INavigationService
+public class NavigationService : INavigationServices
 {
     private readonly IServiceProvider _services;
 
@@ -37,7 +37,19 @@ public class NavigationService : INavigationService
     /// <typeparam name="TPage">The type of page to push (must be registered in DI).</typeparam>
     public async Task PushPageAsync<TPage>() where TPage : Page
     {
+        //var page = _services.GetRequiredService<TPage>();
+        //await Shell.Current.Navigation.PushAsync(page);
         var page = _services.GetRequiredService<TPage>();
+
+        if (page is IHideFlyout)
+        {
+            Shell.Current.FlyoutBehavior = FlyoutBehavior.Disabled;
+        }
+        else
+        {
+            Shell.Current.FlyoutBehavior = FlyoutBehavior.Flyout;
+        }
+
         await Shell.Current.Navigation.PushAsync(page);
     }
 

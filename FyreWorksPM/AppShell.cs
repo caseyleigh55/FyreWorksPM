@@ -1,6 +1,7 @@
 ﻿using FyreWorksPM.Pages.Foundation;
 using FyreWorksPM.Pages.Creation;
 using FyreWorksPM.Services.Auth;
+using FyreWorksPM.Pages.PopUps;
 
 namespace FyreWorksPM;
 
@@ -72,7 +73,7 @@ public partial class AppShell : Shell
         //🧪 TEMP: CreateTasksPage Tab
         Items.Add(new ShellContent
         {
-            Title = "CreateTasks",
+            Title = "🔧 CreateTasks (Temp)",
             ContentTemplate = new DataTemplate(() =>
                 App.Services.GetRequiredService<CreateTasksPage>()),
             Route = "createtasks"

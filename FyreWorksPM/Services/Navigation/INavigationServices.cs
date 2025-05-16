@@ -4,7 +4,7 @@
     /// Provides an abstraction for navigation throughout the app.
     /// Decouples navigation logic from Views and ViewModels for testability and reuse.
     /// </summary>
-    public interface INavigationService
+    public interface INavigationServices
     {
         /// <summary>
         /// Navigates to a Shell route (e.g. "home", "//login").

@@ -13,13 +13,13 @@ namespace FyreWorksPM.ViewModels.Foundation;
 public partial class LoginViewModel : ObservableObject
 {
     private readonly IAuthService _auth;
-    private readonly INavigationService _nav;
+    private readonly INavigationServices _nav;
     private readonly ILoadingService _loading;
 
     [ObservableProperty] private string username = string.Empty;
     [ObservableProperty] private string password = string.Empty;
 
-    public LoginViewModel(IAuthService auth, INavigationService nav, ILoadingService loading)
+    public LoginViewModel(IAuthService auth, INavigationServices nav, ILoadingService loading)
     {
         _auth = auth;
         _nav = nav;
