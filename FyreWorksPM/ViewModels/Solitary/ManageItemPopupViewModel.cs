@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FyreWorksPM.DataAccess.DTO;
+using FyreWorksPM.Pages.Editing;
 using FyreWorksPM.Pages.PopUps;
 using FyreWorksPM.Services.Item;
 
@@ -10,7 +11,7 @@ namespace FyreWorksPM.ViewModels.Solitary;
 /// ViewModel for the item editing popup.
 /// Handles loading editable values, saving changes, and refreshing the main view.
 /// </summary>
-public partial class ManageItemPopupViewModel : ObservableObject
+public partial class EditItemPageViewModel : ObservableObject
 {
     #region Observable Properties
 
@@ -38,7 +39,7 @@ public partial class ManageItemPopupViewModel : ObservableObject
     /// <summary>
     /// Constructor for popup ViewModel. Takes the item being edited, a callback, and the injected item service.
     /// </summary>
-    public ManageItemPopupViewModel(ItemDto item, Func<Task> onSaved, IItemService itemService)
+    public EditItemPageViewModel(ItemDto item, Func<Task> onSaved, IItemService itemService)
     {
         _item = item;
         _onSaved = onSaved;
@@ -56,7 +57,7 @@ public partial class ManageItemPopupViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveAsync()
     {
-        var view = Shell.Current.CurrentPage as ManageItemPopup;
+        var view = Shell.Current.CurrentPage as EditItemPage;
         view?.MarkClosingInternally();
         _item.Name = Name;
         _item.Description = Description;

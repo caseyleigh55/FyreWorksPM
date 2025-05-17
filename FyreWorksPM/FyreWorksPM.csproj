@@ -109,6 +109,9 @@
 	  <Compile Update="Pages\Foundation\ProjectsPage.xaml.cs">
 	    <DependentUpon>ProjectsPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Pages\Editing\EditItemPage.xaml.cs">
+	    <DependentUpon>EditItemPage.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -157,7 +160,7 @@
 	  <MauiXaml Update="Pages\Solitary\SelectedTicketPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Pages\PopUps\ManageItemPopup.xaml">
+	  <MauiXaml Update="Pages\Editing\EditItemPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\PopUps\ManageItemTypesPopup.xaml">

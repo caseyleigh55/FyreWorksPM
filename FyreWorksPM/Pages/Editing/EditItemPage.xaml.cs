@@ -3,24 +3,24 @@ using FyreWorksPM.Services.Item;
 using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.Services;
 
-namespace FyreWorksPM.Pages.PopUps;
+namespace FyreWorksPM.Pages.Editing;
 
 /// <summary>
 /// Code-behind for the item edit popup.
 /// Hosts the editing UI and handles cancel/navigation behavior.
 /// </summary>
-public partial class ManageItemPopup : ContentPage, IHideFlyout
+public partial class EditItemPage : ContentPage, IHideFlyout
 {
     /// <summary>
     /// Initializes the popup with the item to edit and post-save callback.
     /// Resolves the item service via DI.
     /// </summary>
-    public ManageItemPopup(ItemDto item, Func<Task> onSaved, IItemService service)
+    public EditItemPage(ItemDto item, Func<Task> onSaved, IItemService service)
     {
         InitializeComponent();        
 
         // Set up the ViewModel
-        BindingContext = new ManageItemPopupViewModel(item, onSaved, service);
+        BindingContext = new EditItemPageViewModel(item, onSaved, service);
     }
     private bool isClosingInternally = false;
 

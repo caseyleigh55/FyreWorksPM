@@ -5,6 +5,7 @@ using Windows.System;
 #endif
 
 using FyreWorksPM.DataAccess.DTO;
+using FyreWorksPM.Pages.Editing;
 using FyreWorksPM.Pages.PopUps;
 using FyreWorksPM.ViewModels.Creation;
 
@@ -52,7 +53,7 @@ public partial class CreateItemsPage : ContentPage
             if (selectedItem == null)
                 return;
 
-            var popup = new ManageItemPopup(
+            var popup = new EditItemPage(
                 selectedItem,
                 async () =>
                 {

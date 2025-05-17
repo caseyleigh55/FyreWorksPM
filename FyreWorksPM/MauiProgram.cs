@@ -17,6 +17,7 @@ using FyreWorksPM.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using FyreWorksPM.Services.Tasks;
+using FyreWorksPM.Pages.Editing;
 
 namespace FyreWorksPM;
 
@@ -117,7 +118,7 @@ public static class MauiProgram
         builder.Services.AddTransient<CreateTasksViewModel>();
 
         // Pop-Up ViewModels
-        builder.Services.AddTransient<ManageItemPopupViewModel>();
+        builder.Services.AddTransient<EditItemPageViewModel>();
         builder.Services.AddTransient<ManageItemTypesPopupViewModel>();
 
         // ============================
@@ -168,7 +169,7 @@ public static class MauiProgram
         builder.Services.AddTransient<CreateUserPage>();
 
         // Pop-Up Pages
-        builder.Services.AddTransient<ManageItemPopup>();
+        builder.Services.AddTransient<EditItemPage>();
 
         builder.Services.AddTransient<ManageItemTypesPopup>();
 
