@@ -5,11 +5,11 @@
 /// </summary>
 public class ItemDto
 {
-    public int ItemDtoId { get; set; }
+    public int Id { get; set; }
 
-    public string ItemDtoName { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
-    public string? ItemDtoDescription { get; set; }
+    public string? Description { get; set; }
 
-    public string ItemDtoItemTypeName { get; set; } = string.Empty;
+    public string ItemTypeName { get; set; } = string.Empty;
 }

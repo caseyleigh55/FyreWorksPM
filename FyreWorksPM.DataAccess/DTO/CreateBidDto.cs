@@ -2,16 +2,16 @@
 
 public class CreateBidDto
 {
-    public string CreateBidDtoBidNumber { get; set; } = string.Empty;
-    public string CreateBidDtoProjectName { get; set; } = string.Empty;
-    public int CreateBidDtoClientId { get; set; }
-    public DateTime CreateBidDtoCreatedDate { get; set; }
-    public bool CreateBidDtoIsActive { get; set; } = true;
+    public string BidNumber { get; set; } = string.Empty;
+    public string ProjectName { get; set; } = string.Empty;
+    public int ClientId { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public bool IsActive { get; set; } = true;
 
 
-    public SiteInfoDto CreateBidDtoSiteInfo { get; set; } = new();
+    public SiteInfoDto SiteInfo { get; set; } = new();
 
     //Admin and Engineering Tasks Section
-    public List<CreateBidTaskDto> CreateBidDtoTasks { get; set; } = new();
+    public List<CreateBidTaskDto> Tasks { get; set; } = new();
 
 }

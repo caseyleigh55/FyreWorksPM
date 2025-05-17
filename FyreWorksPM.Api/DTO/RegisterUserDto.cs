@@ -2,7 +2,7 @@
 
 public class RegisterUserDto
 {
-    public string RegisterUserDtoUsername { get; set; } = string.Empty;
-    public string RegisterUserDtoEmail { get; set; } = string.Empty;
-    public string RegisterUserDtoPassword { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }

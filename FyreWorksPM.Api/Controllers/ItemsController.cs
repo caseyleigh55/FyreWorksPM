@@ -28,10 +28,10 @@ public class ItemsController : ControllerBase
             .Include(i => i.ItemModelItemType)
             .Select(i => new ItemDto
             {
-                ItemDtoId = i.ItemModelId,
-                ItemDtoName = i.ItemModelName,
-                ItemDtoDescription = i.ItemModelDescription,
-                ItemDtoItemTypeName = i.ItemModelItemType!.ItemTypeModelName
+                Id = i.ItemModelId,
+                Name = i.ItemModelName,
+                Description = i.ItemModelDescription,
+                ItemTypeName = i.ItemModelItemType!.ItemTypeModelName
             })
             .ToListAsync();
 
@@ -53,10 +53,10 @@ public class ItemsController : ControllerBase
 
         var dto = new ItemDto
         {
-            ItemDtoId = item.ItemModelId,
-            ItemDtoName = item.ItemModelName,
-            ItemDtoDescription = item.ItemModelDescription,
-            ItemDtoItemTypeName = item.ItemModelItemType!.ItemTypeModelName
+            Id = item.ItemModelId,
+            Name = item.ItemModelName,
+            Description = item.ItemModelDescription,
+            ItemTypeName = item.ItemModelItemType!.ItemTypeModelName
         };
 
         return Ok(dto);
@@ -71,20 +71,20 @@ public class ItemsController : ControllerBase
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(dto.CreateItemDtoName) || string.IsNullOrWhiteSpace(dto.CreateItemDtoItemTypeName))
+            if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.ItemTypeName))
             {
                 return BadRequest("Item name and item type are required.");
             }
 
             // Check if the item type exists, or create it
             var itemType = await _db.ItemTypes
-                .FirstOrDefaultAsync(t => t.ItemTypeModelName == dto.CreateItemDtoItemTypeName);
+                .FirstOrDefaultAsync(t => t.ItemTypeModelName == dto.ItemTypeName);
 
             if (itemType == null)
             {
                 itemType = new ItemTypeModel
                 {
-                    ItemTypeModelName = dto.CreateItemDtoItemTypeName,
+                    ItemTypeModelName = dto.ItemTypeName,
                     ItemTypeModelItems = new List<ItemModel>() // ensure not null
                 };
 
@@ -94,8 +94,8 @@ public class ItemsController : ControllerBase
 
             var item = new ItemModel
             {
-                ItemModelName = dto.CreateItemDtoName,
-                ItemModelDescription = dto.CreateItemDtoDescription,
+                ItemModelName = dto.Name,
+                ItemModelDescription = dto.Description,
                 ItemModelItemTypeId = itemType.ItemTypeModelId
             };
 
@@ -131,12 +131,12 @@ public class ItemsController : ControllerBase
         var item = await _db.Items.FindAsync(id);
         if (item == null) return NotFound();
 
-        var itemType = await _db.ItemTypes.FirstOrDefaultAsync(t => t.ItemTypeModelName == dto.CreateItemDtoItemTypeName);
+        var itemType = await _db.ItemTypes.FirstOrDefaultAsync(t => t.ItemTypeModelName == dto.ItemTypeName);
         if (itemType == null)
         {
             itemType = new ItemTypeModel
             {
-                ItemTypeModelName = dto.CreateItemDtoItemTypeName,
+                ItemTypeModelName = dto.ItemTypeName,
                 ItemTypeModelItems = new List<ItemModel>() // required to satisfy `required` modifier
             };
 
@@ -144,8 +144,8 @@ public class ItemsController : ControllerBase
             await _db.SaveChangesAsync();
         }
 
-        item.ItemModelName = dto.CreateItemDtoName;
-        item.ItemModelDescription = dto.CreateItemDtoDescription;
+        item.ItemModelName = dto.Name;
+        item.ItemModelDescription = dto.Description;
         item.ItemModelItemTypeId = itemType.ItemTypeModelId;
 
         _db.Items.Update(item);

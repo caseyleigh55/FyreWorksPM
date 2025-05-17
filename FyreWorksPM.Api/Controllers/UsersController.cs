@@ -50,18 +50,18 @@ public class UsersController : ControllerBase
 
         // Check for existing username/email
         bool exists = await _db.Users.AnyAsync(u =>
-            u.UserModelUsername == dto.RegisterUserDtoUsername || u.UserModelEmail == dto.RegisterUserDtoEmail);
+            u.UserModelUsername == dto.Username || u.UserModelEmail == dto.Email);
 
         if (exists)
             return BadRequest("A user with this username or email already exists.");
 
         // Hash password using BCrypt (includes salt)
-        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.RegisterUserDtoPassword);
+        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
         var user = new UserModel
         {
-            UserModelUsername = dto.RegisterUserDtoUsername.Trim(),
-            UserModelEmail = dto.RegisterUserDtoEmail.Trim(),
+            UserModelUsername = dto.Username.Trim(),
+            UserModelEmail = dto.Email.Trim(),
             UserModelPasswordHash = hashedPassword
         };
 
@@ -78,10 +78,10 @@ public class UsersController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserDto dto)
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.UserModelUsername == dto.LoginUserDtoUsername);
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.UserModelUsername == dto.Username);
 
         // Validate credentials
-        if (user == null || !BCrypt.Net.BCrypt.Verify(dto.LoginUserDtoPassword, user.UserModelPasswordHash))
+        if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.UserModelPasswordHash))
             return Unauthorized("Invalid username or password");
 
         // Load JWT configuration values

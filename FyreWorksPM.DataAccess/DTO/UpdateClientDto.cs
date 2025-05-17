@@ -2,9 +2,9 @@
 {
     public class UpdateClientDto
     {
-        public string UpdateClientDtoName { get; set; }
-        public string UpdateClientDtoContact { get; set; }
-        public string UpdateClientDtoEmail { get; set; }
-        public string UpdateClientDtoPhone { get; set; }
+        public string Name { get; set; }
+        public string Contact { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
     }
 }

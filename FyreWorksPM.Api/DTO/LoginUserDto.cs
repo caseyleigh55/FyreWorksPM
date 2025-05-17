@@ -1,5 +1,5 @@
 ﻿public class LoginUserDto
 {
-    public string LoginUserDtoUsername { get; set; }
-    public string LoginUserDtoPassword { get; set; }
+    public string Username { get; set; }
+    public string Password { get; set; }
 }

@@ -26,11 +26,11 @@ namespace FyreWorksPM.API.Controllers
                 .Where(t => t.TaskModelType == type)
                 .Select(t => new SavedTaskDto
                 {
-                    SavedTaskDtoId = t.TaskModelId,
-                    SavedTaskDtoTaskName = t.TaskModelTaskName,
-                    SavedTaskDtoType = t.TaskModelType,
-                    SavedTaskDtoDefaultCost = t.TaskModelDefaultCost,
-                    SavedTaskDtoDefaultSale = t.TaskModelDefaultSale
+                    Id = t.TaskModelId,
+                    TaskName = t.TaskModelTaskName,
+                    Type = t.TaskModelType,
+                    DefaultCost = t.TaskModelDefaultCost,
+                    DefaultSale = t.TaskModelDefaultSale
                 })
                 .ToListAsync();
 
@@ -43,10 +43,10 @@ namespace FyreWorksPM.API.Controllers
         {
             var task = new TaskModel
             {
-                TaskModelTaskName = dto.CreateTaskDtoTaskName,
-                TaskModelType = dto.CreateTaskDtoType,
-                TaskModelDefaultCost = dto.CreateTaskDtoDefaultCost,
-                TaskModelDefaultSale = dto.CreateTaskDtoDefaultSale
+                TaskModelTaskName = dto.TaskName,
+                TaskModelType = dto.Type,
+                TaskModelDefaultCost = dto.DefaultCost,
+                TaskModelDefaultSale = dto.DefaultSale
             };
 
             _db.TaskTemplates.Add(task);
@@ -54,11 +54,11 @@ namespace FyreWorksPM.API.Controllers
 
             return CreatedAtAction(nameof(GetTemplates), new { type = task.TaskModelType }, new SavedTaskDto
             {
-                SavedTaskDtoId = task.TaskModelId,
-                SavedTaskDtoTaskName = task.TaskModelTaskName,
-                SavedTaskDtoType = task.TaskModelType,
-                SavedTaskDtoDefaultCost = task.TaskModelDefaultCost,
-                SavedTaskDtoDefaultSale = task.TaskModelDefaultSale
+                Id = task.TaskModelId,
+                TaskName = task.TaskModelTaskName,
+                Type = task.TaskModelType,
+                DefaultCost = task.TaskModelDefaultCost,
+                DefaultSale = task.TaskModelDefaultSale
             });
         }
 
@@ -70,10 +70,10 @@ namespace FyreWorksPM.API.Controllers
             if (task == null)
                 return NotFound();
 
-            task.TaskModelTaskName = dto.CreateTaskDtoTaskName;
-            task.TaskModelType = dto.CreateTaskDtoType;
-            task.TaskModelDefaultCost = dto.CreateTaskDtoDefaultCost;
-            task.TaskModelDefaultSale = dto.CreateTaskDtoDefaultSale;
+            task.TaskModelTaskName = dto.TaskName;
+            task.TaskModelType = dto.Type;
+            task.TaskModelDefaultCost = dto.DefaultCost;
+            task.TaskModelDefaultSale = dto.DefaultSale;
 
             await _db.SaveChangesAsync();
             return NoContent();

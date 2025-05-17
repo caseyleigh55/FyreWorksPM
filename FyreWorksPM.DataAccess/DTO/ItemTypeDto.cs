@@ -5,7 +5,7 @@
 /// </summary>
 public class ItemTypeDto
 {
-    public int ItemTypeDtoId { get; set; }
+    public int Id { get; set; }
 
-    public string ItemTypeDtoName { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 }

@@ -5,5 +5,5 @@
 /// </summary>
 public class CreateItemTypeDto
 {
-    public string CreateItemTypeDtoName { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 }

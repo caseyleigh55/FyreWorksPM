@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FyreWorksPM.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250517060442_InitialCleanSlate")]
+    [Migration("20250517205004_InitialCleanSlate")]
     partial class InitialCleanSlate
     {
         /// <inheritdoc />

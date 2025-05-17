@@ -34,7 +34,7 @@ public class ItemTypeService : IItemTypeService
     public async Task<List<string>> GetAllItemTypeNamesAsync()
     {
         var types = await GetAllItemTypesAsync();
-        return types.Select(t => t.ItemTypeDtoName).Distinct().ToList();
+        return types.Select(t => t.Name).Distinct().ToList();
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class ItemTypeService : IItemTypeService
     /// </summary>
     public async Task AddItemTypeAsync(ItemTypeDto itemType)
     {
-        var dto = new CreateItemTypeDto { CreateItemTypeDtoName = itemType.ItemTypeDtoName };
+        var dto = new CreateItemTypeDto { Name = itemType.Name };
         var response = await _http.PostAsJsonAsync("api/itemtypes", dto);
         response.EnsureSuccessStatusCode();
     }
@@ -64,8 +64,8 @@ public class ItemTypeService : IItemTypeService
     /// </summary>
     public async Task UpdateItemTypeAsync(ItemTypeDto itemType)
     {
-        var dto = new CreateItemTypeDto { CreateItemTypeDtoName = itemType.ItemTypeDtoName };
-        var response = await _http.PutAsJsonAsync($"api/itemtypes/{itemType.ItemTypeDtoId}", dto);
+        var dto = new CreateItemTypeDto { Name = itemType.Name };
+        var response = await _http.PutAsJsonAsync($"api/itemtypes/{itemType.Id}", dto);
         response.EnsureSuccessStatusCode();
     }
 

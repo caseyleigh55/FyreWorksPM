@@ -43,8 +43,8 @@ public partial class EditItemTypeViewModel : ObservableObject
     {
         ItemTypes.Add(new ItemTypeDto
         {
-            ItemTypeDtoId = 0,
-            ItemTypeDtoName = string.Empty
+            Id = 0,
+            Name = string.Empty
         });
     }
 
@@ -55,7 +55,7 @@ public partial class EditItemTypeViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveAsync(ItemTypeDto itemType)
     {
-        if (!string.IsNullOrWhiteSpace(itemType.ItemTypeDtoName))
+        if (!string.IsNullOrWhiteSpace(itemType.Name))
         {
             await _itemTypeService.UpdateItemTypeAsync(itemType);
             await LoadItemTypesAsync();
@@ -69,7 +69,7 @@ public partial class EditItemTypeViewModel : ObservableObject
     [RelayCommand]
     private async Task DeleteAsync(ItemTypeDto itemType)
     {
-        await _itemTypeService.DeleteItemTypeAsync(itemType.ItemTypeDtoId);
+        await _itemTypeService.DeleteItemTypeAsync(itemType.Id);
         ItemTypes.Remove(itemType);
     }
 }

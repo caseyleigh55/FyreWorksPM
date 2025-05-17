@@ -31,11 +31,11 @@ namespace FyreWorksPM.Api.Controllers
 
             return Ok(new BidDto
             {
-                BidDtoId = bid.BidModelBidId,
-                BidDtoBidNumber = bid.BidModelBidNumber,
-                BidDtoProjectName = bid.BidModelProjectName,
-                BidDtoClientId = bid.BidModelClientId,
-                BidDtoCreatedDate = bid.BidModelCreatedDate
+                Id = bid.BidModelBidId,
+                BidNumber = bid.BidModelBidNumber,
+                ProjectName = bid.BidModelProjectName,
+                ClientId = bid.BidModelClientId,
+                CreatedDate = bid.BidModelCreatedDate
             });
         }
 
@@ -68,46 +68,46 @@ namespace FyreWorksPM.Api.Controllers
 
             var siteInfo = new SiteInfoModel
             {
-                SiteInfoModelScopeOfWork = dto.CreateBidDtoSiteInfo.SiteInfoDtoScopeOfWork,
-                SiteInfoModelAddressLine1 = dto.CreateBidDtoSiteInfo.SiteInfoDtoAddressLine1,
-                SiteInfoModelAddressLine2 = dto.CreateBidDtoSiteInfo.SiteInfoDtoAddressLine2,
-                SiteInfoModelCity = dto.CreateBidDtoSiteInfo.SiteInfoDtoCity,
-                SiteInfoModelState = dto.CreateBidDtoSiteInfo.SiteInfoDtoState,
-                SiteInfoModelZipCode = dto.CreateBidDtoSiteInfo.SiteInfoDtoZipCode,
-                SiteInfoModelParcelNumber = dto.CreateBidDtoSiteInfo.SiteInfoDtoParcelNumber,
-                SiteInfoModelJurisdiction = dto.CreateBidDtoSiteInfo.SiteInfoDtoJurisdiction,
-                SiteInfoModelBuildingArea = dto.CreateBidDtoSiteInfo.SiteInfoDtoBuildingArea,
-                SiteInfoModelNumberOfStories = dto.CreateBidDtoSiteInfo.SiteInfoDtoNumberOfStories,
-                SiteInfoModelOccupancyGroup = dto.CreateBidDtoSiteInfo.SiteInfoDtoOccupancyGroup,
-                SiteInfoModelOccupantLoad = dto.CreateBidDtoSiteInfo.SiteInfoDtoOccupantLoad,
-                SiteInfoModelConstructionType = dto.CreateBidDtoSiteInfo.SiteInfoDtoConstructionType,
-                SiteInfoModelIsSprinklered = dto.CreateBidDtoSiteInfo.SiteInfoDtoIsSprinklered
+                SiteInfoModelScopeOfWork = dto.SiteInfo.ScopeOfWork,
+                SiteInfoModelAddressLine1 = dto.SiteInfo.AddressLine1,
+                SiteInfoModelAddressLine2 = dto.SiteInfo.AddressLine2,
+                SiteInfoModelCity = dto.SiteInfo.City,
+                SiteInfoModelState = dto.SiteInfo.State,
+                SiteInfoModelZipCode = dto.SiteInfo.ZipCode,
+                SiteInfoModelParcelNumber = dto.SiteInfo.ParcelNumber,
+                SiteInfoModelJurisdiction = dto.SiteInfo.Jurisdiction,
+                SiteInfoModelBuildingArea = dto.SiteInfo.BuildingArea,
+                SiteInfoModelNumberOfStories = dto.SiteInfo.NumberOfStories,
+                SiteInfoModelOccupancyGroup = dto.SiteInfo.OccupancyGroup,
+                SiteInfoModelOccupantLoad = dto.SiteInfo.OccupantLoad,
+                SiteInfoModelConstructionType = dto.SiteInfo.ConstructionType,
+                SiteInfoModelIsSprinklered = dto.SiteInfo.IsSprinklered
             };
 
             // 🎯 Task usage only, no creation
             var bidTasks = new List<BidTaskModel>();
 
-            foreach (var t in dto.CreateBidDtoTasks)
+            foreach (var t in dto.Tasks)
             {
-                var template = await _db.TaskTemplates.FindAsync(t.CreateBidTaskDtoTaskModelId);
+                var template = await _db.TaskTemplates.FindAsync(t.TaskModelId);
                 if (template == null)
-                    return BadRequest($"Invalid TaskModelId: {t.CreateBidTaskDtoTaskModelId}");
+                    return BadRequest($"Invalid TaskModelId: {t.TaskModelId}");
 
                 bidTasks.Add(new BidTaskModel
                 {
                     BidTaskModelTaskModelId = template.TaskModelId,
-                    BidTaskModelCost = t.CreateBidTaskDtoCost,
-                    BidTaskModelSale = t.CreateBidTaskDtoSale
+                    BidTaskModelCost = t.Cost,
+                    BidTaskModelSale = t.Sale
                 });
             }
 
             var bid = new BidModel
             {
                 BidModelBidNumber = $"B-{nextNum:D3}",
-                BidModelProjectName = dto.CreateBidDtoProjectName,
-                BidModelClientId = dto.CreateBidDtoClientId,
-                BidModelCreatedDate = dto.CreateBidDtoCreatedDate,
-                BidModelIsActive = dto.CreateBidDtoIsActive,
+                BidModelProjectName = dto.ProjectName,
+                BidModelClientId = dto.ClientId,
+                BidModelCreatedDate = dto.CreatedDate,
+                BidModelIsActive = dto.IsActive,
                 BidModelSiteInfo = siteInfo,
                 BidModelTasks = bidTasks
             };
@@ -117,12 +117,12 @@ namespace FyreWorksPM.Api.Controllers
 
             return CreatedAtAction(nameof(GetBid), new { id = bid.BidModelBidId }, new BidDto
             {
-                BidDtoId = bid.BidModelBidId,
-                BidDtoBidNumber = bid.BidModelBidNumber,
-                BidDtoProjectName = bid.BidModelProjectName,
-                BidDtoClientId = bid.BidModelClientId,
-                BidDtoCreatedDate = bid.BidModelCreatedDate,
-                BidDtoIsActive = bid.BidModelIsActive
+                Id = bid.BidModelBidId,
+                BidNumber = bid.BidModelBidNumber,
+                ProjectName = bid.BidModelProjectName,
+                ClientId = bid.BidModelClientId,
+                CreatedDate = bid.BidModelCreatedDate,
+                IsActive = bid.BidModelIsActive
             });
         }
 
@@ -135,9 +135,9 @@ namespace FyreWorksPM.Api.Controllers
             var bid = await _db.BidInfo.FindAsync(id);
             if (bid == null) return NotFound();
 
-            bid.BidModelProjectName = dto.UpdateBidDtoProjectName;
-            bid.BidModelClientId = dto.UpdateBidDtoClientId;
-            bid.BidModelCreatedDate = dto.UpdateBidDtoCreatedDate;
+            bid.BidModelProjectName = dto.ProjectName;
+            bid.BidModelClientId = dto.ClientId;
+            bid.BidModelCreatedDate = dto.CreatedDate;
 
             await _db.SaveChangesAsync();
             return NoContent();

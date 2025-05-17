@@ -27,8 +27,8 @@ public class ItemTypesController : ControllerBase
         var types = await _db.ItemTypes
             .Select(t => new ItemTypeDto
             {
-                ItemTypeDtoId = t.ItemTypeModelId,
-                ItemTypeDtoName = t.ItemTypeModelName
+                Id = t.ItemTypeModelId,
+                Name = t.ItemTypeModelName
             })
             .ToListAsync();
 
@@ -49,8 +49,8 @@ public class ItemTypesController : ControllerBase
 
         var dto = new ItemTypeDto
         {
-            ItemTypeDtoId = type.ItemTypeModelId,
-            ItemTypeDtoName = type.ItemTypeModelName
+            Id = type.ItemTypeModelId,
+            Name = type.ItemTypeModelName
         };
 
         return Ok(dto);
@@ -63,16 +63,16 @@ public class ItemTypesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateItemType([FromBody] CreateItemTypeDto dto)
     {
-        if (string.IsNullOrWhiteSpace(dto.CreateItemTypeDtoName))
+        if (string.IsNullOrWhiteSpace(dto.Name))
             return BadRequest("Name is required.");
 
-        var exists = await _db.ItemTypes.AnyAsync(t => t.ItemTypeModelName == dto.CreateItemTypeDtoName);
+        var exists = await _db.ItemTypes.AnyAsync(t => t.ItemTypeModelName == dto.Name);
         if (exists)
             return Conflict("An item type with that name already exists.");
 
         var itemType = new ItemTypeModel
         {
-            ItemTypeModelName = dto.CreateItemTypeDtoName,
+            ItemTypeModelName = dto.Name,
             ItemTypeModelItems = new List<ItemModel>() // 🚨 Required because of 'required' modifier
         };
 
@@ -93,7 +93,7 @@ public class ItemTypesController : ControllerBase
         if (itemType == null)
             return NotFound();
 
-        itemType.ItemTypeModelName = dto.CreateItemTypeDtoName;
+        itemType.ItemTypeModelName = dto.Name;
 
         _db.ItemTypes.Update(itemType);
         await _db.SaveChangesAsync();
