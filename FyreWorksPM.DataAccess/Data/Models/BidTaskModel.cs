@@ -8,7 +8,7 @@ namespace FyreWorksPM.DataAccess.Data.Models
     public class BidTaskModel
     {
         [Key]
-        public int Id { get; set; }
+        public int BidTaskModelId { get; set; }
 
         // --- Relationships ---
 

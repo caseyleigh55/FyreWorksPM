@@ -1,7 +1,10 @@
 ﻿using FyreWorksPM.DataAccess.Data.Models;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 public class BidModel
 {
+    [Key]
     public int BidModelBidId { get; set; }
     public string BidModelBidNumber { get; set; } = string.Empty;
     public string BidModelProjectName { get; set; } = string.Empty;
