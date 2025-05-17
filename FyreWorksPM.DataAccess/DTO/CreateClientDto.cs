@@ -2,9 +2,9 @@
 {
     public class CreateClientDto
     {
-        public string Name { get; set; }
-        public string Contact { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
+        public string CreateClientDtoName { get; set; }
+        public string CreateClientDtoContact { get; set; }
+        public string CreateClientDtoEmail { get; set; }
+        public string CreateClientDtoPhone { get; set; }
     }
 }

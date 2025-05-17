@@ -46,10 +46,10 @@ public partial class CreateClientViewModel : ObservableObject
 
         var newClientDto = new CreateClientDto
         {
-            Name = ClientName,
-            Contact = ContactName,
-            Email = Email,
-            Phone = Phone
+            CreateClientDtoName = ClientName,
+            CreateClientDtoContact = ContactName,
+            CreateClientDtoEmail = Email,
+            CreateClientDtoPhone = Phone
         };
 
         var createdClient = await _clientService.AddClientAsync(newClientDto);
@@ -61,10 +61,10 @@ public partial class CreateClientViewModel : ObservableObject
             // Optional double-check if API doesn't return the full object
             var clientList = await _clientService.GetAllClientsAsync();
             var addedClient = clientList.LastOrDefault(c =>
-                c.Name == ClientName &&
-                c.Contact == ContactName &&
-                c.Email == Email &&
-                c.Phone == Phone);
+                c.ClientDtoName == ClientName &&
+                c.ClientDtoContact == ContactName &&
+                c.ClientDtoEmail == Email &&
+                c.ClientDtoPhone == Phone);
 
             if (addedClient != null)
                 await ClientAddedCallback.Invoke(addedClient);

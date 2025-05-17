@@ -25,17 +25,17 @@ namespace FyreWorksPM.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<BidDto>> GetBid(int id)
         {
-            var bid = await _db.BidInfo.Include(b => b.Client)
-                                     .FirstOrDefaultAsync(b => b.Id == id);
+            var bid = await _db.BidInfo.Include(b => b.BidModelClient)
+                                     .FirstOrDefaultAsync(b => b.BidModelBidId == id);
             if (bid == null) return NotFound();
 
             return Ok(new BidDto
             {
-                Id = bid.Id,
-                BidNumber = bid.BidNumber,
-                ProjectName = bid.ProjectName,
-                ClientId = bid.ClientId,
-                CreatedDate = bid.CreatedDate
+                BidDtoId = bid.BidModelBidId,
+                BidDtoBidNumber = bid.BidModelBidNumber,
+                BidDtoProjectName = bid.BidModelProjectName,
+                BidDtoClientId = bid.BidModelClientId,
+                BidDtoCreatedDate = bid.BidModelCreatedDate
             });
         }
 
@@ -43,10 +43,10 @@ namespace FyreWorksPM.Api.Controllers
         [HttpGet("next-number")]
         public async Task<ActionResult<string>> GetNextBidNumber()
         {
-            var lastBid = await _db.BidInfo.OrderByDescending(b => b.Id).FirstOrDefaultAsync();
+            var lastBid = await _db.BidInfo.OrderByDescending(b => b.BidModelBidId).FirstOrDefaultAsync();
             int nextNum = 1;
 
-            if (lastBid != null && Regex.Match(lastBid.BidNumber, @"B-(\d{3})") is Match match && match.Success)
+            if (lastBid != null && Regex.Match(lastBid.BidModelBidNumber, @"B-(\d{3})") is Match match && match.Success)
             {
                 nextNum = int.Parse(match.Groups[1].Value) + 1;
             }
@@ -58,71 +58,71 @@ namespace FyreWorksPM.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<BidDto>> CreateBid([FromBody] CreateBidDto dto)
         {
-            var lastBid = await _db.BidInfo.OrderByDescending(b => b.Id).FirstOrDefaultAsync();
+            var lastBid = await _db.BidInfo.OrderByDescending(b => b.BidModelBidId).FirstOrDefaultAsync();
             int nextNum = 1;
 
-            if (lastBid != null && Regex.Match(lastBid.BidNumber, @"B-(\d{3})") is Match match && match.Success)
+            if (lastBid != null && Regex.Match(lastBid.BidModelBidNumber, @"B-(\d{3})") is Match match && match.Success)
             {
                 nextNum = int.Parse(match.Groups[1].Value) + 1;
             }
 
             var siteInfo = new SiteInfoModel
             {
-                ScopeOfWork = dto.SiteInfo.ScopeOfWork,
-                AddressLine1 = dto.SiteInfo.AddressLine1,
-                AddressLine2 = dto.SiteInfo.AddressLine2,
-                City = dto.SiteInfo.City,
-                State = dto.SiteInfo.State,
-                ZipCode = dto.SiteInfo.ZipCode,
-                ParcelNumber = dto.SiteInfo.ParcelNumber,
-                Jurisdiction = dto.SiteInfo.Jurisdiction,
-                BuildingArea = dto.SiteInfo.BuildingArea,
-                NumberOfStories = dto.SiteInfo.NumberOfStories,
-                OccupancyGroup = dto.SiteInfo.OccupancyGroup,
-                OccupantLoad = dto.SiteInfo.OccupantLoad,
-                ConstructionType = dto.SiteInfo.ConstructionType,
-                IsSprinklered = dto.SiteInfo.IsSprinklered
+                SiteInfoModelScopeOfWork = dto.CreateBidDtoSiteInfo.SiteInfoDtoScopeOfWork,
+                SiteInfoModelAddressLine1 = dto.CreateBidDtoSiteInfo.SiteInfoDtoAddressLine1,
+                SiteInfoModelAddressLine2 = dto.CreateBidDtoSiteInfo.SiteInfoDtoAddressLine2,
+                SiteInfoModelCity = dto.CreateBidDtoSiteInfo.SiteInfoDtoCity,
+                SiteInfoModelState = dto.CreateBidDtoSiteInfo.SiteInfoDtoState,
+                SiteInfoModelZipCode = dto.CreateBidDtoSiteInfo.SiteInfoDtoZipCode,
+                SiteInfoModelParcelNumber = dto.CreateBidDtoSiteInfo.SiteInfoDtoParcelNumber,
+                SiteInfoModelJurisdiction = dto.CreateBidDtoSiteInfo.SiteInfoDtoJurisdiction,
+                SiteInfoModelBuildingArea = dto.CreateBidDtoSiteInfo.SiteInfoDtoBuildingArea,
+                SiteInfoModelNumberOfStories = dto.CreateBidDtoSiteInfo.SiteInfoDtoNumberOfStories,
+                SiteInfoModelOccupancyGroup = dto.CreateBidDtoSiteInfo.SiteInfoDtoOccupancyGroup,
+                SiteInfoModelOccupantLoad = dto.CreateBidDtoSiteInfo.SiteInfoDtoOccupantLoad,
+                SiteInfoModelConstructionType = dto.CreateBidDtoSiteInfo.SiteInfoDtoConstructionType,
+                SiteInfoModelIsSprinklered = dto.CreateBidDtoSiteInfo.SiteInfoDtoIsSprinklered
             };
 
             // 🎯 Task usage only, no creation
             var bidTasks = new List<BidTaskModel>();
 
-            foreach (var t in dto.Tasks)
+            foreach (var t in dto.CreateBidDtoTasks)
             {
-                var template = await _db.TaskTemplates.FindAsync(t.TaskModelId);
+                var template = await _db.TaskTemplates.FindAsync(t.CreateBidTaskDtoTaskModelId);
                 if (template == null)
-                    return BadRequest($"Invalid TaskModelId: {t.TaskModelId}");
+                    return BadRequest($"Invalid TaskModelId: {t.CreateBidTaskDtoTaskModelId}");
 
                 bidTasks.Add(new BidTaskModel
                 {
-                    TaskModelId = template.Id,
-                    Cost = t.Cost,
-                    Sale = t.Sale
+                    BidTaskModelTaskModelId = template.TaskModelId,
+                    BidTaskModelCost = t.CreateBidTaskDtoCost,
+                    BidTaskModelSale = t.CreateBidTaskDtoSale
                 });
             }
 
             var bid = new BidModel
             {
-                BidNumber = $"B-{nextNum:D3}",
-                ProjectName = dto.ProjectName,
-                ClientId = dto.ClientId,
-                CreatedDate = dto.CreatedDate,
-                IsActive = dto.IsActive,
-                SiteInfo = siteInfo,
-                Tasks = bidTasks
+                BidModelBidNumber = $"B-{nextNum:D3}",
+                BidModelProjectName = dto.CreateBidDtoProjectName,
+                BidModelClientId = dto.CreateBidDtoClientId,
+                BidModelCreatedDate = dto.CreateBidDtoCreatedDate,
+                BidModelIsActive = dto.CreateBidDtoIsActive,
+                BidModelSiteInfo = siteInfo,
+                BidModelTasks = bidTasks
             };
 
             _db.BidInfo.Add(bid);
             await _db.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetBid), new { id = bid.Id }, new BidDto
+            return CreatedAtAction(nameof(GetBid), new { id = bid.BidModelBidId }, new BidDto
             {
-                Id = bid.Id,
-                BidNumber = bid.BidNumber,
-                ProjectName = bid.ProjectName,
-                ClientId = bid.ClientId,
-                CreatedDate = bid.CreatedDate,
-                IsActive = bid.IsActive
+                BidDtoId = bid.BidModelBidId,
+                BidDtoBidNumber = bid.BidModelBidNumber,
+                BidDtoProjectName = bid.BidModelProjectName,
+                BidDtoClientId = bid.BidModelClientId,
+                BidDtoCreatedDate = bid.BidModelCreatedDate,
+                BidDtoIsActive = bid.BidModelIsActive
             });
         }
 
@@ -135,9 +135,9 @@ namespace FyreWorksPM.Api.Controllers
             var bid = await _db.BidInfo.FindAsync(id);
             if (bid == null) return NotFound();
 
-            bid.ProjectName = dto.ProjectName;
-            bid.ClientId = dto.ClientId;
-            bid.CreatedDate = dto.CreatedDate;
+            bid.BidModelProjectName = dto.UpdateBidDtoProjectName;
+            bid.BidModelClientId = dto.UpdateBidDtoClientId;
+            bid.BidModelCreatedDate = dto.UpdateBidDtoCreatedDate;
 
             await _db.SaveChangesAsync();
             return NoContent();

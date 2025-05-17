@@ -63,7 +63,7 @@ public partial class CreateBidPage : ContentPage
                 // 3️⃣ Safely update selected client
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    var addedClient = _viewModel.Clients.FirstOrDefault(c => c.Id == newClient.Id);
+                    var addedClient = _viewModel.Clients.FirstOrDefault(c => c.ClientDtoId == newClient.ClientDtoId);
                     if (addedClient != null)
                     {
                         _viewModel.SelectedClient = addedClient;                        

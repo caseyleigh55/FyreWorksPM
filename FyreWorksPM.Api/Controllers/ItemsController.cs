@@ -25,13 +25,13 @@ public class ItemsController : ControllerBase
     public async Task<ActionResult<IEnumerable<ItemDto>>> GetAllItems()
     {
         var items = await _db.Items
-            .Include(i => i.ItemType)
+            .Include(i => i.ItemModelItemType)
             .Select(i => new ItemDto
             {
-                Id = i.Id,
-                Name = i.Name,
-                Description = i.Description,
-                ItemTypeName = i.ItemType!.Name
+                ItemDtoId = i.ItemModelId,
+                ItemDtoName = i.ItemModelName,
+                ItemDtoDescription = i.ItemModelDescription,
+                ItemDtoItemTypeName = i.ItemModelItemType!.ItemTypeModelName
             })
             .ToListAsync();
 
@@ -46,62 +46,21 @@ public class ItemsController : ControllerBase
     public async Task<ActionResult<ItemDto>> GetItem(int id)
     {
         var item = await _db.Items
-            .Include(i => i.ItemType)
-            .FirstOrDefaultAsync(i => i.Id == id);
+            .Include(i => i.ItemModelItemType)
+            .FirstOrDefaultAsync(i => i.ItemModelId == id);
 
         if (item == null) return NotFound();
 
         var dto = new ItemDto
         {
-            Id = item.Id,
-            Name = item.Name,
-            Description = item.Description,
-            ItemTypeName = item.ItemType!.Name
+            ItemDtoId = item.ItemModelId,
+            ItemDtoName = item.ItemModelName,
+            ItemDtoDescription = item.ItemModelDescription,
+            ItemDtoItemTypeName = item.ItemModelItemType!.ItemTypeModelName
         };
 
         return Ok(dto);
     }
-
-    //// ================================================
-    //// ✅ POST: api/items
-    //// Adds a new item with linked ItemType
-    //// ================================================
-    //[HttpPost]
-    //public async Task<ActionResult> CreateItem([FromBody] CreateItemDto dto)
-    //{
-    //    if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.ItemTypeName))
-    //    {
-    //        return BadRequest("Item name and item type are required.");
-    //    }
-
-    //    // Check if the item type exists, or create it
-    //    var itemType = await _db.ItemTypes
-    //        .FirstOrDefaultAsync(t => t.Name == dto.ItemTypeName);
-
-    //    if (itemType == null)
-    //    {
-    //        itemType = new ItemTypeModel
-    //        {
-    //            Name = dto.ItemTypeName,
-    //            Items = new List<ItemModel>() // required to satisfy `required` modifier
-    //        };
-
-    //        _db.ItemTypes.Add(itemType);
-    //        await _db.SaveChangesAsync();
-    //    }
-
-    //    var item = new ItemModel
-    //    {
-    //        Name = dto.Name,
-    //        Description = dto.Description,
-    //        ItemTypeId = itemType.Id
-    //    };
-
-    //    _db.Items.Add(item);
-    //    await _db.SaveChangesAsync();
-
-    //    return CreatedAtAction(nameof(GetItem), new { id = item.Id }, item);
-    //}
 
     // ================================================
     // ✅ POST: api/items
@@ -112,21 +71,21 @@ public class ItemsController : ControllerBase
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.ItemTypeName))
+            if (string.IsNullOrWhiteSpace(dto.CreateItemDtoName) || string.IsNullOrWhiteSpace(dto.CreateItemDtoItemTypeName))
             {
                 return BadRequest("Item name and item type are required.");
             }
 
             // Check if the item type exists, or create it
             var itemType = await _db.ItemTypes
-                .FirstOrDefaultAsync(t => t.Name == dto.ItemTypeName);
+                .FirstOrDefaultAsync(t => t.ItemTypeModelName == dto.CreateItemDtoItemTypeName);
 
             if (itemType == null)
             {
                 itemType = new ItemTypeModel
                 {
-                    Name = dto.ItemTypeName,
-                    Items = new List<ItemModel>() // ensure not null
+                    ItemTypeModelName = dto.CreateItemDtoItemTypeName,
+                    ItemTypeModelItems = new List<ItemModel>() // ensure not null
                 };
 
                 _db.ItemTypes.Add(itemType);
@@ -135,15 +94,15 @@ public class ItemsController : ControllerBase
 
             var item = new ItemModel
             {
-                Name = dto.Name,
-                Description = dto.Description,
-                ItemTypeId = itemType.Id
+                ItemModelName = dto.CreateItemDtoName,
+                ItemModelDescription = dto.CreateItemDtoDescription,
+                ItemModelItemTypeId = itemType.ItemTypeModelId
             };
 
             _db.Items.Add(item);
             await _db.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetItem), new { id = item.Id }, item);
+            return CreatedAtAction(nameof(GetItem), new { id = item.ItemModelId }, item);
         }
         catch (DbUpdateException dbEx)
         {
@@ -172,22 +131,22 @@ public class ItemsController : ControllerBase
         var item = await _db.Items.FindAsync(id);
         if (item == null) return NotFound();
 
-        var itemType = await _db.ItemTypes.FirstOrDefaultAsync(t => t.Name == dto.ItemTypeName);
+        var itemType = await _db.ItemTypes.FirstOrDefaultAsync(t => t.ItemTypeModelName == dto.CreateItemDtoItemTypeName);
         if (itemType == null)
         {
             itemType = new ItemTypeModel
             {
-                Name = dto.ItemTypeName,
-                Items = new List<ItemModel>() // required to satisfy `required` modifier
+                ItemTypeModelName = dto.CreateItemDtoItemTypeName,
+                ItemTypeModelItems = new List<ItemModel>() // required to satisfy `required` modifier
             };
 
             _db.ItemTypes.Add(itemType);
             await _db.SaveChangesAsync();
         }
 
-        item.Name = dto.Name;
-        item.Description = dto.Description;
-        item.ItemTypeId = itemType.Id;
+        item.ItemModelName = dto.CreateItemDtoName;
+        item.ItemModelDescription = dto.CreateItemDtoDescription;
+        item.ItemModelItemTypeId = itemType.ItemTypeModelId;
 
         _db.Items.Update(item);
         await _db.SaveChangesAsync();

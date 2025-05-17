@@ -2,20 +2,20 @@
 
 public class SiteInfoModel
 {
-    public int Id { get; set; }
+    public int SiteInfoModelId { get; set; }
 
-    public string ScopeOfWork { get; set; } = string.Empty;
-    public string AddressLine1 { get; set; } = string.Empty;
-    public string AddressLine2 { get; set; } = string.Empty;
-    public string City { get; set; } = string.Empty;
-    public string State { get; set; } = string.Empty;
-    public string ZipCode { get; set; } = string.Empty;
-    public string ParcelNumber { get; set; } = string.Empty;
-    public string Jurisdiction { get; set; } = string.Empty;
-    public double BuildingArea { get; set; }
-    public int NumberOfStories { get; set; }
-    public string OccupancyGroup { get; set; } = string.Empty;
-    public int OccupantLoad { get; set; }
-    public string ConstructionType { get; set; } = string.Empty;
-    public bool IsSprinklered { get; set; }
+    public string SiteInfoModelScopeOfWork { get; set; } = string.Empty;
+    public string SiteInfoModelAddressLine1 { get; set; } = string.Empty;
+    public string SiteInfoModelAddressLine2 { get; set; } = string.Empty;
+    public string SiteInfoModelCity { get; set; } = string.Empty;
+    public string SiteInfoModelState { get; set; } = string.Empty;
+    public string SiteInfoModelZipCode { get; set; } = string.Empty;
+    public string SiteInfoModelParcelNumber { get; set; } = string.Empty;
+    public string SiteInfoModelJurisdiction { get; set; } = string.Empty;
+    public double SiteInfoModelBuildingArea { get; set; }
+    public int SiteInfoModelNumberOfStories { get; set; }
+    public string SiteInfoModelOccupancyGroup { get; set; } = string.Empty;
+    public int SiteInfoModelOccupantLoad { get; set; }
+    public string SiteInfoModelConstructionType { get; set; } = string.Empty;
+    public bool SiteInfoModelIsSprinklered { get; set; }
 }

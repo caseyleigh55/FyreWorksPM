@@ -45,9 +45,9 @@ public partial class EditItemViewModel : ObservableObject
         _onSaved = onSaved;
         _itemService = itemService;
 
-        name = item.Name;
-        description = item.Description;
-        itemTypeName = item.ItemTypeName;
+        name = item.ItemDtoName;
+        description = item.ItemDtoDescription;
+        itemTypeName = item.ItemDtoItemTypeName;
     }
 
     /// <summary>
@@ -59,19 +59,19 @@ public partial class EditItemViewModel : ObservableObject
     {
         var view = Shell.Current.CurrentPage as EditItemPage;
         view?.MarkClosingInternally();
-        _item.Name = Name;
-        _item.Description = Description;
-        _item.ItemTypeName = ItemTypeName;
+        _item.ItemDtoName = Name;
+        _item.ItemDtoDescription = Description;
+        _item.ItemDtoItemTypeName = ItemTypeName;
 
         // Call the API via IItemService
         var dto = new CreateItemDto
         {
-            Name = _item.Name,
-            Description = _item.Description,
-            ItemTypeName = _item.ItemTypeName
+            CreateItemDtoName = _item.ItemDtoName,
+            CreateItemDtoDescription = _item.ItemDtoDescription,
+            CreateItemDtoItemTypeName = _item.ItemDtoItemTypeName
         };
 
-        await _itemService.UpdateItemAsync(_item.Id, dto);
+        await _itemService.UpdateItemAsync(_item.ItemDtoId, dto);
 
         // Notify parent to refresh the list
         if (_onSaved != null)

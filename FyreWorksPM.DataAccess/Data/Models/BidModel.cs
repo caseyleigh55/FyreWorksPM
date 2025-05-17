@@ -2,21 +2,21 @@
 
 public class BidModel
 {
-    public int Id { get; set; }
-    public string BidNumber { get; set; } = string.Empty;
-    public string ProjectName { get; set; } = string.Empty;
-    public int ClientId { get; set; }
-    public ClientModel Client { get; set; }
-    public DateTime CreatedDate { get; set; }
-    public bool IsActive { get; set; } = true; // default to true
+    public int BidModelBidId { get; set; }
+    public string BidModelBidNumber { get; set; } = string.Empty;
+    public string BidModelProjectName { get; set; } = string.Empty;
+    public int BidModelClientId { get; set; }
+    public ClientModel BidModelClient { get; set; }
+    public DateTime BidModelCreatedDate { get; set; }
+    public bool BidModelIsActive { get; set; } = true; // default to true
 
 
     //SiteInfo Section
-    public SiteInfoModel? SiteInfo { get; set; }
-    public int? SiteInfoId { get; set; }
+    public SiteInfoModel? BidModelSiteInfo { get; set; }
+    public int? BidModelSiteInfoId { get; set; }
 
     // 💼 New hotness: Admin & Engineering Tasks
-    public List<BidTaskModel> Tasks { get; set; } = new();
+    public List<BidTaskModel> BidModelTasks { get; set; } = new();
     
 
 

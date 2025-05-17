@@ -54,10 +54,10 @@ namespace FyreWorksPM.ViewModels.Foundation
 
                 // Separate into active/inactive
                 ActiveBids = new ObservableCollection<BidDto>(
-                    AllBids.Where(b => b.IsActive)); // Assuming IsActive exists
+                    AllBids.Where(b => b.BidDtoIsActive)); // Assuming IsActive exists
 
                 InactiveBids = new ObservableCollection<BidDto>(
-                    AllBids.Where(b => !b.IsActive));
+                    AllBids.Where(b => !b.BidDtoIsActive));
             }
             catch (Exception ex)
             {
@@ -77,7 +77,7 @@ namespace FyreWorksPM.ViewModels.Foundation
             if (SelectedBid == null) return;
 
             // TODO: Navigate to EditBidPage and pass SelectedBid
-            Console.WriteLine($"Editing bid {SelectedBid.BidNumber}");
+            Console.WriteLine($"Editing bid {SelectedBid.BidDtoBidNumber}");
         }
 
         private void OnConvertToProject()
@@ -85,7 +85,7 @@ namespace FyreWorksPM.ViewModels.Foundation
             if (SelectedBid == null) return;
 
             // TODO: Later: transform this bid into a project
-            Console.WriteLine($"Converting bid {SelectedBid.BidNumber} to project...");
+            Console.WriteLine($"Converting bid {SelectedBid.BidDtoBidNumber} to project...");
         }
 
         private bool CanEditBid() => SelectedBid != null;

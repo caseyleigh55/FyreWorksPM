@@ -11,31 +11,31 @@ public class ItemModel : INotifyPropertyChanged
     /// <summary>
     /// Primary key for the item.
     /// </summary>
-    public int Id { get; set; }
+    public int ItemModelId { get; set; }
 
-    private string name = string.Empty;
+    private string ItemModelname = string.Empty;
 
     /// <summary>
     /// The name or title of the item.
     /// </summary>
-    public string Name
+    public string ItemModelName
     {
-        get => name;
-        set => SetProperty(ref name, value);
+        get => ItemModelname;
+        set => SetProperty(ref ItemModelname, value);
     }
 
-    private string description = string.Empty;
+    private string ItemModeldescription = string.Empty;
 
     /// <summary>
     /// Optional description or additional details.
     /// </summary>
-    public string Description
+    public string ItemModelDescription
     {
-        get => description;
-        set => SetProperty(ref description, value);
+        get => ItemModeldescription;
+        set => SetProperty(ref ItemModeldescription, value);
     }
 
-    private decimal unitCost = 0;
+    private decimal ItemModelunitCost = 0;
 
     ///// <summary>
     ///// Default unit cost of the item.
@@ -48,22 +48,22 @@ public class ItemModel : INotifyPropertyChanged
     //    set => SetProperty(ref unitCost, value);
     //}
 
-    private ItemTypeModel? itemType;
+    private ItemTypeModel? ItemModelitemType;
 
     /// <summary>
     /// Navigation property for the item's type.
     /// </summary>
-    public ItemTypeModel? ItemType
+    public ItemTypeModel? ItemModelItemType
     {
-        get => itemType;
-        set => SetProperty(ref itemType, value);
+        get => ItemModelitemType;
+        set => SetProperty(ref ItemModelitemType, value);
     }
 
     /// <summary>
     /// Foreign key reference to the associated item type.
     /// Nullable in case it's not set yet.
     /// </summary>
-    public int? ItemTypeId { get; set; }
+    public int? ItemModelItemTypeId { get; set; }
 
     #region INotifyPropertyChanged
 

@@ -2,18 +2,18 @@
 
 public class SiteInfoDto
 {
-    public string ScopeOfWork { get; set; } = string.Empty;
-    public string AddressLine1 { get; set; } = string.Empty;
-    public string AddressLine2 { get; set; } = string.Empty;
-    public string City { get; set; } = string.Empty;
-    public string State { get; set; } = string.Empty;
-    public string ZipCode { get; set; } = string.Empty;
-    public string ParcelNumber { get; set; } = string.Empty;
-    public string Jurisdiction { get; set; } = string.Empty;
-    public double BuildingArea { get; set; }
-    public int NumberOfStories { get; set; }
-    public string OccupancyGroup { get; set; } = string.Empty;
-    public int OccupantLoad { get; set; }
-    public string ConstructionType { get; set; } = string.Empty;
-    public bool IsSprinklered { get; set; }
+    public string SiteInfoDtoScopeOfWork { get; set; } = string.Empty;
+    public string SiteInfoDtoAddressLine1 { get; set; } = string.Empty;
+    public string SiteInfoDtoAddressLine2 { get; set; } = string.Empty;
+    public string SiteInfoDtoCity { get; set; } = string.Empty;
+    public string SiteInfoDtoState { get; set; } = string.Empty;
+    public string SiteInfoDtoZipCode { get; set; } = string.Empty;
+    public string SiteInfoDtoParcelNumber { get; set; } = string.Empty;
+    public string SiteInfoDtoJurisdiction { get; set; } = string.Empty;
+    public double SiteInfoDtoBuildingArea { get; set; }
+    public int SiteInfoDtoNumberOfStories { get; set; }
+    public string SiteInfoDtoOccupancyGroup { get; set; } = string.Empty;
+    public int SiteInfoDtoOccupantLoad { get; set; }
+    public string SiteInfoDtoConstructionType { get; set; } = string.Empty;
+    public bool SiteInfoDtoIsSprinklered { get; set; }
 }

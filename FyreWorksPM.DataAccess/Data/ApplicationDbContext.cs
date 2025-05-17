@@ -27,16 +27,16 @@ public class ApplicationDbContext : DbContext
 
         // BidModel to BidTasks: One-to-many
         modelBuilder.Entity<BidModel>()
-            .HasMany(b => b.Tasks)
-            .WithOne(t => t.Bid)
-            .HasForeignKey(t => t.BidId)
+            .HasMany(b => b.BidModelTasks)
+            .WithOne(t => t.BidTaskModelBid)
+            .HasForeignKey(t => t.BidTaskModelBidId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // BidTaskModel to TaskModel: Many-to-one
         modelBuilder.Entity<BidTaskModel>()
-            .HasOne(t => t.Task)
+            .HasOne(t => t.BidTaskModelTask)
             .WithMany() // if TaskModel doesn't need to know its BidTasks
-            .HasForeignKey(t => t.TaskModelId)
+            .HasForeignKey(t => t.BidTaskModelTaskModelId)
             .OnDelete(DeleteBehavior.Restrict); // Or Cascade if you want them deleted with the task template
 
         base.OnModelCreating(modelBuilder);

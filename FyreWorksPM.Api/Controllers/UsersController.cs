@@ -50,19 +50,19 @@ public class UsersController : ControllerBase
 
         // Check for existing username/email
         bool exists = await _db.Users.AnyAsync(u =>
-            u.Username == dto.RegUsername || u.Email == dto.RegEmail);
+            u.UserModelUsername == dto.RegisterUserDtoUsername || u.UserModelEmail == dto.RegisterUserDtoEmail);
 
         if (exists)
             return BadRequest("A user with this username or email already exists.");
 
         // Hash password using BCrypt (includes salt)
-        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.RegPassword);
+        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.RegisterUserDtoPassword);
 
         var user = new UserModel
         {
-            Username = dto.RegUsername.Trim(),
-            Email = dto.RegEmail.Trim(),
-            PasswordHash = hashedPassword
+            UserModelUsername = dto.RegisterUserDtoUsername.Trim(),
+            UserModelEmail = dto.RegisterUserDtoEmail.Trim(),
+            UserModelPasswordHash = hashedPassword
         };
 
         _db.Users.Add(user);
@@ -78,10 +78,10 @@ public class UsersController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserDto dto)
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == dto.LoginUsername);
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.UserModelUsername == dto.LoginUserDtoUsername);
 
         // Validate credentials
-        if (user == null || !BCrypt.Net.BCrypt.Verify(dto.LoginPassword, user.PasswordHash))
+        if (user == null || !BCrypt.Net.BCrypt.Verify(dto.LoginUserDtoPassword, user.UserModelPasswordHash))
             return Unauthorized("Invalid username or password");
 
         // Load JWT configuration values
@@ -92,8 +92,8 @@ public class UsersController : ControllerBase
         // Build claims to embed into token
         var authClaims = new[]
         {
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.UserModelUsername),
+            new Claim(ClaimTypes.NameIdentifier, user.UserModelId.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

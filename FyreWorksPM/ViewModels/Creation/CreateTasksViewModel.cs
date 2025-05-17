@@ -61,7 +61,7 @@ namespace FyreWorksPM.ViewModels.Creation
 
             foreach (var task in tasks)
             {
-                Debug.WriteLine($"Loaded Task: {task.TaskName} - {task.Type}");
+                Debug.WriteLine($"Loaded Task: {task.SavedTaskDtoTaskName} - {task.SavedTaskDtoType}");
                 AllTasks.Add(task);
             }
 
@@ -80,7 +80,7 @@ namespace FyreWorksPM.ViewModels.Creation
 
             var filtered = AllTasks
                 .Where(t => string.IsNullOrWhiteSpace(query) ||
-                            t.TaskName.ToLowerInvariant().Contains(query))
+                            t.SavedTaskDtoTaskName.ToLowerInvariant().Contains(query))
                 .ToList();
 
             filteredTasks.Clear();
@@ -99,10 +99,10 @@ namespace FyreWorksPM.ViewModels.Creation
 
             var dto = new CreateTaskDto
             {
-                TaskName = TaskName,
-                Type = SelectedTaskType,
-                DefaultCost = DefaultCost,
-                DefaultSale = DefaultSale
+                CreateTaskDtoTaskName = TaskName,
+                CreateTaskDtoType = SelectedTaskType,
+                CreateTaskDtoDefaultCost = DefaultCost,
+                CreateTaskDtoDefaultSale = DefaultSale
             };
 
             var result = await _taskService.CreateTemplateAsync(dto);
@@ -123,7 +123,7 @@ namespace FyreWorksPM.ViewModels.Creation
             if (SelectedTask is null)
                 return;
 
-            await _taskService.DeleteTemplateAsync(SelectedTask.Id);
+            await _taskService.DeleteTemplateAsync(SelectedTask.SavedTaskDtoId);
             AllTasks.Remove(SelectedTask);
             filteredTasks.Remove(SelectedTask);
             SelectedTask = null;
@@ -140,13 +140,13 @@ namespace FyreWorksPM.ViewModels.Creation
 
             var dto = new CreateTaskDto
             {
-                TaskName = SelectedTask.TaskName,
-                Type = SelectedTask.Type,
-                DefaultCost = SelectedTask.DefaultCost,
-                DefaultSale = SelectedTask.DefaultSale
+                CreateTaskDtoTaskName = SelectedTask.SavedTaskDtoTaskName,
+                CreateTaskDtoType = SelectedTask.SavedTaskDtoType,
+                CreateTaskDtoDefaultCost = SelectedTask.SavedTaskDtoDefaultCost,
+                CreateTaskDtoDefaultSale = SelectedTask.SavedTaskDtoDefaultSale
             };
 
-            await _taskService.UpdateTemplateAsync(SelectedTask.Id, dto);
+            await _taskService.UpdateTemplateAsync(SelectedTask.SavedTaskDtoId, dto);
             await LoadTasksAsync(); // refresh the list
         }
 

@@ -27,11 +27,11 @@ public class ClientsController : ControllerBase
         var clients = await _db.Clients
             .Select(c => new ClientDto
             {
-                ClientId = c.ClientModelId,
-                ClientName = c.ClientModelName,
-                ClientContact = c.ClientModelContact,
-                ClientEmail = c.ClientModelEmail,
-                ClientPhone = c.ClientModelPhone
+                ClientDtoId = c.ClientModelId,
+                ClientDtoName = c.ClientModelName,
+                ClientDtoContact = c.ClientModelContact,
+                ClientDtoEmail = c.ClientModelEmail,
+                ClientDtoPhone = c.ClientModelPhone
             })
             .ToListAsync();
 
@@ -50,11 +50,11 @@ public class ClientsController : ControllerBase
 
         var dto = new ClientDto
         {
-            ClientId = client.ClientModelId,
-            ClientName = client.ClientModelName,
-            ClientContact = client.ClientModelContact,
-            ClientEmail = client.ClientModelEmail,
-            ClientPhone = client.ClientModelPhone
+            ClientDtoId = client.ClientModelId,
+            ClientDtoName = client.ClientModelName,
+            ClientDtoContact = client.ClientModelContact,
+            ClientDtoEmail = client.ClientModelEmail,
+            ClientDtoPhone = client.ClientModelPhone
         };
 
         return Ok(dto);
@@ -67,17 +67,17 @@ public class ClientsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ClientDto>> CreateClient([FromBody] CreateClientDto dto)
     {
-        if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.Contact))
+        if (string.IsNullOrWhiteSpace(dto.CreateClientDtoName) || string.IsNullOrWhiteSpace(dto.CreateClientDtoContact))
         {
             return BadRequest("Client name and contact are required.");
         }
 
         var client = new ClientModel
         {
-            ClientModelName = dto.Name,
-            ClientModelContact = dto.Contact,
-            ClientModelEmail = dto.Email,
-            ClientModelPhone = dto.Phone
+            ClientModelName = dto.CreateClientDtoName,
+            ClientModelContact = dto.CreateClientDtoContact,
+            ClientModelEmail = dto.CreateClientDtoEmail,
+            ClientModelPhone = dto.CreateClientDtoPhone
         };
 
         _db.Clients.Add(client);
@@ -85,20 +85,20 @@ public class ClientsController : ControllerBase
 
         var createdDto = new ClientDto
         {
-            ClientId = client.ClientModelId,
-            ClientName = client.ClientModelName,
-            ClientContact = client.ClientModelContact,
-            ClientEmail = client.ClientModelEmail,
-            ClientPhone = client.ClientModelPhone
+            ClientDtoId = client.ClientModelId,
+            ClientDtoName = client.ClientModelName,
+            ClientDtoContact = client.ClientModelContact,
+            ClientDtoEmail = client.ClientModelEmail,
+            ClientDtoPhone = client.ClientModelPhone
         };
 
         return CreatedAtAction(nameof(GetClient), new { id = client.ClientModelId }, new ClientDto
         {
-            ClientId = client.ClientModelId,
-            ClientName = client.ClientModelName,
-            ClientContact = client.ClientModelContact,
-            ClientEmail = client.ClientModelEmail,
-            ClientPhone = client.ClientModelPhone
+            ClientDtoId = client.ClientModelId,
+            ClientDtoName = client.ClientModelName,
+            ClientDtoContact = client.ClientModelContact,
+            ClientDtoEmail = client.ClientModelEmail,
+            ClientDtoPhone = client.ClientModelPhone
         });
     }
 
@@ -112,10 +112,10 @@ public class ClientsController : ControllerBase
         var client = await _db.Clients.FindAsync(id);
         if (client == null) return NotFound();
 
-        client.ClientModelName = dto.Name;
-        client.ClientModelContact = dto.Contact;
-        client.ClientModelEmail = dto.Email;
-        client.ClientModelPhone = dto.Phone;
+        client.ClientModelName = dto.UpdateClientDtoName;
+        client.ClientModelContact = dto.UpdateClientDtoContact;
+        client.ClientModelEmail = dto.UpdateClientDtoEmail;
+        client.ClientModelPhone = dto.UpdateClientDtoPhone;
 
         _db.Clients.Update(client);
         await _db.SaveChangesAsync();

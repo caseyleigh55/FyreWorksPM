@@ -107,7 +107,7 @@ public partial class CreateBidViewModel : ObservableObject
             {
                 LineItems.Add(new BidLineItemModel
                 {
-                    ItemName = value.Name,
+                    ItemName = value.ItemDtoName,
                     UnitCost = 0,
                     Quantity = 1,
                     MarkupPercent = 0
@@ -271,37 +271,37 @@ public partial class CreateBidViewModel : ObservableObject
         }
         var newBid = new CreateBidDto
         {
-            BidNumber = BidNumber,
-            ProjectName = ProjectName,
-            ClientId = SelectedClient.Id,
-            CreatedDate = CreatedDate,
-            IsActive = IsActive,
-            SiteInfo = new SiteInfoDto
+            CreateBidDtoBidNumber = BidNumber,
+            CreateBidDtoProjectName = ProjectName,
+            CreateBidDtoClientId = SelectedClient.ClientDtoId,
+            CreateBidDtoCreatedDate = CreatedDate,
+            CreateBidDtoIsActive = IsActive,
+            CreateBidDtoSiteInfo = new SiteInfoDto
             {
-                ScopeOfWork = ScopeOfWork,
-                AddressLine1 = AddressLine1,
-                AddressLine2 = AddressLine2,
-                City = City,
-                State = State,
-                ZipCode = ZipCode,
-                ParcelNumber = ParcelNumber,
-                Jurisdiction = Jurisdiction,
-                BuildingArea = BuildingArea,
-                NumberOfStories = NumberOfStories,
-                OccupancyGroup = OccupancyGroup,
-                OccupantLoad = OccupantLoad,
-                ConstructionType = ConstructionType,
-                IsSprinklered = IsSprinklered
+                SiteInfoDtoScopeOfWork = ScopeOfWork,
+                SiteInfoDtoAddressLine1 = AddressLine1,
+                SiteInfoDtoAddressLine2 = AddressLine2,
+                SiteInfoDtoCity = City,
+                SiteInfoDtoState = State,
+                SiteInfoDtoZipCode = ZipCode,
+                SiteInfoDtoParcelNumber = ParcelNumber,
+                SiteInfoDtoJurisdiction = Jurisdiction,
+                SiteInfoDtoBuildingArea = BuildingArea,
+                SiteInfoDtoNumberOfStories = NumberOfStories,
+                SiteInfoDtoOccupancyGroup = OccupancyGroup,
+                SiteInfoDtoOccupantLoad = OccupantLoad,
+                SiteInfoDtoConstructionType = ConstructionType,
+                SiteInfoDtoIsSprinklered = IsSprinklered
             },
 
-            Tasks = AdminTasks
+            CreateBidDtoTasks = AdminTasks
                     .Concat(EngineeringTasks)
                     .Select(t => new CreateBidTaskDto
                     {
-                        TaskModelId = t.TaskModelId,
-                        TaskName = t.Name,
-                        Cost = t.Cost,
-                        Sale = t.Sale
+                        CreateBidTaskDtoTaskModelId = t.TaskModelId,
+                        CreateBidTaskDtoTaskName = t.Name,
+                        CreateBidTaskDtoCost = t.Cost,
+                        CreateBidTaskDtoSale = t.Sale
                     })
                     .ToList()
         };
@@ -390,7 +390,7 @@ public partial class CreateBidViewModel : ObservableObject
         await LoadClientsAsync();
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            var matchingClient = Clients.FirstOrDefault(c => c.Id == newClient.Id);
+            var matchingClient = Clients.FirstOrDefault(c => c.ClientDtoId == newClient.ClientDtoId);
             if (matchingClient != null)
             {
                 SelectedClient = matchingClient;

@@ -80,7 +80,7 @@ public class BidLineItemModel : INotifyPropertyChanged
             if (SetProperty(ref _selectedItem, value) && value != null)
             {
                 // ✅ Autofill name and cost from selected item
-                ItemName = value.Name;
+                ItemName = value.ItemModelName;
                 //UnitCost = value.UnitCost;
             }
         }

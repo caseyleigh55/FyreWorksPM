@@ -2,8 +2,8 @@
 {
     public class UpdateBidDto
     {
-        public string ProjectName { get; set; }
-        public int ClientId { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public string UpdateBidDtoProjectName { get; set; }
+        public int UpdateBidDtoClientId { get; set; }
+        public DateTime UpdateBidDtoCreatedDate { get; set; }
     }
 }

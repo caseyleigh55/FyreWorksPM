@@ -68,7 +68,7 @@ public partial class CreateItemsViewModel : ObservableObject
     {
         if (SelectedItem == null) return;
 
-        await _itemService.DeleteItemAsync(SelectedItem.Id);
+        await _itemService.DeleteItemAsync(SelectedItem.ItemDtoId);
 
         Items.Remove(SelectedItem);
         FilterItems();
@@ -85,7 +85,7 @@ public partial class CreateItemsViewModel : ObservableObject
         if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Description) || string.IsNullOrWhiteSpace(SelectedItemType))
             return;
 
-        var dto = new CreateItemDto { Name = Name, Description = Description, ItemTypeName = SelectedItemType };
+        var dto = new CreateItemDto { CreateItemDtoName = Name, CreateItemDtoDescription = Description, CreateItemDtoItemTypeName = SelectedItemType };
         await _itemService.AddItemAsync(dto);
 
         await LoadItemsAsync();
@@ -111,7 +111,7 @@ public partial class CreateItemsViewModel : ObservableObject
         SelectedItemType = type;
         AreSuggestionsVisible = false;
 
-        var matchedItem = Items.FirstOrDefault(i => i.Name.Equals(type, StringComparison.OrdinalIgnoreCase));
+        var matchedItem = Items.FirstOrDefault(i => i.ItemDtoName.Equals(type, StringComparison.OrdinalIgnoreCase));
         if (matchedItem != null)
             ItemSelectedCallback?.Invoke(matchedItem);
     }
@@ -140,8 +140,8 @@ public partial class CreateItemsViewModel : ObservableObject
     {
         var filtered = Items
             .Where(i =>
-                (string.IsNullOrWhiteSpace(SearchText) || i.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) &&
-                (string.IsNullOrWhiteSpace(SelectedItemType) || i.ItemTypeName == SelectedItemType))
+                (string.IsNullOrWhiteSpace(SearchText) || i.ItemDtoName.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrWhiteSpace(SelectedItemType) || i.ItemDtoItemTypeName == SelectedItemType))
             .ToList();
 
         FilteredItems.Clear();
