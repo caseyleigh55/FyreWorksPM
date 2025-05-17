@@ -7,7 +7,7 @@ namespace FyreWorksPM.Pages.Creation;
 /// </summary>
 public partial class CreateUserPage : ContentPage
 {
-    public CreateUserPage(RegisterViewModel vm)
+    public CreateUserPage(CreateUserViewModel vm)
     {
         InitializeComponent();
         BindingContext = vm;

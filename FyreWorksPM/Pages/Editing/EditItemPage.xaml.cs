@@ -20,7 +20,7 @@ public partial class EditItemPage : ContentPage, IHideFlyout
         InitializeComponent();        
 
         // Set up the ViewModel
-        BindingContext = new EditItemPageViewModel(item, onSaved, service);
+        BindingContext = new EditItemViewModel(item, onSaved, service);
     }
     private bool isClosingInternally = false;
 

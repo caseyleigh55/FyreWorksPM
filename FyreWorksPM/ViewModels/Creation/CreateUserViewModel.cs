@@ -11,13 +11,13 @@ namespace FyreWorksPM.ViewModels.Creation;
 /// ViewModel responsible for handling user registration logic from the UI.
 /// Refactored for ObservableProperty and RelayCommand usage.
 /// </summary>
-public partial class RegisterViewModel : ObservableObject
+public partial class CreateUserViewModel : ObservableObject
 {
     private readonly ILoadingService _loading;
     private readonly HttpClient _httpClient;
     private readonly INavigationServices _navigation;
 
-    public RegisterViewModel(HttpClient httpClient, INavigationServices navigation, ILoadingService loading)
+    public CreateUserViewModel(HttpClient httpClient, INavigationServices navigation, ILoadingService loading)
     {
         _httpClient = httpClient;
         _navigation = navigation;

@@ -114,12 +114,12 @@ public static class MauiProgram
         builder.Services.AddTransient<CreateBidViewModel>();
         builder.Services.AddTransient<CreateClientViewModel>();
         builder.Services.AddTransient<CreateItemsViewModel>();
-        builder.Services.AddTransient<RegisterViewModel>();
+        builder.Services.AddTransient<CreateUserViewModel>();
         builder.Services.AddTransient<CreateTasksViewModel>();
 
         // Pop-Up ViewModels
-        builder.Services.AddTransient<EditItemPageViewModel>();
-        builder.Services.AddTransient<ManageItemTypesPopupViewModel>();
+        builder.Services.AddTransient<EditItemViewModel>();
+        builder.Services.AddTransient<EditItemTypeViewModel>();
 
         // ============================
         // 📄 Pages (DI-resolved with ViewModels where needed)
@@ -171,7 +171,7 @@ public static class MauiProgram
         // Pop-Up Pages
         builder.Services.AddTransient<EditItemPage>();
 
-        builder.Services.AddTransient<ManageItemTypesPopup>();
+        builder.Services.AddTransient<EditItemTypePage>();
 
         // Solitary Pages
         builder.Services.AddTransient<SelectedBidPage>();

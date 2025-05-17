@@ -11,7 +11,7 @@ namespace FyreWorksPM.ViewModels.Solitary;
 /// ViewModel for the item editing popup.
 /// Handles loading editable values, saving changes, and refreshing the main view.
 /// </summary>
-public partial class EditItemPageViewModel : ObservableObject
+public partial class EditItemViewModel : ObservableObject
 {
     #region Observable Properties
 
@@ -39,7 +39,7 @@ public partial class EditItemPageViewModel : ObservableObject
     /// <summary>
     /// Constructor for popup ViewModel. Takes the item being edited, a callback, and the injected item service.
     /// </summary>
-    public EditItemPageViewModel(ItemDto item, Func<Task> onSaved, IItemService itemService)
+    public EditItemViewModel(ItemDto item, Func<Task> onSaved, IItemService itemService)
     {
         _item = item;
         _onSaved = onSaved;

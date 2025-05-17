@@ -112,6 +112,9 @@
 	  <Compile Update="Pages\Editing\EditItemPage.xaml.cs">
 	    <DependentUpon>EditItemPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Pages\Editing\EditItemTypePage.xaml.cs">
+	    <DependentUpon>EditItemTypePage.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -163,9 +166,13 @@
 	  <MauiXaml Update="Pages\Editing\EditItemPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Pages\PopUps\ManageItemTypesPopup.xaml">
+	  <MauiXaml Update="Pages\Editing\EditItemTypePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="ViewModels\Solitary\" />
 	</ItemGroup>
 
 </Project>

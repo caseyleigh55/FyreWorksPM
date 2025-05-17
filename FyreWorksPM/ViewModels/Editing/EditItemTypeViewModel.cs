@@ -10,14 +10,14 @@ namespace FyreWorksPM.ViewModels.Solitary;
 /// ViewModel for managing all ItemTypes, allowing creation, editing, and deletion.
 /// Interacts with the item type service and backs a management popup.
 /// </summary>
-public partial class ManageItemTypesPopupViewModel : ObservableObject
+public partial class EditItemTypeViewModel : ObservableObject
 {
     private readonly IItemTypeService _itemTypeService;
 
     [ObservableProperty]
     private ObservableCollection<ItemTypeDto> itemTypes = new();
 
-    public ManageItemTypesPopupViewModel(IItemTypeService itemTypeService)
+    public EditItemTypeViewModel(IItemTypeService itemTypeService)
     {
         _itemTypeService = itemTypeService;
         _ = LoadItemTypesAsync();

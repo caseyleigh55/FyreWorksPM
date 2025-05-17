@@ -2,16 +2,16 @@ using FyreWorksPM.DataAccess.Data;
 using FyreWorksPM.Services.Item;
 using FyreWorksPM.ViewModels.Solitary;
 
-namespace FyreWorksPM.Pages.PopUps;
+namespace FyreWorksPM.Pages.Editing;
 
-public partial class ManageItemTypesPopup : ContentPage
+public partial class EditItemTypePage : ContentPage
 {
     private readonly IItemTypeService _service;
 
-    public ManageItemTypesPopup(IItemTypeService service)
+    public EditItemTypePage(IItemTypeService service)
     {
         InitializeComponent();
         _service = service;
-        BindingContext = new ManageItemTypesPopupViewModel(service);
+        BindingContext = new EditItemTypeViewModel(service);
     }
 }
