@@ -18,4 +18,11 @@ public partial class CreateClientPage : ContentPage
 		InitializeComponent();
 		BindingContext = vm;
 	}
+    /// <summary>
+    /// Handles the cancel button click by closing the popup view.
+    /// </summary>
+    private async void OnCancelClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("..");
+    }
 }

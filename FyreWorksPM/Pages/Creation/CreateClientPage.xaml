@@ -26,13 +26,25 @@
                    Keyboard="Telephone"
                    Text="{Binding Phone}" />
 
-            <Button Text="Save"
+            <!--<Button Text="Save"
                     Command="{Binding SaveClientCommand}"
                     BackgroundColor="#7B61FF"
                     TextColor="White"
                     CornerRadius="10"
                     FontAttributes="Bold"
-                    HeightRequest="50" />
+                    HeightRequest="50" />-->
+
+            <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                <Button Text="Save" 
+                        Command="{Binding SaveClientCommand}"
+                        BackgroundColor="DarkGreen"
+                        TextColor="White" />
+
+                <Button Text="Cancel" 
+                        Clicked="OnCancelClicked"
+                        BackgroundColor="DarkRed"
+                        TextColor="White" />
+            </HorizontalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
