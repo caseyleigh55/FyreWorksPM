@@ -5,9 +5,9 @@ namespace FyreWorksPM.Pages.Creation;
 /// <summary>
 /// Placeholder registration page.
 /// </summary>
-public partial class RegisterPage : ContentPage
+public partial class CreateUserPage : ContentPage
 {
-    public RegisterPage(RegisterViewModel vm)
+    public CreateUserPage(RegisterViewModel vm)
     {
         InitializeComponent();
         BindingContext = vm;

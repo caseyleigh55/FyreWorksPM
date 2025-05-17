@@ -165,7 +165,7 @@ public static class MauiProgram
             var vm = provider.GetRequiredService<CreateItemsViewModel>();
             return new CreateItemsPage(vm);
         });
-        builder.Services.AddTransient<RegisterPage>();
+        builder.Services.AddTransient<CreateUserPage>();
 
         // Pop-Up Pages
         builder.Services.AddTransient<ManageItemPopup>();

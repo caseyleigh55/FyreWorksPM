@@ -137,6 +137,6 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("createBid", typeof(CreateBidPage));
         Routing.RegisterRoute("projects", typeof(ProjectsPage));
         Routing.RegisterRoute("services", typeof(ServicePage));
-        Routing.RegisterRoute("register", typeof(RegisterPage)); // Used by LoginShell
+        Routing.RegisterRoute("register", typeof(CreateUserPage)); // Used by LoginShell
     }
 }

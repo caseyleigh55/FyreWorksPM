@@ -37,11 +37,11 @@ public partial class LoginShell : Shell
     {
         // ✅ Register navigation routes (clean GoToAsync support)
         Routing.RegisterRoute("login", typeof(LoginPage));
-        Routing.RegisterRoute("register", typeof(RegisterPage));
+        Routing.RegisterRoute("register", typeof(CreateUserPage));
 
         // Resolve pages using DI
         var loginPage = App.Services.GetRequiredService<LoginPage>();
-        var registerPage = App.Services.GetRequiredService<RegisterPage>();
+        var registerPage = App.Services.GetRequiredService<CreateUserPage>();
 
         // 🧑‍💻 Login Tab
         Items.Add(new ShellContent

@@ -91,8 +91,8 @@
 	  <Compile Update="Pages\Creation\CreateClientPage.xaml.cs">
 	    <DependentUpon>CreateClientPage.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Pages\Creation\RegisterPage.xaml.cs">
-	    <DependentUpon>RegisterPage.xaml</DependentUpon>
+	  <Compile Update="Pages\Creation\CreateUserPage.xaml.cs">
+	    <DependentUpon>CreateUserPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Pages\Foundation\BidsPage.xaml.cs">
 	    <DependentUpon>BidsPage.xaml</DependentUpon>
@@ -124,7 +124,7 @@
 	  <MauiXaml Update="Pages\Creation\CreateTasksPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Pages\Creation\RegisterPage.xaml">
+	  <MauiXaml Update="Pages\Creation\CreateUserPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\Creation\CreateItemsPage.xaml">

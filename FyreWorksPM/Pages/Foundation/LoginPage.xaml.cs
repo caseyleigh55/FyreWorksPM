@@ -47,7 +47,7 @@ public partial class LoginPage : ContentPage
     /// </summary>
     private async void OnRegisterClicked(object sender, EventArgs e)
     {
-        await _nav.PushPageAsync<RegisterPage>(); // 👈 No more "page already has parent" errors!
+        await _nav.PushPageAsync<CreateUserPage>(); // 👈 No more "page already has parent" errors!
     }
 
     protected override void OnAppearing()
