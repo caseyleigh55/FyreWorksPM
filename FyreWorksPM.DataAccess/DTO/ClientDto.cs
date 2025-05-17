@@ -2,10 +2,10 @@
 {
     public class ClientDto
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Contact { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
+        public int ClientId { get; set; }
+        public string ClientName { get; set; }
+        public string ClientContact { get; set; }
+        public string ClientEmail { get; set; }
+        public string ClientPhone { get; set; }
     }
 }
