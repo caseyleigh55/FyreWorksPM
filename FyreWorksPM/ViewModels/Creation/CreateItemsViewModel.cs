@@ -9,14 +9,8 @@ using FyreWorksPM.ViewModels.Solitary;
 using FyreWorksPM.DataAccess.DTO;
 using Microsoft.Maui.ApplicationModel;
 using System.Xml.Linq;
-
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using FyreWorksPM.DataAccess.DTO;
-using FyreWorksPM.Pages.PopUps;
-using FyreWorksPM.Services.Item;
 using Microsoft.Maui.ApplicationModel;
-using System.Collections.ObjectModel;
 using static Azure.Core.HttpHeader;
 using FyreWorksPM.Services.Navigation;
 
@@ -29,13 +23,17 @@ namespace FyreWorksPM.ViewModels.Creation;
 public partial class CreateItemsViewModel : ObservableObject
 {
     private readonly IItemService _itemService;
+    public IItemService ItemService => _itemService;
     private readonly IItemTypeService _itemTypeService;
     private readonly INavigationServices _navigationService;
+    public Func<Task> RequestEditItemPopup { get; set; }
+
 
     public Action<ItemDto>? ItemSelectedCallback { get; set; }
 
     public CreateItemsViewModel(IItemService itemService, IItemTypeService itemTypeService,INavigationServices navigationService)
     {
+        
         _itemService = itemService;
         _itemTypeService = itemTypeService;
         _navigationService = navigationService;
@@ -103,22 +101,8 @@ public partial class CreateItemsViewModel : ObservableObject
     private async Task EditSelectedItemAsync()
     {
         if (SelectedItem == null) return;
-
-        var popup = new ManageItemPopup(
-            SelectedItem,
-            async () =>
-            {
-                await LoadItemsAsync();
-                await LoadItemTypesAsync();
-                FilterItemTypeSuggestions(SearchText);
-                FilterItems();
-            },
-            _itemService);
-
-        await _navigationService.PushPageAsync<ManageItemPopup>();
-
-
-
+        if (RequestEditItemPopup != null)
+            await RequestEditItemPopup.Invoke();
     }
 
     [RelayCommand]
@@ -152,7 +136,7 @@ public partial class CreateItemsViewModel : ObservableObject
         AreSuggestionsVisible = FilteredItemTypes.Any();
     }
 
-    private void FilterItems()
+    public void FilterItems()
     {
         var filtered = Items
             .Where(i =>
@@ -165,7 +149,7 @@ public partial class CreateItemsViewModel : ObservableObject
             FilteredItems.Add(item);
     }
 
-    private async Task LoadItemTypesAsync()
+    public async Task LoadItemTypesAsync()
     {
         var types = await _itemTypeService.GetAllItemTypeNamesAsync();
         MainThread.BeginInvokeOnMainThread(() =>
@@ -178,7 +162,7 @@ public partial class CreateItemsViewModel : ObservableObject
         });
     }
 
-    private async Task LoadItemsAsync()
+    public async Task LoadItemsAsync()
     {
         var items = await _itemService.GetAllItemsAsync();
         MainThread.BeginInvokeOnMainThread(() =>

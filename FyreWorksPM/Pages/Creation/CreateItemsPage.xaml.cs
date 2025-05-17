@@ -5,6 +5,7 @@ using Windows.System;
 #endif
 
 using FyreWorksPM.DataAccess.DTO;
+using FyreWorksPM.Pages.PopUps;
 using FyreWorksPM.ViewModels.Creation;
 
 namespace FyreWorksPM.Pages.Creation;
@@ -13,6 +14,7 @@ public partial class CreateItemsPage : ContentPage
 {
     private int _suggestionIndex = -1;
     private readonly Action<ItemDto>? _onItemSelected;
+    private readonly CreateItemsViewModel _viewModel;
 
 
     /// <summary>
@@ -24,6 +26,7 @@ public partial class CreateItemsPage : ContentPage
     {
         InitializeComponent();
         BindingContext = vm;
+        _viewModel = vm;
         _onItemSelected = onItemSelected;
 
         // Reset suggestion navigation on focus/text change
@@ -42,6 +45,28 @@ public partial class CreateItemsPage : ContentPage
 
         // Register callback from ViewModel (when item is tapped)
         vm.ItemSelectedCallback = OnItemSelectedInternal;
+
+        vm.RequestEditItemPopup = async () =>
+        {
+            var selectedItem = vm.SelectedItem;
+            if (selectedItem == null)
+                return;
+
+            var popup = new ManageItemPopup(
+                selectedItem,
+                async () =>
+                {
+                    await vm.LoadItemsAsync();
+                    await vm.LoadItemTypesAsync();
+                    vm.FilterItemTypeSuggestions(vm.SearchText);
+                    vm.FilterItems();
+                },
+                vm.ItemService  // Or however you access the item service from the view model
+            );
+
+            await Shell.Current.Navigation.PushModalAsync(popup);
+        };
+
     }
 
     /// <summary>
