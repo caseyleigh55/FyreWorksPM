@@ -80,7 +80,6 @@ public partial class EditItemViewModel : ObservableObject
         // Proceed with save logic
         await Shell.Current.GoToAsync("..");
 
-        //// Close the popup
-        //await Shell.Current.Navigation.PopAsync();
+        
     }
 }
