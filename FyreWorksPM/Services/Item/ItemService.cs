@@ -63,16 +63,6 @@ public class ItemService : IItemService
     public async Task DeleteItemAsync(int id)
     {
         var response = await _http.DeleteAsync($"api/items/{id}");
-        response.EnsureSuccessStatusCode();
-    }
- 
-    public Task AddItemAsync(ItemModel item)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task UpdateItemAsync(ItemModel item)
-    {
-        throw new NotImplementedException();
+        response.EnsureSuccessStatusCode();    
     }
 }

@@ -13,10 +13,10 @@ public partial class EditClientViewModel : ObservableObject
     private int id;
 
     [ObservableProperty]
-    private string name;
+    private string clientName;
 
     [ObservableProperty]
-    private string contact;
+    private string contactName;
 
     [ObservableProperty]
     private string email;
@@ -35,8 +35,8 @@ public partial class EditClientViewModel : ObservableObject
         _clientService = clientService;
 
         // Initialize editable values from the original DTO        
-        name = client.Name;
-        contact = client.Contact;
+        clientName = client.Name;
+        contactName = client.Contact;
         email = client.Email;
         phone = client.Phone;
 
@@ -48,12 +48,21 @@ public partial class EditClientViewModel : ObservableObject
     {
         var view = Shell.Current.CurrentPage as EditClientPage;
         view?.MarkClosingInternally();
-        _originalClient.Name = Name;
-        _originalClient.Contact = Contact;
-        _originalClient.Email = Email;
-        _originalClient.Phone = Phone;
+        _originalClient.Name = clientName;
+        _originalClient.Contact = contactName;
+        _originalClient.Email = email;
+        _originalClient.Phone = phone;
 
-       var dto = new UpdateClientDto
+        if (string.IsNullOrWhiteSpace(clientName) ||
+            string.IsNullOrWhiteSpace(contactName) ||
+            string.IsNullOrWhiteSpace(Email) ||
+            string.IsNullOrWhiteSpace(Phone))
+        {
+            await Shell.Current.DisplayAlert("Validation Error", "Please fill out all fields.", "OK");
+            return;
+        }
+
+        var dto = new CreateClientDto
        {
            Name = _originalClient.Name,
            Contact = _originalClient.Contact,

@@ -79,7 +79,7 @@
                                 <VerticalStackLayout>
                                     <Label Text="{Binding Name}" FontAttributes="Bold"/>
                                     <Label Text="{Binding Description}" FontSize="12"/>
-                                    <Label Text="{Binding ItemType.Name}" FontSize="10" TextColor="Gray"/>
+                                    <Label Text="{Binding ItemTypeName}" FontSize="10" TextColor="Gray"/>
                                 </VerticalStackLayout>
                             </Border>
                         </DataTemplate>

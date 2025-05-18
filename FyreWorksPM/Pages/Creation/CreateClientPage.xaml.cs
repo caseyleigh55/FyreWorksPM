@@ -1,4 +1,6 @@
 using FyreWorksPM.DataAccess.Data.Models;
+using FyreWorksPM.DataAccess.DTO;
+using FyreWorksPM.Pages.Editing;
 using FyreWorksPM.ViewModels.Creation;
 
 namespace FyreWorksPM.Pages.Creation;
@@ -8,16 +10,60 @@ namespace FyreWorksPM.Pages.Creation;
 /// </summary>
 public partial class CreateClientPage : ContentPage
 {
-    public Func<ClientModel, Task> ClientAddedCallback { get; set; }
+    private int _suggestionIndex = -1;
+    private readonly Action<ClientDto>? _onClientSelected;
+    private readonly CreateClientViewModel _viewModel;
 
     /// <summary>
-    /// Constructor accepts DI-injected view model and sets it as the BindingContext.
+    /// Initializes the ClientsPage with a ViewModel and an optional CLient-selected callback.
     /// </summary>
-    public CreateClientPage(CreateClientViewModel vm)
+    /// <param name="vm">The CreateItemsViewModel for this page.</param>
+    /// <param name="onClientSelected">Optional callback to fire when an item is selected from the list.</param>
+    public CreateClientPage(CreateClientViewModel vm, Action<ClientDto>? onClientSelected = null)
 	{
 		InitializeComponent();
 		BindingContext = vm;
-	}
+        _viewModel = vm;
+        _onClientSelected = onClientSelected;
+
+        // Register callback from ViewModel (when item is tapped)
+        //vm.ClientSelectedCallback = OnClientSelectedInternal;
+
+        vm.RequestEditClientPopup = async () =>
+        {
+            var selectedClient = vm.SelectedClient;
+            if (selectedClient == null)
+                return;
+
+            var popup = new EditClientPage(
+                selectedClient,
+                async () =>
+                {
+                    await vm.LoadClientsAsync();
+                    vm.FilterClients();
+                },
+                vm.ClientService  // Or however you access the item service from the view model
+            );
+
+            await Shell.Current.Navigation.PushModalAsync(popup);
+        };
+    }
+
+    /// <summary>
+    /// Internal method triggered when a client is selected.
+    /// Fires callback and optionally closes the page.
+    /// </summary>
+    /// <param name="client">The client selected by the user.</param>
+    private async void OnClientSelectedInternal(ClientDto client)
+    {
+        _onClientSelected?.Invoke(client);
+        await Shell.Current.Navigation.PopAsync();
+    }
+
+    public void FocusClientName()
+    {
+        ClientNameEntry.Focus();
+    }
     /// <summary>
     /// Handles the cancel button click by closing the popup view.
     /// </summary>

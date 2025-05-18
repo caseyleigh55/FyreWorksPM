@@ -79,7 +79,7 @@ public class ClientService : IClientService
     /// Updates an existing client's information in the database.
     /// </summary>
     /// <param name="client">The client with updated values.</param>
-    public async Task UpdateClientAsync(int id, UpdateClientDto client)
+    public async Task UpdateClientAsync(int id, CreateClientDto client)
     {
         var response = await _httpClient.PutAsJsonAsync($"api/clients/{id}", client);
         response.EnsureSuccessStatusCode();
@@ -94,24 +94,4 @@ public class ClientService : IClientService
         var response = await _httpClient.DeleteAsync($"api/clients/{id}");
         response.EnsureSuccessStatusCode();
     }
-
-    //Task<List<ClientDto>> IClientService.GetAllClientsAsync()
-    //{
-    //    throw new NotImplementedException();
-    //}
-
-    //Task<ClientDto?> IClientService.GetClientByIdAsync(int id)
-    //{
-    //    throw new NotImplementedException();
-    //}
-
-    //public Task AddClientAsync(ClientDto client)
-    //{
-    //    throw new NotImplementedException();
-    //}
-
-    //public Task UpdateClientAsync(ClientDto client)
-    //{
-    //    throw new NotImplementedException();
-    //}
 }

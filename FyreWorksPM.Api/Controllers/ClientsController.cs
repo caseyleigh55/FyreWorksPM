@@ -107,7 +107,7 @@ public class ClientsController : ControllerBase
     // Updates an existing client
     // ================================================
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateClient(int id, [FromBody] UpdateClientDto dto)
+    public async Task<IActionResult> UpdateClient(int id, [FromBody] CreateClientDto dto)
     {
         var client = await _db.Clients.FindAsync(id);
         if (client == null) return NotFound();
