@@ -209,7 +209,11 @@
                         <Entry Grid.Row="12" Grid.Column="1" Text="{Binding ConstructionType}" />
 
                         <Label Grid.Row="13" Grid.Column="0" Text="Sprinklered (Yes/No)" />
-                        <Entry Grid.Row="13" Grid.Column="1" Text="{Binding IsSprinklered}" />
+                        <Picker Grid.Row="13" Grid.Column="1"                                
+                                ItemsSource="{Binding YesNoOptions}"
+                                SelectedItem="{Binding SelectedSprinklerOption}" />
+
+                        <!--<Entry Grid.Row="13" Grid.Column="1" Text="{Binding IsSprinklered}" />-->
                     </Grid>
                 </VerticalStackLayout>
             </Border>

@@ -5,18 +5,21 @@ using FyreWorksPM.DataAccess.Enums;
 using FyreWorksPM.Services.Tasks;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FyreWorksPM.ViewModels.Creation
 {
     public partial class CreateTasksViewModel : ObservableObject
     {
         private readonly ITaskService _taskService;
+        public ITaskService TaskService => _taskService;
 
+        //===============================================\\
+        //================= Constructor =================\\
+        //===============================================\\
         public CreateTasksViewModel(ITaskService taskService)
         {
             _taskService = taskService;
+            _=LoadTasksAsync();
 
             TaskTypes = new ObservableCollection<TaskType>((TaskType[])Enum.GetValues(typeof(TaskType)));
             SelectedTaskType = TaskType.Admin;
@@ -33,26 +36,31 @@ namespace FyreWorksPM.ViewModels.Creation
         [ObservableProperty] private TaskType selectedTaskType;
 
         // ----------------------------
+        // Functions
+        // ----------------------------
+        public Func<Task>? RequestEditTaskPopup { get; set; }
+
+        // ----------------------------
         // Collections
         // ----------------------------
         public ObservableCollection<TaskType> TaskTypes { get; }
 
-        public ObservableCollection<SavedTaskDto> AllTasks { get; } = new();
+        public ObservableCollection<TaskDto> AllTasks { get; } = new();
 
         [ObservableProperty]
-        private ObservableCollection<SavedTaskDto> filteredTasks = new();
+        private ObservableCollection<TaskDto> filteredTasks = new();
 
         // ----------------------------
         // UI-Related State
         // ----------------------------
-        [ObservableProperty] private SavedTaskDto selectedTask;
+        [ObservableProperty] private TaskDto selectedTask;
         [ObservableProperty] private string searchText;
 
         // ----------------------------
         // Load tasks from API
         // ----------------------------
         [RelayCommand]
-        private async Task LoadTasksAsync()
+        public async Task LoadTasksAsync()
         {
             Debug.WriteLine($"Loading tasks for: {SelectedTaskType}");
 
@@ -74,7 +82,7 @@ namespace FyreWorksPM.ViewModels.Creation
         partial void OnSearchTextChanged(string value) => ApplyFilter();
         partial void OnSelectedTaskTypeChanged(TaskType value) => LoadTasksCommand.Execute(null);
 
-        private void ApplyFilter()
+        public void ApplyFilter()
         {
             var query = SearchText?.ToLowerInvariant() ?? "";
 
@@ -123,7 +131,7 @@ namespace FyreWorksPM.ViewModels.Creation
             if (SelectedTask is null)
                 return;
 
-            await _taskService.DeleteTemplateAsync(SelectedTask.Id);
+            await _taskService.DeleteTaskAsync(SelectedTask.Id);
             AllTasks.Remove(SelectedTask);
             filteredTasks.Remove(SelectedTask);
             SelectedTask = null;
@@ -138,17 +146,10 @@ namespace FyreWorksPM.ViewModels.Creation
             if (SelectedTask is null)
                 return;
 
-            var dto = new CreateTaskDto
-            {
-                TaskName = SelectedTask.TaskName,
-                Type = SelectedTask.Type,
-                DefaultCost = SelectedTask.DefaultCost,
-                DefaultSale = SelectedTask.DefaultSale
-            };
-
-            await _taskService.UpdateTemplateAsync(SelectedTask.Id, dto);
-            await LoadTasksAsync(); // refresh the list
-        }
+            if(RequestEditTaskPopup != null)            
+                await RequestEditTaskPopup.Invoke();
+                        
+        }       
 
         private void ClearForm()
         {

@@ -28,6 +28,9 @@ public partial class EditClientViewModel : ObservableObject
     private readonly Func<Task> _onSaved;
     private readonly IClientService _clientService;
 
+    //===============================================\\
+    //================= Constructor =================\\
+    //===============================================\\
     public EditClientViewModel(ClientDto client, Func<Task> onSaved, IClientService clientService)
     {
         _originalClient = client;
@@ -55,8 +58,8 @@ public partial class EditClientViewModel : ObservableObject
 
         if (string.IsNullOrWhiteSpace(clientName) ||
             string.IsNullOrWhiteSpace(contactName) ||
-            string.IsNullOrWhiteSpace(Email) ||
-            string.IsNullOrWhiteSpace(Phone))
+            string.IsNullOrWhiteSpace(email) ||
+            string.IsNullOrWhiteSpace(phone))
         {
             await Shell.Current.DisplayAlert("Validation Error", "Please fill out all fields.", "OK");
             return;

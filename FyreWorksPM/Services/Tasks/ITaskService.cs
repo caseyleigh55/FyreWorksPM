@@ -5,9 +5,9 @@ namespace FyreWorksPM.Services.Tasks
 {
     public interface ITaskService
     {
-        Task<List<SavedTaskDto>> GetTemplatesByTypeAsync(TaskType type);
-        Task<SavedTaskDto> CreateTemplateAsync(CreateTaskDto dto);
-        Task UpdateTemplateAsync(int id, CreateTaskDto dto);
-        Task DeleteTemplateAsync(int id);
+        Task<List<TaskDto>> GetTemplatesByTypeAsync(TaskType type);
+        Task<TaskDto> CreateTemplateAsync(CreateTaskDto dto);
+        Task UpdateTaskAsync(int id, TaskDto dto);
+        Task DeleteTaskAsync(int id);
     }
 }

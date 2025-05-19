@@ -20,11 +20,11 @@ namespace FyreWorksPM.API.Controllers
 
         // GET: api/tasks/templates?type=0
         [HttpGet("templates")]
-        public async Task<ActionResult<List<SavedTaskDto>>> GetTemplates([FromQuery] TaskType type)
+        public async Task<ActionResult<List<TaskDto>>> GetTemplates([FromQuery] TaskType type)
         {
             var templates = await _db.TaskTemplates
                 .Where(t => t.TaskModelType == type)
-                .Select(t => new SavedTaskDto
+                .Select(t => new TaskDto
                 {
                     Id = t.TaskModelId,
                     TaskName = t.TaskModelTaskName,
@@ -39,7 +39,7 @@ namespace FyreWorksPM.API.Controllers
 
         // POST: api/tasks/templates
         [HttpPost("templates")]
-        public async Task<ActionResult<SavedTaskDto>> CreateTemplate([FromBody] CreateTaskDto dto)
+        public async Task<ActionResult<TaskDto>> CreateTemplate([FromBody] CreateTaskDto dto)
         {
             var task = new TaskModel
             {
@@ -52,7 +52,7 @@ namespace FyreWorksPM.API.Controllers
             _db.TaskTemplates.Add(task);
             await _db.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetTemplates), new { type = task.TaskModelType }, new SavedTaskDto
+            return CreatedAtAction(nameof(GetTemplates), new { type = task.TaskModelType }, new TaskDto
             {
                 Id = task.TaskModelId,
                 TaskName = task.TaskModelTaskName,

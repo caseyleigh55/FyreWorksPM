@@ -2,11 +2,40 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="FyreWorksPM.Pages.Editing.EditTaskPage"
-             Title="EditTaskPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+             Title="Edit Task"
+             Shell.NavBarIsVisible="False">
+    <VerticalStackLayout Padding="20" Spacing="15">
+
+        <Entry Placeholder="Task Name"
+            Text="{Binding TaskName}"
+            PlaceholderColor="Gray"
+            TextColor="White" />
+
+        <Picker ItemsSource="{Binding TaskTypes}"
+        SelectedItem="{Binding SelectedTaskType}" />
+
+        <Entry Placeholder="Default Cost"
+            Text="{Binding DefaultCost}"
+            PlaceholderColor="Gray"
+            TextColor="White"
+            Keyboard="Email" />
+
+        <Entry Placeholder="Default Sale"
+            Text="{Binding DefaultSale}"
+            PlaceholderColor="Gray"
+            TextColor="White"
+            Keyboard="Telephone" />
+
+        <HorizontalStackLayout Spacing="20" HorizontalOptions="Center">
+            <Button Text="Save"
+                 Command="{Binding SaveCommand}"
+                 BackgroundColor="Green"
+                 TextColor="White" />
+
+            <Button Text="Cancel" 
+                 Clicked="OnCancelClicked"
+                 BackgroundColor="DarkRed"
+                 TextColor="White" />
+        </HorizontalStackLayout>
     </VerticalStackLayout>
 </ContentPage>

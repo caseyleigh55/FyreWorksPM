@@ -26,9 +26,9 @@ namespace FyreWorksPM.ViewModels.Creation
         private string selectedTemplateName;
 
         [ObservableProperty]
-        private SavedTaskDto selectedTemplateTaskName;
+        private TaskDto selectedTemplateTaskName;
 
-        partial void OnSelectedTemplateTaskNameChanged(SavedTaskDto value)
+        partial void OnSelectedTemplateTaskNameChanged(TaskDto value)
         {
             Debug.WriteLine($"🔥 Template selected: {value?.TaskName}");
             if (value == null) return;

@@ -8,7 +8,10 @@ namespace FyreWorksPM.Pages.Editing;
 
     public partial class EditClientPage : ContentPage
     {
-        public EditClientPage(ClientDto client, Func<Task> onSaved, IClientService service)
+    //===============================================\\
+    //================= Constructor =================\\
+    //===============================================\\
+    public EditClientPage(ClientDto client, Func<Task> onSaved, IClientService service)
         {
             InitializeComponent();
             BindingContext = new EditClientViewModel(client, onSaved, service);

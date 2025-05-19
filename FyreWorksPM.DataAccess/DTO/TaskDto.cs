@@ -2,7 +2,7 @@
 
 namespace FyreWorksPM.DataAccess.DTO
 {
-    public class SavedTaskDto
+    public class TaskDto
     {
         public int Id { get; set; }
         public string TaskName { get; set; }

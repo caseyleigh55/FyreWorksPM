@@ -14,6 +14,10 @@ public partial class CreateClientPage : ContentPage
     private readonly Action<ClientDto>? _onClientSelected;
     private readonly CreateClientViewModel _viewModel;
 
+    //===============================================\\
+    //================= Constructor =================\\
+    //===============================================\\
+
     /// <summary>
     /// Initializes the ClientsPage with a ViewModel and an optional CLient-selected callback.
     /// </summary>
@@ -24,10 +28,7 @@ public partial class CreateClientPage : ContentPage
 		InitializeComponent();
 		BindingContext = vm;
         _viewModel = vm;
-        _onClientSelected = onClientSelected;
-
-        // Register callback from ViewModel (when item is tapped)
-        //vm.ClientSelectedCallback = OnClientSelectedInternal;
+        _onClientSelected = onClientSelected;        
 
         vm.RequestEditClientPopup = async () =>
         {

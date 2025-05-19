@@ -28,7 +28,7 @@ public partial class CreateBidViewModel : ObservableObject
     private readonly IBidService _bidService;
     private readonly ITaskService _taskService;
     private readonly INavigationServices _navigationService;
-
+    
     public CreateBidViewModel(
         IBidService bidService,
         IClientService clientService,
@@ -43,6 +43,7 @@ public partial class CreateBidViewModel : ObservableObject
         _itemTypeService = itemTypeService;
         _taskService = taskService;
         _navigationService = navigationService;
+        
 
         CreatedDate = DateTime.Today;
 
@@ -52,6 +53,8 @@ public partial class CreateBidViewModel : ObservableObject
         EngineeringTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseEngineeringTotalsChanged);
 
         Task.Run(async () => await InitializeAsync());
+
+
         
     }
 
@@ -73,6 +76,17 @@ public partial class CreateBidViewModel : ObservableObject
     [ObservableProperty] private int occupantLoad;
     [ObservableProperty] private string constructionType = string.Empty;
     [ObservableProperty] private bool isSprinklered;
+    public ObservableCollection<string> YesNoOptions { get; } = new()
+{
+    "Yes",
+    "No"
+};
+
+    public string SelectedSprinklerOption
+    {
+        get => IsSprinklered ? "Yes" : "No";
+        set => IsSprinklered = value == "Yes";
+    }
     [ObservableProperty] private string jobName = string.Empty;
     [ObservableProperty] private DateTime createdDate;
     [ObservableProperty] private string projectName = string.Empty;
@@ -82,8 +96,8 @@ public partial class CreateBidViewModel : ObservableObject
     [ObservableProperty] private ClientDto? selectedClient;
 
 
-    [ObservableProperty] private ObservableCollection<SavedTaskDto> taskTemplates;
-    [ObservableProperty] private SavedTaskDto selectedTemplateTask;
+    [ObservableProperty] private ObservableCollection<TaskDto> taskTemplates;
+    [ObservableProperty] private TaskDto selectedTemplateTask;
     [ObservableProperty] private BidTaskModel currentTask;
 
 
@@ -126,10 +140,10 @@ public partial class CreateBidViewModel : ObservableObject
 
     public ObservableCollection<BidTaskViewModel> AdminTasks { get; } = new();
     [ObservableProperty]
-    private ObservableCollection<SavedTaskDto> allAdminTaskNames = new();
+    private ObservableCollection<TaskDto> allAdminTaskNames = new();
     public ObservableCollection<BidTaskViewModel> EngineeringTasks { get; } = new();
     [ObservableProperty]
-    private ObservableCollection<SavedTaskDto> allEngineeringTaskNames = new();
+    private ObservableCollection<TaskDto> allEngineeringTaskNames = new();
 
     public IAsyncRelayCommand NavigateToCreateTasksCommand { get; }
 
@@ -330,11 +344,11 @@ public partial class CreateBidViewModel : ObservableObject
     public async Task LoadTaskTemplatesAsync()
     {
         var admin = await _taskService.GetTemplatesByTypeAsync(TaskType.Admin);
-        allAdminTaskNames = new ObservableCollection<SavedTaskDto>(admin);
+        allAdminTaskNames = new ObservableCollection<TaskDto>(admin);
 
 
         var eng = await _taskService.GetTemplatesByTypeAsync(TaskType.Engineering);
-        allEngineeringTaskNames = new ObservableCollection<SavedTaskDto>(eng);
+        allEngineeringTaskNames = new ObservableCollection<TaskDto>(eng);
 
     }
 

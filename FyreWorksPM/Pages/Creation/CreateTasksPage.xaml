@@ -44,19 +44,20 @@
             <!-- Filtered Task List -->
             <Border MaximumHeightRequest="185">
                 <ScrollView>
-        <CollectionView ItemsSource="{Binding FilteredTasks}"
+        <CollectionView x:Name="TaskList" 
+                        ItemsSource="{Binding FilteredTasks}"
                         SelectionMode="Single"
                         SelectedItem="{Binding SelectedTask}">
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="dto:SavedTaskDto">
-                    <Frame Padding="5" Margin="2">
+                <DataTemplate x:DataType="dto:TaskDto">
+                    <Border Padding="10" Margin="5">
                         <VerticalStackLayout>
                             <Label Text="{Binding TaskName}" FontAttributes="Bold" TextColor="Green"/>
                             <Label Text="{Binding Type}" />
                             <Label Text="{Binding DefaultCost, StringFormat='Cost: {0:C}'}" />
                             <Label Text="{Binding DefaultSale, StringFormat='Sale: {0:C}'}" />
                         </VerticalStackLayout>
-                    </Frame>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
