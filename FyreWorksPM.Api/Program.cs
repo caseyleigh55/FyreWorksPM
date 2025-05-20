@@ -86,8 +86,11 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer("Server=tcp:fyreworkspmserver.database.windows.net,1433;Initial Catalog=FyreWorksPM;Persist Security Info=False;User ID=ccagle;Password=NakedD!sc0753;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));
+    options.UseSqlServer(connectionString));
+
 
 
 // ==============================

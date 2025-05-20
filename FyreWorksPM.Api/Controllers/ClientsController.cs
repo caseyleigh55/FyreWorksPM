@@ -71,6 +71,11 @@ public class ClientsController : ControllerBase
         {
             return BadRequest("Client name and contact are required.");
         }
+        bool exists = await _db.Clients.AnyAsync(c =>
+            c.ClientModelName == dto.Name || c.ClientModelContact == dto.Contact);
+
+        if (exists)
+            return BadRequest("A client with this name or contact already exists.");
 
         var client = new ClientModel
         {

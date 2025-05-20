@@ -268,6 +268,7 @@ public partial class CreateBidViewModel : ObservableObject
     {
         if (RequestAddNewClient != null)
             await RequestAddNewClient.Invoke();
+        await LoadClientsAsync();
     }
 
     [RelayCommand]

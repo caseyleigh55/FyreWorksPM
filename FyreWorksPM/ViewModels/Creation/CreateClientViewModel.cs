@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.Services.Client;
 using System.Collections.ObjectModel;
+using System.Net.Http.Json;
 using static Microsoft.Maui.ApplicationModel.Permissions;
 
 namespace FyreWorksPM.ViewModels.Creation;
@@ -14,16 +15,18 @@ namespace FyreWorksPM.ViewModels.Creation;
 public partial class CreateClientViewModel : ObservableObject
 {
     private readonly IClientService _clientService;
+    private readonly HttpClient _httpClient;
     public IClientService ClientService => _clientService;
 
     //===============================================\\
     //================= Constructor =================\\
     //===============================================\\
 
-    public CreateClientViewModel(IClientService clientService)
+    public CreateClientViewModel(IClientService clientService, HttpClient httpClient)
     {
         _clientService = clientService;
-        _=LoadClientsAsync();
+        _ = LoadClientsAsync();
+        _httpClient = httpClient;
     }
     /// <summary>
     /// Optional callback to notify when a new client is successfully added.
@@ -66,13 +69,10 @@ public partial class CreateClientViewModel : ObservableObject
 
         await LoadClientsAsync();
     }
-   
 
 
 
-    /// <summary>
-    /// Saves the new client to the database after validation.
-    /// </summary>
+
     [RelayCommand]
     private async Task SaveClientAsync()
     {
@@ -95,11 +95,17 @@ public partial class CreateClientViewModel : ObservableObject
 
         var createdClient = await _clientService.AddClientAsync(newClientDto);
 
+        if (createdClient == null)
+        {
+            // 🛑 Error already shown in service — just exit quietly
+            return;
+        }
+
         if (ClientAddedCallback != null)
         {
             await ClientAddedCallback.Invoke(createdClient);
 
-            // Optional double-check if API doesn't return the full object
+            // Optional double-check if API doesn’t return full object
             var clientList = await _clientService.GetAllClientsAsync();
             var addedClient = clientList.LastOrDefault(c =>
                 c.Name == ClientName &&
@@ -113,7 +119,9 @@ public partial class CreateClientViewModel : ObservableObject
 
         await Shell.Current.DisplayAlert("Success", "Client added successfully!", "OK");
         await Shell.Current.GoToAsync("..");
+        await LoadClientsAsync();
     }
+
 
     [RelayCommand]
     private async Task EditSelectedClientAsync()

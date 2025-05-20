@@ -1,5 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
+
+using System.IO;
+
 
 namespace FyreWorksPM.DataAccess.Data;
 
@@ -16,17 +21,22 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
     /// <param name="args">CLI arguments passed by EF tools (unused here).</param>
     public ApplicationDbContext CreateDbContext(string[] args)
     {
+        // Try current dir, fallback to API project dir
+        string basePath = Directory.GetCurrentDirectory();
+        if (!File.Exists(Path.Combine(basePath, "appsettings.json")))
+        {
+            basePath = Path.Combine(basePath, "../FyreWorksPM.Api");
+        }
+
+        var config = new ConfigurationBuilder()
+            .SetBasePath(basePath)
+            .AddJsonFile("appsettings.json", optional: false)
+            .Build();
+
+        var connectionString = config.GetConnectionString("DefaultConnection");
+
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-
-        // Must match the connection string in MauiProgram.cs
-        optionsBuilder.UseSqlServer(
-                        "Server=tcp:fyreworkspmserver.database.windows.net,1433;" +
-                        "Initial Catalog=FyreWorksPM;Persist Security Info=False;" +
-                        "User ID=ccagle;Password=NakedD!sc0753;" +
-                        "MultipleActiveResultSets=False;Encrypt=True;" +
-                        "TrustServerCertificate=False;Connection Timeout=30;"
-                        );
-
+        optionsBuilder.UseSqlServer(connectionString);
 
         return new ApplicationDbContext(optionsBuilder.Options);
     }

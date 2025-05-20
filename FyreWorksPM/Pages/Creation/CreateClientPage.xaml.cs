@@ -28,7 +28,7 @@ public partial class CreateClientPage : ContentPage
 		InitializeComponent();
 		BindingContext = vm;
         _viewModel = vm;
-        _onClientSelected = onClientSelected;        
+        _onClientSelected = onClientSelected;
 
         vm.RequestEditClientPopup = async () =>
         {

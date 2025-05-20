@@ -44,22 +44,26 @@ public class ClientService : IClientService
         return await response.Content.ReadFromJsonAsync<ClientDto>();
     }
 
-
-    /// <summary>
-    /// Adds a new client to the database.
-    /// </summary>
-    /// <param name="client">The client to be added.</param>
-    public async Task<ClientDto> AddClientAsync(CreateClientDto client)
+    public async Task<ClientDto?> AddClientAsync(CreateClientDto client)
     {
         var response = await _httpClient.PostAsJsonAsync("api/clients", client);
 
         if (!response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
+
+            if ((int)response.StatusCode >= 400 && (int)response.StatusCode < 500)
+            {
+                // ⚠️ Known client-side issue (validation, already exists, etc.)
+                await Application.Current.MainPage.DisplayAlert("Client Error", content, "OK");
+                return null;
+            }
+
+            // 🚨 Unexpected or server-side error
             throw new Exception($"❌ API Error: {response.StatusCode}\nBody:\n{content}");
         }
 
-        // ✅ Now it's safe to parse the response
+        // ✅ Successful response, parse the JSON
         var json = await response.Content.ReadAsStringAsync();
 
         try
@@ -67,13 +71,14 @@ public class ClientService : IClientService
             return JsonSerializer.Deserialize<ClientDto>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
-            })!;
+            });
         }
         catch (JsonException ex)
         {
             throw new Exception($"⚠️ JSON parse error.\nResponse Body:\n{json}", ex);
         }
     }
+
 
     /// <summary>
     /// Updates an existing client's information in the database.
