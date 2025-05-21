@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.DataAccess.Enums;
+using FyreWorksPM.DataAccess.Models;
 using FyreWorksPM.Pages.Creation;
 using FyreWorksPM.Services.Bid;
 using FyreWorksPM.Services.Client;
@@ -87,6 +88,25 @@ public partial class CreateBidViewModel : ObservableObject
         get => IsSprinklered ? "Yes" : "No";
         set => IsSprinklered = value == "Yes";
     }
+
+    public List<string> InstallTypeOptions { get; } = new()
+{
+    "Normal",
+    "Lift",
+    "Panel",
+    "Pipe"
+};
+
+    public List<string> InstallLocationOptions { get; } = new()
+{
+    "warehouse",
+    "hardlid",
+    "tbar",
+    "underground",
+    "panel room"
+};
+
+
     [ObservableProperty] private string jobName = string.Empty;
     [ObservableProperty] private DateTime createdDate;
     [ObservableProperty] private string projectName = string.Empty;
@@ -145,6 +165,8 @@ public partial class CreateBidViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<TaskDto> allEngineeringTaskNames = new();
 
+    public ObservableCollection<BidComponentLineItemViewModel> ComponentLineItems { get; } = new();
+
     public IAsyncRelayCommand NavigateToCreateTasksCommand { get; }
 
 
@@ -154,6 +176,9 @@ public partial class CreateBidViewModel : ObservableObject
     public decimal EngineeringSaleTotal => EngineeringTasks.Sum(t => t.Sale);
     public decimal AdminEngCostTotal => AdminCostTotal + EngineeringCostTotal;
     public decimal AdminEngSaleTotal => AdminSaleTotal + EngineeringSaleTotal;
+
+    public BidLaborConfig LaborOverrides { get; set; } = new();
+
 
     private async Task NavigateToCreateTasksAsync()
     {
@@ -261,6 +286,32 @@ public partial class CreateBidViewModel : ObservableObject
     {
         var vm = new CreateItemsViewModel(_itemService, _itemTypeService,_navigationService);
         await Shell.Current.Navigation.PushAsync(new CreateItemsPage(vm, item => SelectedItemFromLibrary = item));
+    }
+
+    [RelayCommand]
+    private void AddComponentItem()
+    {
+        var newModel = new BidComponentLineItemModel
+        {
+            ItemName = "New Component",
+            Description = "Describe me!",
+            Type = "Panel Device",
+            Qty = 1,
+            UnitCost = 0,
+            UnitSale = 0,
+            Piped = false,
+            InstallType = "Normal",
+            InstallLocation = "warehouse"
+        };
+
+        var vm = new BidComponentLineItemViewModel(newModel, LaborOverrides)
+        {
+            InstallTypeOptions = InstallTypeOptions,
+            InstallLocationOptions = InstallLocationOptions
+        };
+        ComponentLineItems.Add(vm);
+
+        // Optional: Raise props for summary/calculation here
     }
 
     [RelayCommand]

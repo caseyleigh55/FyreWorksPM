@@ -694,17 +694,39 @@ HorizontalTextAlignment="Start" />
                             <Label Text="Panel Components" TextDecorations="Underline" FontAttributes="Bold" FontSize="18" TextColor="White" />
 
                             <!-- Headers -->
-                            <Grid ColumnDefinitions="2*,3*,Auto,*,*" ColumnSpacing="10">
-                                <Label Text="Item" FontAttributes="Bold" Grid.Column="0" />
-                                <Label Text="Description" FontAttributes="Bold" Grid.Column="1" />
-                                <Label Text="Qty" FontAttributes="Bold" Grid.Column="2" />
-                                <Label Text="Unit Cost" FontAttributes="Bold" Grid.Column="3" />
-                                <Label Text="Unit Sale" FontAttributes="Bold" Grid.Column="4" />
+                            <Grid ColumnDefinitions="2*,2*,1*,1*,1*,*,2*,2*" ColumnSpacing="10">
+                                <Label Text="Item" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="0" />
+                                <Label Text="Description" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="1" />
+                                <Label Text="Qty" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="2" />
+                                <Label Text="Unit Cost" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="3" />
+                                <Label Text="Unit Sale" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="4" />
+                                <Label Text="Piped" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="5" />
+                                <Label Text="Install Type" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="6" />
+                                <Label Text="Install Location" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="7" />
                             </Grid>
 
                             <!-- Scrollable list -->
+                            <Border>
                             <ScrollView HeightRequest="200">
-                                <CollectionView ItemsSource="{Binding PanelItems}">
+                                <CollectionView        
+                                    ItemsSource="{Binding ComponentLineItems}" 
+                                    Margin="0,10">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid ColumnDefinitions="2*,2*,*,*,*,*,2*,2*">
+                                                <Label Grid.Column="0"  Text="{Binding ItemName}" />
+                                                <Entry Grid.Column="1" Text="{Binding Description}" />
+                                                <Entry Grid.Column="2" Text="{Binding Qty}" Keyboard="Numeric" />
+                                                <Entry Grid.Column="3" Text="{Binding UnitCost}" Keyboard="Numeric" Placeholder="Unit Cost" />
+                                                <Entry Grid.Column="4" Text="{Binding UnitSale}" Keyboard="Numeric" Placeholder="Unit Sale" />
+                                                <CheckBox Grid.Column="5" HorizontalOptions="Center" IsChecked="{Binding Piped}" />
+                                                <Picker Grid.Column="6"  ItemsSource="{Binding InstallTypeOptions}" SelectedItem="{Binding InstallType}" />
+                                                <Picker Grid.Column="7"  ItemsSource="{Binding InstallLocationOptions}" SelectedItem="{Binding InstallLocation}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                                <!--<CollectionView ItemsSource="{Binding PanelItems}">
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate>
                                             <Grid ColumnDefinitions="2*,3*,Auto,*,*" ColumnSpacing="10" Padding="5">
@@ -716,21 +738,23 @@ HorizontalTextAlignment="Start" />
                                             </Grid>
                                         </DataTemplate>
                                     </CollectionView.ItemTemplate>
-                                </CollectionView>
+                                </CollectionView>-->
                             </ScrollView>
+                            </Border>
 
                             <!-- Buttons -->
-                            <HorizontalStackLayout Spacing="10">
-                                <Button Text="➕ Add Item" Command="{Binding AddPanelItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
-                                <Button Text="🗑️ Delete Item" Command="{Binding RemovePanelItemCommand}" BackgroundColor="DarkRed" TextColor="White" />
-                            </HorizontalStackLayout>
+                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                                <Button Grid.Column="0" Text="➕ Add Item" Command="{Binding AddComponentItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
+                                <Button Grid.Column="1" Text="🗑️ Delete Item" Command="{Binding RemoveComponentItemCommand}" BackgroundColor="DarkRed" TextColor="White" />
+                                <Button Grid.Column="2" Text="Create Item" Command="{Binding CreateNewtItemCommand}" BackgroundColor="Orange" TextColor="White" />
+                            </Grid>
 
                             <!-- Totals -->
                             <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
                                 <Label Text="Panel Totals:" FontAttributes="Bold" Grid.Column="0" />
                                 <Label Text="{Binding PanelCostTotal, StringFormat='${0:F2}'}" Grid.Column="1" />
                                 <Label Text="{Binding PanelSaleTotal, StringFormat='${0:F2}'}" Grid.Column="2" />
-                            </Grid>
+                                    </Grid>
                         </VerticalStackLayout>
                     </Border>
 
