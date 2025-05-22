@@ -1,0 +1,160 @@
+﻿*What happens User selects Create New Task Button within the Tasks section of the Create Bid Page:
+
+ 
+
+============================================================
+========================xaml binding======================== CreateBidPage.xaml ---> Lines 243-250
+============================================================
+  
+	                    <!-- Add Task Button -->
+                        <Button 
+                            Text="Create New Task"
+                            Command="{Binding NavigateToCreateTasksCommand}"
+                            BackgroundColor="Purple"
+                            TextColor="White"
+                            Margin="10"
+                            HorizontalOptions="Center" />
+
+============================================================
+=====================command declaration==================== CreateBidViewModel.cs ---> Line 51
+============================================================
+
+                        NavigateToCreateTasksCommand = new AsyncRelayCommand(NavigateToCreateTasksAsync);
+
+============================================================
+=======================Task Performed======================= CreateBidPageViewModel.cs ---> Lines 185-188
+============================================================
+
+                        private async Task NavigateToCreateTasksAsync()
+                            {
+                                await _navigationService.GoToAsync(nameof(CreateTasksPage));
+                            }
+
+============================================================
+=======================Task Performed======================= NavigationService.cs ---> Lines 28-31
+============================================================
+
+                         public async Task GoToAsync(string route, bool animate = true)
+                            {
+                                await Shell.Current.GoToAsync(route, animate);
+                            }
+
+
+============================================================
+====================Maui Builder Service==================== MauiProgram.cs ---> Lines 77-79
+============================================================
+
+                        builder.Services.AddHttpClient<ITaskService, TaskService>(client =>
+                            {
+                                client.BaseAddress = new Uri(ApiConfig.BaseUrl);
+                            });
+
+============================================================
+=========================Task Service======================= TaskService.cs ---> Lines 12-15
+============================================================
+
+                        public TaskService(HttpClient http)
+                            {
+                                _http = http;
+                            }
+
+============================================================
+===========================AllTasks========================= CreateTasksViewModel.cs ---> Line 48 & 51
+============================================================
+
+                        public ObservableCollection<TaskDto> AllTasks { get; } = new();
+
+                        [ObservableProperty]
+                        private ObservableCollection<TaskDto> filteredTasks = new();
+
+============================================================
+==================TaskViewModel constructor================= CreateTasksViewModel.cs ---> Lines 19-22
+============================================================
+
+public CreateTasksViewModel(ITaskService taskService)
+        {
+            _taskService = taskService;
+            _=LoadTasksAsync(); ---> line 22  ///takes us to next step
+
+            TaskTypes = new ObservableCollection<TaskType>((TaskType[])Enum.GetValues(typeof(TaskType)));
+            SelectedTaskType = TaskType.Admin;
+
+            LoadTasksCommand.Execute(null);
+        }
+
+============================================================
+====================LoadTasksAsync==================== CreateTasksViewModel.cs ---> Line63
+============================================================
+
+public async Task LoadTasksAsync()
+        {
+            Debug.WriteLine($"Loading tasks for: {SelectedTaskType}");
+
+            var tasks = await _taskService.GetTemplatesByTypeAsync(SelectedTaskType);  ///this takes us to next step
+            AllTasks.Clear();
+
+            foreach (var task in tasks)
+            {
+                Debug.WriteLine($"Loaded Task: {task.TaskName} - {task.Type}");
+                AllTasks.Add(task);
+            }
+
+            ApplyFilter();
+        }
+
+============================================================
+====================GetTemplatesByTypeAcyncc==================== CreateTasksViewModel.cs ---> Line17
+============================================================
+
+public async Task<List<TaskDto>> GetTemplatesByTypeAsync(TaskType type)
+        {
+            var tasks = await _http.GetFromJsonAsync<List<TaskDto>>(      ///This loads tasks as a list and will return "tasks" back in LoadTasksAsync and this is when Create Tasks page first loads
+                $"api/tasks/templates?type={(int)type}")
+                ?? new List<TaskDto>();
+
+            Debug.WriteLine($"Found {tasks.Count} tasks from API.");
+
+            return tasks;
+        }
+
+============================================================
+====================LoadTasksAsync==================== CreateTasksViewModel.cs ---> Line63
+============================================================
+
+public async Task LoadTasksAsync()
+        {
+            Debug.WriteLine($"Loading tasks for: {SelectedTaskType}");
+
+            var tasks = await _taskService.GetTemplatesByTypeAsync(SelectedTaskType);
+            AllTasks.Clear();
+
+            foreach (var task in tasks)
+            {
+                Debug.WriteLine($"Loaded Task: {task.TaskName} - {task.Type}");
+                AllTasks.Add(task);
+            }
+
+            ApplyFilter();   ///takes us to next step
+        }
+
+============================================================
+====================ApplyFilter==================== CreateTasksViewModel.cs ---> Line 85
+============================================================
+
+ public void ApplyFilter()
+        {
+            var query = SearchText?.ToLowerInvariant() ?? "";
+
+            var filtered = AllTasks
+                .Where(t => string.IsNullOrWhiteSpace(query) ||
+                            t.TaskName.ToLowerInvariant().Contains(query))
+                .ToList();
+
+            filteredTasks.Clear();
+            foreach (var task in filtered)
+                filteredTasks.Add(task);
+        }
+
+============================================================
+========================Page is Loaded====================== 
+============================================================

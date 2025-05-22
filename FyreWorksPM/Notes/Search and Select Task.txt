@@ -1,4 +1,414 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿*What happens User updates task in admin Tasks section of the Create Bid Page:
+
+1. typing a letter in the Task Name Box
+
+============================================================
+========================OnTextChanged======================= SearchableEntryView.xaml.cs ---> Line 80
+============================================================
+
+private void OnTextChanged(object sender, TextChangedEventArgs e)
+    {
+        SearchText = e.NewTextValue; -----// sets search text to what is in the box with each change
+        ApplyFilter(); ------> // calls apply filter
+    }
+
+============================================================
+====================ApplyFilter==================== SearchableEntryView.cs ---> Line 85
+============================================================
+
+ private void ApplyFilter()
+    {
+        var query = SearchText?.ToLowerInvariant();
+
+        // 🛑 If no query, hide suggestions and bail out
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            FilteredSuggestions.Clear();
+            SuggestionsView.IsVisible = false;
+            return;
+        }
+        var items = new List<object>();
+
+        foreach (var item in Suggestions ?? Enumerable.Empty<object>())
+        {
+            string value = item.ToString();  -------> to taskDto "ToString method"
+
+            if (!string.IsNullOrWhiteSpace(DisplayMemberPath))
+            {
+                var prop = item.GetType().GetProperty(DisplayMemberPath);
+                value = prop?.GetValue(item)?.ToString() ?? "";
+            }
+
+            if (!string.IsNullOrWhiteSpace(value) && value.ToLowerInvariant().Contains(query))
+            {
+                items.Add(item);
+            }
+        }
+
+        FilteredSuggestions.Clear();
+        foreach (var item in items)
+            FilteredSuggestions.Add(item);
+
+        SuggestionsView.IsVisible = FilteredSuggestions.Any();
+    }
+
+============================================================
+====================TaskDto ToString()==================== TaskDto.cs ---> Line 13
+============================================================
+
+public override string ToString()
+        {
+            return TaskName;
+        }
+
+============================================================
+====================ApplyFilter==================== SearchableEntryView.cs ---> Line 85
+============================================================
+
+ private void ApplyFilter()
+    {
+        var query = SearchText?.ToLowerInvariant();
+
+        // 🛑 If no query, hide suggestions and bail out
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            FilteredSuggestions.Clear();
+            SuggestionsView.IsVisible = false;
+            return;
+        }
+        var items = new List<object>();
+
+        foreach (var item in Suggestions ?? Enumerable.Empty<object>())
+        {
+            string value = item.ToString();  <------- returns here
+
+            if (!string.IsNullOrWhiteSpace(DisplayMemberPath))
+            {
+                var prop = item.GetType().GetProperty(DisplayMemberPath);
+                value = prop?.GetValue(item)?.ToString() ?? "";
+            }
+
+            if (!string.IsNullOrWhiteSpace(value) && value.ToLowerInvariant().Contains(query))
+            {
+                items.Add(item);
+            }
+        }
+
+        FilteredSuggestions.Clear();
+        foreach (var item in items)
+            FilteredSuggestions.Add(item);
+
+        SuggestionsView.IsVisible = FilteredSuggestions.Any();
+    }
+
+============================================================
+========================OnTextChanged======================= SearchableEntryView.xaml.cs ---> Line 80
+============================================================
+
+private void OnTextChanged(object sender, TextChangedEventArgs e)
+    {
+        SearchText = e.NewTextValue; -----// sets search text to what is in the box with each change
+        ApplyFilter(); <------ Returns here
+    }
+
+============================================================
+=====================New Letter is added==================== 
+============================================================
+
+***********************************************************************************************************
+***********************************************************************************************************
+***********************************************************************************************************
+
+2. Selecting a task from the suggestions window
+
+============================================================
+==================OnSuggestionsSelected===================== SearchableEntryView.xaml.cs ---> Line 86
+============================================================
+
+private void OnSuggestionSelected(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection.FirstOrDefault() is object selected)
+        {
+            SelectedItem = selected; -----> on text changed with search text being selected task name
+
+            // Use DisplayMemberPath if provided
+            if (!string.IsNullOrWhiteSpace(DisplayMemberPath))
+            {
+                var prop = selected.GetType().GetProperty(DisplayMemberPath);
+                SearchText = prop?.GetValue(selected)?.ToString() ?? "";
+            }
+            else
+            {
+                SearchText = selected.ToString();
+            }
+
+            SuggestionsView.IsVisible = false;
+        }
+    }
+
+===========================================================
+========================OnTextChanged======================= SearchableEntryView.xaml.cs ---> Line 80
+============================================================
+
+private void OnTextChanged(object sender, TextChangedEventArgs e)
+    {
+        SearchText = e.NewTextValue; -----// sets search text to what is in the box with each change
+        ApplyFilter(); ------> // calls apply filter
+    }
+
+============================================================
+====================ApplyFilter==================== SearchableEntryView.cs ---> Line 85
+============================================================
+
+ private void ApplyFilter()
+    {
+        var query = SearchText?.ToLowerInvariant();
+
+        // 🛑 If no query, hide suggestions and bail out
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            FilteredSuggestions.Clear();
+            SuggestionsView.IsVisible = false;
+            return;
+        }
+        var items = new List<object>();
+
+        foreach (var item in Suggestions ?? Enumerable.Empty<object>())
+        {
+            string value = item.ToString();  -------> to taskDto "ToString method"
+
+            if (!string.IsNullOrWhiteSpace(DisplayMemberPath))
+            {
+                var prop = item.GetType().GetProperty(DisplayMemberPath);
+                value = prop?.GetValue(item)?.ToString() ?? "";
+            }
+
+            if (!string.IsNullOrWhiteSpace(value) && value.ToLowerInvariant().Contains(query))
+            {
+                items.Add(item);
+            }
+        }
+
+        FilteredSuggestions.Clear();
+        foreach (var item in items)
+            FilteredSuggestions.Add(item);
+
+        SuggestionsView.IsVisible = FilteredSuggestions.Any();
+    }
+
+============================================================
+====================TaskDto ToString()==================== TaskDto.cs ---> Line 13
+============================================================
+
+public override string ToString()
+        {
+            return TaskName;
+        }
+
+============================================================
+====================ApplyFilter==================== SearchableEntryView.cs ---> Line 85
+============================================================
+
+ private void ApplyFilter()
+    {
+        var query = SearchText?.ToLowerInvariant();
+
+        // 🛑 If no query, hide suggestions and bail out
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            FilteredSuggestions.Clear();
+            SuggestionsView.IsVisible = false;
+            return;
+        }
+        var items = new List<object>();
+
+        foreach (var item in Suggestions ?? Enumerable.Empty<object>())
+        {
+            string value = item.ToString();  <------- returns here
+
+            if (!string.IsNullOrWhiteSpace(DisplayMemberPath))
+            {
+                var prop = item.GetType().GetProperty(DisplayMemberPath);
+                value = prop?.GetValue(item)?.ToString() ?? "";
+            }
+
+            if (!string.IsNullOrWhiteSpace(value) && value.ToLowerInvariant().Contains(query))
+            {
+                items.Add(item);
+            }
+        }
+
+        FilteredSuggestions.Clear();
+        foreach (var item in items)
+            FilteredSuggestions.Add(item);
+
+        SuggestionsView.IsVisible = FilteredSuggestions.Any();
+    }
+
+===========================================================
+========================OnTextChanged======================= SearchableEntryView.xaml.cs ---> Line 80
+============================================================
+
+private void OnTextChanged(object sender, TextChangedEventArgs e)
+    {
+        SearchText = e.NewTextValue; -----// sets search text to what is in the box with each change
+        ApplyFilter(); <------ // returns here
+    }
+
+============================================================
+==================OnSuggestionsSelected===================== SearchableEntryView.xaml.cs ---> Line 86
+============================================================
+
+private void OnSuggestionSelected(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection.FirstOrDefault() is object selected)
+        {
+            SelectedItem = selected; -----> on text changed with search text being selected task name
+
+            // Use DisplayMemberPath if provided
+            if (!string.IsNullOrWhiteSpace(DisplayMemberPath))
+            {
+                var prop = selected.GetType().GetProperty(DisplayMemberPath); ------> to BidTaskViewModel.cs
+                SearchText = prop?.GetValue(selected)?.ToString() ?? "";
+            }
+            else
+            {
+                SearchText = selected.ToString();
+            }
+
+            SuggestionsView.IsVisible = false;
+        }
+    }
+
+============================================================
+==================OnSelectedTemplateTaskNameChanged===================== BidTaskViewModel.cs ---> Line 31
+============================================================
+
+ partial void OnSelectedTemplateTaskNameChanged(TaskDto value)
+        {
+            Debug.WriteLine($"🔥 Template selected: {value?.TaskName}");
+            if (value == null) return;
+
+            // Set the task name and prices based on the template
+            Name = value.TaskName;
+            Cost = value.DefaultCost;
+            Sale = value.DefaultSale;
+            TaskModelId = value.Id;
+
+            OnPropertyChanged(nameof(Name)); ------> add task
+            OnPropertyChanged(nameof(Cost));
+            OnPropertyChanged(nameof(Sale));
+
+        }
+
+********************************this process for name cos and sale*****************************************
+
+============================================================
+==================Add Task===================== CreateBidViewModel.cs ---> Line 233
+============================================================
+
+{
+        var task = new BidTaskViewModel();
+        task.PropertyChanged += (_, __) => raise();
+        tasks.Add(task);
+        raise();
+    }
+
+
+============================================================
+===================RaiseAdminTotalsChanged================== CreateBidViewModel.cs ---> Line 212
+============================================================
+
+private void RaiseAdminTotalsChanged()
+    {
+        OnPropertyChanged(nameof(AdminCostTotal));
+        OnPropertyChanged(nameof(AdminSaleTotal));
+        OnPropertyChanged(nameof(AdminEngCostTotal));
+        OnPropertyChanged(nameof(AdminEngSaleTotal));
+    }
+
+============================================================
+==================Add Task===================== CreateBidViewModel.cs ---> Line 233
+============================================================
+
+{
+        var task = new BidTaskViewModel();
+        task.PropertyChanged += (_, __) => raise();
+        tasks.Add(task);
+        raise();
+    }
+
+
+============================================================
+=====================hooktaskhandlers==================== CreateBidViewModel.cs ---> Line 198
+============================================================
+
+private void HookTaskHandlers(System.Collections.Specialized.NotifyCollectionChangedEventArgs e, Action raiseTotals)
+    {
+        if (e.NewItems != null)
+        {
+            foreach (BidTaskViewModel item in e.NewItems)
+                item.PropertyChanged += (_, __) => raiseTotals();
+        }
+        raiseTotals();   -----> to next step
+    }
+
+============================================================
+===================RaiseAdminTotalsChanged================== CreateBidViewModel.cs ---> Line 212
+============================================================
+
+private void RaiseAdminTotalsChanged()
+    {
+        OnPropertyChanged(nameof(AdminCostTotal));
+        OnPropertyChanged(nameof(AdminSaleTotal));
+        OnPropertyChanged(nameof(AdminEngCostTotal));
+        OnPropertyChanged(nameof(AdminEngSaleTotal));
+    }
+
+============================================================
+=====================hooktaskhandlers==================== CreateBidViewModel.cs ---> Line 198
+============================================================
+
+private void HookTaskHandlers(System.Collections.Specialized.NotifyCollectionChangedEventArgs e, Action raiseTotals)
+    {
+        if (e.NewItems != null)
+        {
+            foreach (BidTaskViewModel item in e.NewItems)
+                item.PropertyChanged += (_, __) => raiseTotals();
+        }
+        raiseTotals();   <-----returned here
+    }
+
+************************************************************************************************************
+
+============================================================ ----->derives from selectedTemplateTaskName in BidtaskViewmodel based on TaskName of TaskDto
+==================OnSelectedTemplateTaskNameChanged===================== BidTaskViewModel.cs ---> Line 31
+============================================================
+
+ partial void OnSelectedTemplateTaskNameChanged(TaskDto value)
+        {
+            Debug.WriteLine($"🔥 Template selected: {value?.TaskName}");
+            if (value == null) return;
+
+            // Set the task name and prices based on the template
+            Name = value.TaskName;
+            Cost = value.DefaultCost;
+            Sale = value.DefaultSale;
+            TaskModelId = value.Id;
+
+            OnPropertyChanged(nameof(Name)); ------> add task
+            OnPropertyChanged(nameof(Cost));
+            OnPropertyChanged(nameof(Sale));
+
+        }
+
+
+*********************************************************************************************************************************
+
+
+
+// ReSharper disable InconsistentNaming
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.DataAccess.DTO;
@@ -10,7 +420,6 @@ using FyreWorksPM.Services.Client;
 using FyreWorksPM.Services.Item;
 using FyreWorksPM.Services.Navigation;
 using FyreWorksPM.Services.Tasks;
-using FyreWorksPM.Utilities;
 using Microsoft.Maui.ApplicationModel;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -56,7 +465,6 @@ public partial class CreateBidViewModel : ObservableObject
 
         AdminTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseAdminTotalsChanged);
         EngineeringTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseEngineeringTotalsChanged);
-        ViewModelHookHelper.AttachCollectionHandlers(ComponentLineItems, (_, __) => RaiseComponentTotalsChanged(),RaiseComponentTotalsChanged);
 
         Task.Run(async () => await InitializeAsync());
     }
@@ -136,8 +544,6 @@ public partial class CreateBidViewModel : ObservableObject
     public decimal EngineeringSaleTotal => EngineeringTasks.Sum(t => t.Sale);
     public decimal AdminEngCostTotal => AdminCostTotal + EngineeringCostTotal;
     public decimal AdminEngSaleTotal => AdminSaleTotal + EngineeringSaleTotal;
-    public int TotalComponentMinutes => ComponentLineItems.Sum(x => x.TotalMinutes);
-    public double TotalComponentHours => Math.Round(TotalComponentMinutes / 60.0, 2);
 
     public BidLaborConfig LaborOverrides { get; set; } = new();
 
@@ -237,15 +643,6 @@ public partial class CreateBidViewModel : ObservableObject
         OnPropertyChanged(nameof(AdminEngCostTotal));
         OnPropertyChanged(nameof(AdminEngSaleTotal));
     }
-
-   
-
-    private void RaiseComponentTotalsChanged()
-    {
-        OnPropertyChanged(nameof(TotalComponentMinutes));
-        OnPropertyChanged(nameof(TotalComponentHours));
-    }
-
 
     private void AddTask(ObservableCollection<BidTaskViewModel> tasks, Action raise)
     {

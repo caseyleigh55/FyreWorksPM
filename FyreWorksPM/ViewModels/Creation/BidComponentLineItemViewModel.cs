@@ -1,9 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using FyreWorksPM.DataAccess.Data.Models;
+using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.DataAccess.Models;
 using FyreWorksPM.Services.BidLineItem;
+using System.Collections.ObjectModel;
 
-public class BidComponentLineItemViewModel : ObservableObject
+public partial class BidComponentLineItemViewModel : ObservableObject
 {
     public BidComponentLineItemModel Item { get; }
     private readonly BidLaborConfig _laborOverrides;
@@ -11,15 +13,42 @@ public class BidComponentLineItemViewModel : ObservableObject
     public BidComponentLineItemViewModel(BidComponentLineItemModel item, BidLaborConfig laborOverrides)
     {
         Item = item;
-        _laborOverrides = laborOverrides;
+        _laborOverrides = laborOverrides;        
     }
+
+    public ObservableCollection<ItemDto> AvailableItems { get; set; } = new();
+
 
     public List<string> InstallTypeOptions { get; set; } = new();
     public List<string> InstallLocationOptions { get; set; } = new();
 
 
-    public string ItemName => Item.ItemName;
-    public string Description => Item.Description;
+    public string ItemName
+    {
+        get => Item.ItemName;
+        set
+        {
+            if (Item.ItemName != value)
+            {
+                Item.ItemName = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string Description
+    {
+        get => Item.Description;
+        set
+        {
+            if (Item.Description != value)
+            {
+                Item.Description = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public string Type => Item.Type;
     public int Qty => Item.Qty;
     public decimal UnitCost => Item.UnitCost;
@@ -61,6 +90,18 @@ public class BidComponentLineItemViewModel : ObservableObject
 
     public int TotalMinutes => Qty * (PrewireMinutes + TrimMinutes);
     public double TotalHours => Math.Round(TotalMinutes / 60.0, 2);
+
+    [ObservableProperty] private ItemDto selectedItem;
+    partial void OnSelectedItemChanged(ItemDto? value)
+    {
+        if (value == null) return;
+
+        Item.ItemName = value.Name;
+        Item.Description = value.Description;
+        // Could add more later like default cost suggestions, etc.
+        OnPropertyChanged(nameof(ItemName));
+        OnPropertyChanged(nameof(Description));
+    }
 
 
 }

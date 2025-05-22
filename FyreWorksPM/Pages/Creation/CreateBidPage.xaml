@@ -708,13 +708,19 @@ HorizontalTextAlignment="Start" />
                             <!-- Scrollable list -->
                             <Border>
                             <ScrollView HeightRequest="200">
-                                <CollectionView        
-                                    ItemsSource="{Binding ComponentLineItems}" 
+                                <CollectionView  x:Name="BidComponentList"      
+                                    ItemsSource="{Binding ComponentLineItems}"                                    
+                                    SelectionMode="Single"
                                     Margin="0,10">
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate>
                                             <Grid ColumnDefinitions="2*,2*,*,*,*,*,2*,2*">
-                                                <Label Grid.Column="0"  Text="{Binding ItemName}" />
+                                                    <controls:SearchableEntryView
+                                                        Suggestions="{Binding AvailableItems}"                                                       
+                                                        SearchText="{Binding Name, Mode=TwoWay}"
+                                                        SelectedItem="{Binding SelectedComponentItem, Mode=TwoWay}"
+                                                        DisplayMemberPath="Name"
+                                                        Placeholder="Search for an item..." />
                                                 <Entry Grid.Column="1" Text="{Binding Description}" />
                                                 <Entry Grid.Column="2" Text="{Binding Qty}" Keyboard="Numeric" />
                                                 <Entry Grid.Column="3" Text="{Binding UnitCost}" Keyboard="Numeric" Placeholder="Unit Cost" />
@@ -726,19 +732,6 @@ HorizontalTextAlignment="Start" />
                                         </DataTemplate>
                                     </CollectionView.ItemTemplate>
                                 </CollectionView>
-                                <!--<CollectionView ItemsSource="{Binding PanelItems}">
-                                    <CollectionView.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid ColumnDefinitions="2*,3*,Auto,*,*" ColumnSpacing="10" Padding="5">
-                                                <Entry Grid.Column="0" Text="{Binding Item}" Placeholder="Item" />
-                                                <Entry Grid.Column="1" Text="{Binding Description}" Placeholder="Description" />
-                                                <Entry Grid.Column="2" Text="{Binding Quantity}" Keyboard="Numeric" Placeholder="Qty" />
-                                                <Entry Grid.Column="3" Text="{Binding UnitCost}" Keyboard="Numeric" Placeholder="Unit Cost" />
-                                                <Entry Grid.Column="4" Text="{Binding UnitSale}" Keyboard="Numeric" Placeholder="Unit Sale" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </CollectionView.ItemTemplate>
-                                </CollectionView>-->
                             </ScrollView>
                             </Border>
 
@@ -746,7 +739,7 @@ HorizontalTextAlignment="Start" />
                             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
                                 <Button Grid.Column="0" Text="➕ Add Item" Command="{Binding AddComponentItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
                                 <Button Grid.Column="1" Text="🗑️ Delete Item" Command="{Binding RemoveComponentItemCommand}" BackgroundColor="DarkRed" TextColor="White" />
-                                <Button Grid.Column="2" Text="Create Item" Command="{Binding CreateNewtItemCommand}" BackgroundColor="Orange" TextColor="White" />
+                                <Button Grid.Column="2" Text="Create Item" Command="{Binding CreateNewItemCommand}" BackgroundColor="Orange" TextColor="White" />
                             </Grid>
 
                             <!-- Totals -->

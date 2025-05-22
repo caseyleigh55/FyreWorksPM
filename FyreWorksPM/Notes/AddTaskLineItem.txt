@@ -1,0 +1,136 @@
+﻿*What happens User selects AddTask Button within the admin Tasks section of the Create Bid Page:
+
+============================================================
+========================xaml binding======================== CreateBidPage.xaml ---> Line 254
+============================================================
+
+ <Button Text="Add Task" Command="{Binding AddAdminTaskCommand}" />
+
+============================================================
+=====================command declaration==================== CreateBidViewModel.cs ---> Line 227
+============================================================
+
+public ObservableCollection<BidTaskViewModel> AdminTasks { get; } = new();  ----> line 163
+
+[RelayCommand] private void AddAdminTask() => AddTask(AdminTasks, RaiseAdminTotalsChanged);   ----> line 227
+
+============================================================
+=====================add task==================== CreateBidViewModel.cs ---> Line 233
+============================================================
+
+ private void AddTask(ObservableCollection<BidTaskViewModel> tasks, Action raise)
+    {
+        var task = new BidTaskViewModel();
+        task.PropertyChanged += (_, __) => raise();
+        tasks.Add(task);
+        raise();
+    }
+
+============================================================
+=====================Collection Changed==================== CreateBidViewModel.cs ---> Line 53
+============================================================
+
+AdminTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseAdminTotalsChanged);
+
+============================================================
+=====================hooktaskhandlers==================== CreateBidViewModel.cs ---> Line 198
+============================================================
+
+private void HookTaskHandlers(System.Collections.Specialized.NotifyCollectionChangedEventArgs e, Action raiseTotals)
+    {
+        if (e.NewItems != null)
+        {
+            foreach (BidTaskViewModel item in e.NewItems)
+                item.PropertyChanged += (_, __) => raiseTotals();
+        }
+        raiseTotals();   -----> to next step
+    }
+
+============================================================
+===================RaiseAdminTotalsChanged================== CreateBidViewModel.cs ---> Line 212
+============================================================
+
+private void RaiseAdminTotalsChanged()
+    {
+        OnPropertyChanged(nameof(AdminCostTotal));
+        OnPropertyChanged(nameof(AdminSaleTotal));
+        OnPropertyChanged(nameof(AdminEngCostTotal));
+        OnPropertyChanged(nameof(AdminEngSaleTotal));
+    }
+
+============================================================
+=====================hooktaskhandlers==================== CreateBidViewModel.cs ---> Line 198
+============================================================
+
+private void HookTaskHandlers(System.Collections.Specialized.NotifyCollectionChangedEventArgs e, Action raiseTotals)
+    {
+        if (e.NewItems != null)
+        {
+            foreach (BidTaskViewModel item in e.NewItems)
+                item.PropertyChanged += (_, __) => raiseTotals();
+        }
+        raiseTotals();   <-----returned here
+    }
+
+============================================================
+=====================Collection Changed==================== CreateBidViewModel.cs ---> Line 53
+============================================================
+
+AdminTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseAdminTotalsChanged); <----- returned here
+    
+============================================================
+==================SearchableEntryView==================== SearchableEntryView.cs ---> Line 10
+============================================================
+
+public SearchableEntryView()
+    {
+        InitializeComponent();
+        FilteredSuggestions = new ObservableCollection<object>();
+        SuggestionsView.IsVisible = false;
+    }
+
+============================================================
+=====================add task==================== CreateBidViewModel.cs ---> Line 233
+============================================================
+
+ private void AddTask(ObservableCollection<BidTaskViewModel> tasks, Action raise)
+    {
+        var task = new BidTaskViewModel();
+        task.PropertyChanged += (_, __) => raise();
+        tasks.Add(task); <----- returned here
+        raise();  ---To next step
+    }
+
+============================================================
+===================RaiseAdminTotalsChanged================== CreateBidViewModel.cs ---> Line 212
+============================================================
+
+private void RaiseAdminTotalsChanged()
+    {
+        OnPropertyChanged(nameof(AdminCostTotal));
+        OnPropertyChanged(nameof(AdminSaleTotal));
+        OnPropertyChanged(nameof(AdminEngCostTotal));
+        OnPropertyChanged(nameof(AdminEngSaleTotal));
+    }
+
+============================================================
+=====================add task==================== CreateBidViewModel.cs ---> Line 233
+============================================================
+
+ private void AddTask(ObservableCollection<BidTaskViewModel> tasks, Action raise)
+    {
+        var task = new BidTaskViewModel();
+        task.PropertyChanged += (_, __) => raise();
+        tasks.Add(task);
+        raise(); <---- returned here 
+    }
+
+============================================================
+=====================command declaration==================== CreateBidViewModel.cs ---> Line 227
+============================================================
+
+[RelayCommand] private void AddAdminTask() => AddTask(AdminTasks, RaiseAdminTotalsChanged);   ----> returned here
+
+============================================================
+=====================blank task is Loaded=================== 
+============================================================
