@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:converters="clr-namespace:FyreWorksPM.Common.Converters;assembly=FyreWorksPM"
     xmlns:controls="clr-namespace:FyreWorksPM.Controls"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     x:Class="FyreWorksPM.Pages.Creation.CreateBidPage"
     x:Name="CreateBid"
     Title="New Bid">
@@ -707,38 +708,61 @@ HorizontalTextAlignment="Start" />
 
                             <!-- Scrollable list -->
                             <Border>
-                            <ScrollView HeightRequest="200">
-                                <CollectionView  x:Name="BidComponentList"      
-                                    ItemsSource="{Binding ComponentLineItems}"                                    
-                                    SelectionMode="Single"
-                                    Margin="0,10">
+                                <CollectionView  x:Name="BidComponentList"   
+                                                 ItemsSource="{Binding ComponentLineItems}"  
+                                                 SelectedItem="{Binding Source={x:Reference CreateBid}, Path=BindingContext.SelectedComponentLineItem, Mode=TwoWay}"
+                                                 SelectionMode="Single"
+                                                 SelectionChanged="OnComponentSelectionChanged"
+                                                 Margin="0,10"
+                                                 HeightRequest="200">
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid ColumnDefinitions="2*,2*,*,*,*,*,2*,2*">
+                                            <Grid>
+                                                <Grid.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        Command="{Binding Source={x:Reference CreateBid}, Path=BindingContext.SelectComponentItemCommand}"
+                                                        CommandParameter="{Binding .}" />
+                                                </Grid.GestureRecognizers>
+
+                                                <Grid ColumnDefinitions="2*,2*,*,*,*,*,2*,2*">
                                                     <controls:SearchableEntryView
-                                                        Suggestions="{Binding AvailableItems}"                                                       
-                                                        SearchText="{Binding Name, Mode=TwoWay}"
-                                                        SelectedItem="{Binding SelectedComponentItem, Mode=TwoWay}"
+                                                        Suggestions="{Binding Source={x:Reference CreateBid}, Path=BindingContext.AvailableItems}" 
+                                                        SelectedItem="{Binding Source={x:Reference CreateBid}, Path=BindingContext.SelectedLibraryItem, Mode=TwoWay}"
+                                                        SearchText="{Binding Name, Mode=TwoWay}"            
                                                         DisplayMemberPath="Name"
                                                         Placeholder="Search for an item..." />
-                                                <Entry Grid.Column="1" Text="{Binding Description}" />
-                                                <Entry Grid.Column="2" Text="{Binding Qty}" Keyboard="Numeric" />
-                                                <Entry Grid.Column="3" Text="{Binding UnitCost}" Keyboard="Numeric" Placeholder="Unit Cost" />
-                                                <Entry Grid.Column="4" Text="{Binding UnitSale}" Keyboard="Numeric" Placeholder="Unit Sale" />
-                                                <CheckBox Grid.Column="5" HorizontalOptions="Center" IsChecked="{Binding Piped}" />
-                                                <Picker Grid.Column="6"  ItemsSource="{Binding InstallTypeOptions}" SelectedItem="{Binding InstallType}" />
-                                                <Picker Grid.Column="7"  ItemsSource="{Binding InstallLocationOptions}" SelectedItem="{Binding InstallLocation}" />
+                                                    <Entry Grid.Column="1" Text="{Binding Description}" >
+                                                        <Entry.Behaviors>
+                                                            <toolkit:EventToCommandBehavior
+                                                            EventName="Focused"
+                                                            Command="{Binding Source={x:Reference CreateBid}, Path=BindingContext.FocusComponentItemCommand}"
+                                                            CommandParameter="{Binding .}" />
+                                                        </Entry.Behaviors> </Entry>
+                                                    <Entry Grid.Column="2" Text="{Binding Qty}" Keyboard="Numeric" />
+                                                    <Entry Grid.Column="3" Text="{Binding UnitCost}" Keyboard="Numeric" Placeholder="Unit Cost" />
+                                                    <Entry Grid.Column="4" Text="{Binding UnitSale}" Keyboard="Numeric" Placeholder="Unit Sale" />
+                                                    <CheckBox Grid.Column="5" HorizontalOptions="Center" IsChecked="{Binding Piped}" />
+                                                    <Picker Grid.Column="6" ItemsSource="{Binding InstallTypeOptions}" SelectedItem="{Binding InstallType}" />
+                                                    <Picker Grid.Column="7" ItemsSource="{Binding InstallLocationOptions}" SelectedItem="{Binding InstallLocation}" />
+                                                </Grid>
                                             </Grid>
                                         </DataTemplate>
                                     </CollectionView.ItemTemplate>
+
                                 </CollectionView>
-                            </ScrollView>
                             </Border>
 
                             <!-- Buttons -->
+                            
                             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
                                 <Button Grid.Column="0" Text="➕ Add Item" Command="{Binding AddComponentItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
-                                <Button Grid.Column="1" Text="🗑️ Delete Item" Command="{Binding RemoveComponentItemCommand}" BackgroundColor="DarkRed" TextColor="White" />
+                                <Button Grid.Column="1" 
+                                        Text="🗑️ Delete Item" 
+                                        Command="{Binding BindingContext.RemoveComponentItemCommand, Source={x:Reference CreateBid}}"
+                                        CommandParameter="{Binding Source={x:Reference CreateBid}, Path=BindingContext.SelectedComponentLineItem}"
+
+                                        BackgroundColor="DarkRed"
+                                        TextColor="White" />
                                 <Button Grid.Column="2" Text="Create Item" Command="{Binding CreateNewItemCommand}" BackgroundColor="Orange" TextColor="White" />
                             </Grid>
 

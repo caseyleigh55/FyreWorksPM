@@ -93,7 +93,21 @@ public partial class CreateBidViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<TaskDto> taskTemplates;
     [ObservableProperty] private TaskDto selectedTemplateTask;
     [ObservableProperty] private BidTaskModel currentTask;
-    [ObservableProperty] private BidComponentLineItemViewModel? selectedComponentItem;
+    // For SearchableEntryView's selected item
+    [ObservableProperty]
+    private ItemDto? selectedLibraryItem;
+
+    // For the actual selected row
+    [ObservableProperty]
+    private BidComponentLineItemViewModel? selectedComponentLineItem;
+   
+
+    partial void OnSelectedComponentLineItemChanged(BidComponentLineItemViewModel? value)
+    {
+        Debug.WriteLine($"📌 SelectedComponentLineItem changed: {value?.ItemName ?? "null"}");
+    }
+
+
     [ObservableProperty] private ObservableCollection<TaskDto> allAdminTaskNames = new();
     [ObservableProperty] private ObservableCollection<TaskDto> allEngineeringTaskNames = new();
 
@@ -154,7 +168,24 @@ public partial class CreateBidViewModel : ObservableObject
     [RelayCommand] private void RemoveEngineeringTask(BidTaskViewModel task) => RemoveTask(EngineeringTasks, task, RaiseEngineeringTotalsChanged);
     [RelayCommand] private void SaveTasks() => SaveValidTasks();
     [RelayCommand] public async Task CreateNewItemAsync() => await CreateNewItem();
-    [RelayCommand] private void RemoveComponentItem() { if (SelectedComponentItem != null) ComponentLineItems.Remove(SelectedComponentItem); }
+
+    //[RelayCommand]
+    //public void FocusComponentItem(BidComponentLineItemViewModel item)
+    //{
+    //    SelectedComponentLineItem = item;
+    //    Debug.WriteLine($"📌 Focused: {item.Item.ItemName}");
+    //}
+
+    [RelayCommand]
+    private void SelectComponentItem(BidComponentLineItemViewModel item)
+    {
+        SelectedComponentLineItem = item;
+        Debug.WriteLine($"✅ Selected: {item.Item.ItemName}");
+    }
+
+
+    [RelayCommand] private void RemoveComponentItem(BidComponentLineItemViewModel SelectedComponentLineItem) => RemoveComponentItem(ComponentLineItems, SelectedComponentLineItem, RaiseComponentTotalsChanged);
+
     [RelayCommand] public async Task OpenItemLibraryAsync() => await OpenLibrary();
     [RelayCommand] private void AddComponentItem() => AddNewComponent();
     [RelayCommand] public async Task AddNewClientAsync() => await AddClient();
@@ -261,6 +292,17 @@ public partial class CreateBidViewModel : ObservableObject
         {
             task.PropertyChanged -= (_, __) => raise();
             tasks.Remove(task);
+            raise();
+        }
+    }
+
+    private void RemoveComponentItem(ObservableCollection<BidComponentLineItemViewModel> items, BidComponentLineItemViewModel item, Action raise)
+    {
+        
+        if (items.Contains(item))
+        {
+            item.PropertyChanged -= (_, __) => raise();
+            items.Remove(item);
             raise();
         }
     }

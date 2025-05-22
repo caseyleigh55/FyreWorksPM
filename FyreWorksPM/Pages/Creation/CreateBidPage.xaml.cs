@@ -2,6 +2,7 @@
 using FyreWorksPM.Services.Client;
 using FyreWorksPM.ViewModels.Creation;
 using FyreWorksPM.Common.Converters;
+using System.Diagnostics;
 
 namespace FyreWorksPM.Pages.Creation;
 
@@ -38,6 +39,12 @@ public partial class CreateBidPage : ContentPage
         {
             await bidVm.LoadTaskTemplatesAsync();
         }
+    }
+
+    private void OnComponentSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var selected = e.CurrentSelection.FirstOrDefault() as BidComponentLineItemViewModel;
+        Debug.WriteLine($"🔥 SelectionChanged event fired! {selected?.ItemName ?? "null"}");
     }
 
 
