@@ -731,20 +731,20 @@ HorizontalTextAlignment="Start" />
                                                     </controls:SearchableEntryView.ItemTemplate>
                                                 </controls:SearchableEntryView>
                                                 <Entry Grid.Column="1" Text="{Binding Description, Mode=TwoWay, UpdateSourceEventName=TextChanged}" />
-                                                <Entry Grid.Column="2" Text="{Binding Qty, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}}" 
+                                                <Entry Grid.Column="2" Text="{Binding Qty, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
                                                        Keyboard="Numeric"
                                                        Placeholder="1"/>
                                                 
                                                 <Grid Grid.Column="3" VerticalOptions="Center">
                                                     <Label Text="$" TextColor="White" VerticalOptions="Center" />
-                                                    <Entry Text="{Binding UnitCost, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}}" 
+                                                    <Entry Text="{Binding UnitCost, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
                                                            Keyboard="Numeric" 
                                                            Placeholder="0.00" />
                                                 </Grid>
 
                                                 <Grid Grid.Column="4" VerticalOptions="Center">
                                                     <Label Text="$" TextColor="White" VerticalOptions="Center" />
-                                                    <Entry Text="{Binding UnitSale, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}}" 
+                                                    <Entry Text="{Binding UnitSale, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
                                                            Keyboard="Numeric" 
                                                            Placeholder="0.00" />
                                                 </Grid>

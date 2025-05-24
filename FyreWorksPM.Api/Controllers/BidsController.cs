@@ -35,7 +35,8 @@ namespace FyreWorksPM.Api.Controllers
                 BidNumber = bid.BidModelBidNumber,
                 ProjectName = bid.BidModelProjectName,
                 ClientId = bid.BidModelClientId,
-                CreatedDate = bid.BidModelCreatedDate
+                CreatedDate = bid.BidModelCreatedDate,
+                IsActive = bid.BidModelIsActive
             });
         }
 
