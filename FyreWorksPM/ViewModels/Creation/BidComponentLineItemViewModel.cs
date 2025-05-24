@@ -52,7 +52,20 @@ public partial class BidComponentLineItemViewModel : ObservableObject
     }
 
     public string Type => Item.Type;
-    public int Qty => Item.Qty;
+    public int Qty
+    {
+        get => Item.Qty;
+        set
+        {
+            if (Item.Qty != value)
+            {
+                Item.Qty = value;
+                OnPropertyChanged();
+                RaiseComponentTotalsChanged?.Invoke(); // 🎯 fire the update
+            }
+        }
+    }
+
     public decimal UnitCost
     {
         get => Item.UnitCost;

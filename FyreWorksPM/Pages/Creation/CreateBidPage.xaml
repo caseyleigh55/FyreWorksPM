@@ -730,8 +730,10 @@ HorizontalTextAlignment="Start" />
                                                         </DataTemplate>
                                                     </controls:SearchableEntryView.ItemTemplate>
                                                 </controls:SearchableEntryView>
-                                                <Entry Grid.Column="1" Text="{Binding Description, Mode=TwoWay, UpdateSourceEventName=TextChanged}" />                                                    
-                                                    <Entry Grid.Column="2" Text="{Binding Qty}" Keyboard="Numeric" />
+                                                <Entry Grid.Column="1" Text="{Binding Description, Mode=TwoWay, UpdateSourceEventName=TextChanged}" />
+                                                <Entry Grid.Column="2" Text="{Binding Qty, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}}" 
+                                                       Keyboard="Numeric"
+                                                       Placeholder="1"/>
                                                 
                                                 <Grid Grid.Column="3" VerticalOptions="Center">
                                                     <Label Text="$" TextColor="White" VerticalOptions="Center" />
