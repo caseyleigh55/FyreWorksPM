@@ -23,9 +23,8 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Label 
-                        Text="{Binding TaskName}" 
-                        Padding="5" />
+                    <Label  
+                        Padding="5" TextColor="White"/>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

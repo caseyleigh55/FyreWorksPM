@@ -169,12 +169,7 @@ public partial class CreateBidViewModel : ObservableObject
     [RelayCommand] private void SaveTasks() => SaveValidTasks();
     [RelayCommand] public async Task CreateNewItemAsync() => await CreateNewItem();
 
-    //[RelayCommand]
-    //public void FocusComponentItem(BidComponentLineItemViewModel item)
-    //{
-    //    SelectedComponentLineItem = item;
-    //    Debug.WriteLine($"📌 Focused: {item.Item.ItemName}");
-    //}
+
 
     [RelayCommand]
     private void SelectComponentItem(BidComponentLineItemViewModel item)
@@ -361,12 +356,14 @@ public partial class CreateBidViewModel : ObservableObject
 
     private async Task CreateNewItem()
     {
-        var vm = new CreateItemsViewModel(_itemService, _itemTypeService, _navigationService);
-        await Shell.Current.Navigation.PushModalAsync(new CreateItemsPage(vm, item =>
-        {
-            SelectedItemFromLibrary = item;
-            _ = LoadItemsAsync();
-        }));
+        await _navigationService.GoToAsync("createitems");
+
+        //var vm = new CreateItemsViewModel(_itemService, _itemTypeService, _navigationService);
+        //await Shell.Current.Navigation.PushModalAsync(new CreateItemsPage(vm, item =>
+        //{
+        //    SelectedItemFromLibrary = item;
+        //    _ = LoadItemsAsync();
+        //}));
     }
 
     private async Task OpenLibrary()
@@ -379,8 +376,8 @@ public partial class CreateBidViewModel : ObservableObject
     {
         var newModel = new BidComponentLineItemModel
         {
-            ItemName = "New Component",
-            Description = "Describe me!",
+            ItemName = "Select Item",
+            Description = "Description",
             Type = "Panel Device",
             Qty = 1,
             UnitCost = 0,
@@ -394,9 +391,10 @@ public partial class CreateBidViewModel : ObservableObject
         {
             InstallTypeOptions = InstallTypeOptions,
             InstallLocationOptions = InstallLocationOptions,
-            AvailableItems = AvailableItems
+            AvailableItems = AvailableItems,            
         };
         ComponentLineItems.Add(vm);
+        
     }
 
     private async Task LoadItemsAsync()

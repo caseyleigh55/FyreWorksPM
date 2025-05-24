@@ -12,4 +12,9 @@ public class ItemDto
     public string? Description { get; set; }
 
     public string ItemTypeName { get; set; } = string.Empty;
+
+    public override string ToString()
+    {
+        return Name;
+    }
 }

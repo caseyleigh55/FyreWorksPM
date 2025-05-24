@@ -5,7 +5,7 @@
         public Guid Id { get; set; }
 
         // Shared fields
-        public string ItemName { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
 
@@ -19,6 +19,11 @@
         public string InstallLocation { get; set; } = string.Empty;
 
         public Guid BidId { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 
 }

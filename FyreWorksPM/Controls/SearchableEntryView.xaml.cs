@@ -18,6 +18,17 @@ public partial class SearchableEntryView : ContentView
     public static readonly BindableProperty SuggestionsProperty =
         BindableProperty.Create(nameof(Suggestions), typeof(IEnumerable), typeof(SearchableEntryView), propertyChanged: OnSuggestionsChanged);
 
+    public static readonly BindableProperty ItemTemplateProperty =
+    BindableProperty.Create(nameof(ItemTemplate), typeof(DataTemplate), typeof(SearchableEntryView));
+
+    public DataTemplate ItemTemplate
+    {
+        get => (DataTemplate)GetValue(ItemTemplateProperty);
+        set => SetValue(ItemTemplateProperty, value);
+    } 
+
+
+
     public IEnumerable Suggestions
     {
         get => (IEnumerable)GetValue(SuggestionsProperty);
@@ -56,7 +67,22 @@ public partial class SearchableEntryView : ContentView
 
     // Optional: property to display (i.e. "Name" on a complex object)
     public static readonly BindableProperty DisplayMemberPathProperty =
-        BindableProperty.Create(nameof(DisplayMemberPath), typeof(string), typeof(SearchableEntryView), "");
+     BindableProperty.Create(
+         nameof(DisplayMemberPath),
+         typeof(string),
+         typeof(SearchableEntryView),
+         default(string),
+         propertyChanged: OnDisplayMemberPathChanged);
+
+    private static void OnDisplayMemberPathChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is SearchableEntryView control && newValue is string path)
+        {
+            control.UpdateSuggestionTemplate();
+        }
+    }
+
+
 
     public string DisplayMemberPath
     {
@@ -68,6 +94,24 @@ public partial class SearchableEntryView : ContentView
     public ObservableCollection<object> FilteredSuggestions { get; private set; }
 
     // === Event Handlers ===
+
+    private void UpdateSuggestionTemplate()
+    {
+        if (string.IsNullOrWhiteSpace(DisplayMemberPath) || SuggestionsView == null)
+            return;
+
+        SuggestionsView.ItemTemplate = new DataTemplate(() =>
+        {
+            var label = new Label
+            {
+                Padding = 5,
+                TextColor = Colors.White
+            };
+            label.SetBinding(Label.TextProperty, new Binding(DisplayMemberPath));
+            return label;
+        });
+    }
+
 
     private static void OnSuggestionsChanged(BindableObject bindable, object oldValue, object newValue)
     {
