@@ -697,7 +697,7 @@ HorizontalTextAlignment="Start" />
                             <Label Text="Panel Components" TextDecorations="Underline" FontAttributes="Bold" FontSize="18" TextColor="White" />
 
                             <!-- Headers -->
-                            <Grid ColumnDefinitions="2*,*,*,*,*,*,2*,2*,*" ColumnSpacing="10">
+                            <Grid ColumnDefinitions="2*,2*,*,*,*,*,2*,2*,*" ColumnSpacing="10">
                                 <Label Text="Item" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="0" />
                                 <Label Text="Description" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="1" />
                                 <Label Text="Qty" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="2" />
@@ -732,9 +732,21 @@ HorizontalTextAlignment="Start" />
                                                 </controls:SearchableEntryView>
                                                 <Entry Grid.Column="1" Text="{Binding Description, Mode=TwoWay, UpdateSourceEventName=TextChanged}" />                                                    
                                                     <Entry Grid.Column="2" Text="{Binding Qty}" Keyboard="Numeric" />
-                                                    <Entry Grid.Column="3" Text="{Binding UnitCost}" Keyboard="Numeric" Placeholder="Unit Cost" />
-                                                    <Entry Grid.Column="4" Text="{Binding UnitSale}" Keyboard="Numeric" Placeholder="Unit Sale" />
-                                                    <CheckBox Grid.Column="5" HorizontalOptions="Center" IsChecked="{Binding Piped}" />
+                                                
+                                                <Grid Grid.Column="3" VerticalOptions="Center">
+                                                    <Label Text="$" TextColor="White" VerticalOptions="Center" />
+                                                    <Entry Text="{Binding UnitCost, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}}" 
+                                                           Keyboard="Numeric" 
+                                                           Placeholder="0.00" />
+                                                </Grid>
+
+                                                <Grid Grid.Column="4" VerticalOptions="Center">
+                                                    <Label Text="$" TextColor="White" VerticalOptions="Center" />
+                                                    <Entry Text="{Binding UnitSale, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}}" 
+                                                           Keyboard="Numeric" 
+                                                           Placeholder="0.00" />
+                                                </Grid>
+                                                <CheckBox Grid.Column="5" HorizontalOptions="Center" IsChecked="{Binding Piped}" />
                                                     <Picker Grid.Column="6" ItemsSource="{Binding InstallTypeOptions}" SelectedItem="{Binding InstallType}" />
                                                     <Picker Grid.Column="7" ItemsSource="{Binding InstallLocationOptions}" SelectedItem="{Binding InstallLocation}" />
                                                     <Button Grid.Column="8" 
@@ -760,12 +772,31 @@ HorizontalTextAlignment="Start" />
                                 <Button Grid.Column="2" Text="Create Item" Command="{Binding CreateNewItemCommand}" BackgroundColor="Orange" TextColor="White" />
                             </Grid>
 
+                            <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
+                                <Label Text="Cost" FontAttributes="Bold" TextColor="Red" Grid.Column="1" />
+                                <Label Text="Sale" FontAttributes="Bold" TextColor="Orange" Grid.Column="2" />
+                            </Grid>
+
                             <!-- Totals -->
                             <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
                                 <Label Text="Panel Totals:" FontAttributes="Bold" Grid.Column="0" />
-                                <Label Text="{Binding PanelCostTotal, StringFormat='${0:F2}'}" Grid.Column="1" />
-                                <Label Text="{Binding PanelSaleTotal, StringFormat='${0:F2}'}" Grid.Column="2" />
-                                    </Grid>
+
+                                
+
+                                <!-- Cost total -->                                
+                                    <Label Grid.Column="1"
+                                       Text="{Binding Source={x:Reference CreateBid}, Path=BindingContext.PanelLineItemsCostTotal, StringFormat='${0:F2}'}"
+                                       TextColor="Red"
+                                       FontAttributes="Bold"
+                                       HorizontalTextAlignment="Start" />                              
+
+                                <!-- Sale total -->
+                                <Label Grid.Column="2"
+                                       Text="{Binding PanelLineItemsSaleTotal, StringFormat='${0:F2}'}"
+                                       TextColor="Orange"
+                                       FontAttributes="Bold"
+                                       HorizontalTextAlignment="Start" />
+                            </Grid>
                         </VerticalStackLayout>
                     </Border>
 

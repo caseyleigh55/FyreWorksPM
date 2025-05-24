@@ -9,6 +9,8 @@ public partial class BidComponentLineItemViewModel : ObservableObject
 {
     public BidComponentLineItemModel Item { get; }
     private readonly BidLaborConfig _laborOverrides;
+    public Action? RaiseComponentTotalsChanged { get; set; }
+
 
     public BidComponentLineItemViewModel(BidComponentLineItemModel item, BidLaborConfig laborOverrides)
     {
@@ -51,8 +53,34 @@ public partial class BidComponentLineItemViewModel : ObservableObject
 
     public string Type => Item.Type;
     public int Qty => Item.Qty;
-    public decimal UnitCost => Item.UnitCost;
-    public decimal UnitSale => Item.UnitSale;
+    public decimal UnitCost
+    {
+        get => Item.UnitCost;
+        set
+        {
+            if (Item.UnitCost != value)
+            {
+                Item.UnitCost = value;
+                OnPropertyChanged();
+                RaiseComponentTotalsChanged?.Invoke(); // 🔥 Fire the total update
+            }
+        }
+    }
+
+    public decimal UnitSale
+    {
+        get => Item.UnitSale;
+        set
+        {
+            if (Item.UnitSale != value)
+            {
+                Item.UnitSale = value;
+                OnPropertyChanged();
+                RaiseComponentTotalsChanged?.Invoke();
+            }
+        }
+    }
+
 
     public bool Piped => Item.Piped;
     public string InstallType => Item.InstallType;

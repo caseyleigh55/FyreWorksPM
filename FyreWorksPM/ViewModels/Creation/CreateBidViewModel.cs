@@ -56,6 +56,8 @@ public partial class CreateBidViewModel : ObservableObject
 
         AdminTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseAdminTotalsChanged);
         EngineeringTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseEngineeringTotalsChanged);
+        //ComponentLineItems.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseComponentTotalsChanged);
+
         ViewModelHookHelper.AttachCollectionHandlers(ComponentLineItems, (_, __) => RaiseComponentTotalsChanged(),RaiseComponentTotalsChanged);
 
         Task.Run(async () => await InitializeAsync());
@@ -150,6 +152,10 @@ public partial class CreateBidViewModel : ObservableObject
     public decimal EngineeringSaleTotal => EngineeringTasks.Sum(t => t.Sale);
     public decimal AdminEngCostTotal => AdminCostTotal + EngineeringCostTotal;
     public decimal AdminEngSaleTotal => AdminSaleTotal + EngineeringSaleTotal;
+
+    public decimal PanelLineItemsCostTotal => ComponentLineItems.Sum(t => t.UnitCost * t.Qty);
+    public decimal PanelLineItemsSaleTotal => ComponentLineItems.Sum(t => t.UnitSale * t.Qty);
+   
     public int TotalComponentMinutes => ComponentLineItems.Sum(x => x.TotalMinutes);
     public double TotalComponentHours => Math.Round(TotalComponentMinutes / 60.0, 2);
 
@@ -270,6 +276,8 @@ public partial class CreateBidViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(TotalComponentMinutes));
         OnPropertyChanged(nameof(TotalComponentHours));
+        OnPropertyChanged(nameof(PanelLineItemsCostTotal));
+        OnPropertyChanged(nameof(PanelLineItemsSaleTotal));
     }
 
 
@@ -391,7 +399,8 @@ public partial class CreateBidViewModel : ObservableObject
         {
             InstallTypeOptions = InstallTypeOptions,
             InstallLocationOptions = InstallLocationOptions,
-            AvailableItems = AvailableItems,            
+            AvailableItems = AvailableItems,
+            RaiseComponentTotalsChanged = RaiseComponentTotalsChanged
         };
         ComponentLineItems.Add(vm);
         
