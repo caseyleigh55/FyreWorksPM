@@ -13,5 +13,5 @@ public class CreateBidDto
 
     //Admin and Engineering Tasks Section
     public List<CreateBidTaskDto> Tasks { get; set; } = new();
-
+    public List<BidComponentLineItemDto> ComponentLineItems { get; set; } = new();
 }

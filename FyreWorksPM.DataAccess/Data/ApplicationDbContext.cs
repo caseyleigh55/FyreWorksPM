@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using FyreWorksPM.DataAccess.Data.Models;
+using FyreWorksPM.DataAccess.Models;
 
 namespace FyreWorksPM.DataAccess.Data;
 
@@ -83,6 +84,11 @@ public class ApplicationDbContext : DbContext
     /// Table for taskModel categories.
     /// </summary>
     public DbSet<TaskModel> TaskTemplates { get; set; } = default!;
+
+    /// <summary>
+    /// Table for BidComponentLineItems categories.
+    /// </summary>
+    public DbSet<BidComponentLineItemModel> BidComponents { get; set; } = default!;
 
 
 

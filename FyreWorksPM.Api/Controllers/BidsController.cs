@@ -2,6 +2,7 @@
 using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.DataAccess.Enums;
+using FyreWorksPM.DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
@@ -101,6 +102,27 @@ namespace FyreWorksPM.Api.Controllers
                     BidTaskModelSale = t.Sale
                 });
             }
+
+            //
+            //
+            //
+            var bidComponentLineItems = new List<BidComponentLineItemModel>();
+
+            foreach (var c in dto.ComponentLineItems)
+            {
+                var componentTemplate = await _db.BidComponents.FindAsync(c.Id);
+                if (componentTemplate == null)
+                    return BadRequest($"Invalid ComponentModelId: {c.Id}");
+                bidComponentLineItems.Add(new BidComponentLineItemModel
+                {
+                    Id = componentTemplate.Id,
+                    UnitCost = componentTemplate.UnitCost,
+                    UnitSale = componentTemplate.UnitSale
+                });
+            }
+            //
+            //
+            //
 
             var bid = new BidModel
             {
