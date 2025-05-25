@@ -106,20 +106,20 @@ namespace FyreWorksPM.Api.Controllers
             //
             //
             //
-            var bidComponentLineItems = new List<BidComponentLineItemModel>();
-
-            foreach (var c in dto.ComponentLineItems)
+            var bidComponentLineItems = dto.ComponentLineItems.Select(c => new BidComponentLineItemModel
             {
-                var componentTemplate = await _db.BidComponents.FindAsync(c.Id);
-                if (componentTemplate == null)
-                    return BadRequest($"Invalid ComponentModelId: {c.Id}");
-                bidComponentLineItems.Add(new BidComponentLineItemModel
-                {
-                    Id = componentTemplate.Id,
-                    UnitCost = componentTemplate.UnitCost,
-                    UnitSale = componentTemplate.UnitSale
-                });
-            }
+                ItemId = c.Id, // keep this if you're referencing an existing item/template
+                ItemName = c.Name,
+                Description = c.Description,
+                Type = c.Type,
+                Qty = c.Qty,
+                UnitCost = c.UnitCost,
+                UnitSale = c.UnitSale,
+                Piped = c.Piped,
+                InstallType = c.InstallType,
+                InstallLocation = c.InstallLocation
+            }).ToList();
+
             //
             //
             //
@@ -132,7 +132,8 @@ namespace FyreWorksPM.Api.Controllers
                 BidModelCreatedDate = dto.CreatedDate,
                 BidModelIsActive = dto.IsActive,
                 BidModelSiteInfo = siteInfo,
-                BidModelTasks = bidTasks
+                BidModelTasks = bidTasks,
+                BidModelComponentLineItems = bidComponentLineItems
             };
 
             _db.BidInfo.Add(bid);

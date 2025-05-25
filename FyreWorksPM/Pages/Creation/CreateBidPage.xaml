@@ -642,6 +642,129 @@ HorizontalTextAlignment="Start" />
                            FontAttributes="Bold,Italic" 
                            FontSize="18" 
                            TextColor="White" />
+                    <StackLayout Orientation="Horizontal" Grid.Column="3" Spacing="5">
+                        <Label Text="Markup %" />
+                        <Entry Text="{Binding MaterialMarkup}" WidthRequest="60" Keyboard="Numeric" />
+                    </StackLayout>
+
+                    <!-- === PANEL COMPONENTS === -->
+                    <Border Stroke="Gray" StrokeThickness="1" Padding="10">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Panel Components" TextDecorations="Underline" FontAttributes="Bold" FontSize="18" TextColor="White" />
+
+                            <!-- Headers -->
+                            <Grid ColumnDefinitions="2*,2*,*,*,*,*,2*,2*,*" ColumnSpacing="10">
+                                <Label Text="Item" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="0" />
+                                <Label Text="Description" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="1" />
+                                <Label Text="Qty" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="2" />
+                                <Label Text="Unit Cost" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="3" />
+                                <Label Text="Unit Sale" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="4" />
+                                <Label Text="Piped" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="5" />
+                                <Label Text="Install Type" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="6" />
+                                <Label Text="Install Location" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="7" />
+                                <Label Text="Delete" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="8" />
+                            </Grid>
+
+                            <!-- Scrollable list -->
+                            <Border>
+                                <CollectionView  x:Name="BidComponentList"   
+                              ItemsSource="{Binding ComponentLineItems}"
+                              Margin="0,10"
+                              HeightRequest="200">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid ColumnDefinitions="2*,2*,*,*,*,*,2*,2*,*">
+                                                <controls:SearchableEntryView
+                                     Suggestions="{Binding Source={x:Reference CreateBid}, Path=BindingContext.AvailableItems}"  
+                                     SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                                     SearchText="{Binding Name, Mode=TwoWay}"
+                                     DisplayMemberPath="Name"
+                                     Placeholder="Search for an item..." >
+                                                    <controls:SearchableEntryView.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Label Text="{Binding Name}" TextColor="Blue" Padding="10"/>
+                                                        </DataTemplate>
+                                                    </controls:SearchableEntryView.ItemTemplate>
+                                                </controls:SearchableEntryView>
+                                                <Entry Grid.Column="1" Text="{Binding Description, Mode=TwoWay, UpdateSourceEventName=TextChanged}" />
+                                                <Entry Grid.Column="2" Text="{Binding Qty, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
+                                    Keyboard="Numeric"
+                                    Placeholder="1"/>
+
+                                                <Grid Grid.Column="3" VerticalOptions="Center">
+                                                    <Label Text="$" TextColor="White" VerticalOptions="Center" />
+                                                    <Entry Grid.Column="0" Text="{Binding UnitCost, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
+                                        Keyboard="Numeric" 
+                                        Placeholder="0.00" />
+
+                                                </Grid>
+
+                                                <Grid Grid.Column="4" VerticalOptions="Center">
+                                                    <Label Text="$" TextColor="White" VerticalOptions="Center" />
+                                                    <Entry Text="{Binding UnitSale, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
+                                        Keyboard="Numeric" 
+                                        Placeholder="0.00" >
+                                                        <Entry.Triggers>
+                                                            <DataTrigger TargetType="Entry" Binding="{Binding IsSaleOverridden}" Value="True">
+                                                                <Setter Property="BackgroundColor" Value="orange"/>
+                                                                <Setter Property="TextColor" Value="black"/>
+                                                            </DataTrigger>
+                                                        </Entry.Triggers>
+                                                    </Entry>
+                                                </Grid>
+                                                <CheckBox Grid.Column="5" HorizontalOptions="Center" IsChecked="{Binding Piped}" />
+                                                <Picker Grid.Column="6" ItemsSource="{Binding InstallTypeOptions}" SelectedItem="{Binding InstallType}" />
+                                                <Picker Grid.Column="7" ItemsSource="{Binding InstallLocationOptions}" SelectedItem="{Binding InstallLocation}" />
+                                                <Button Grid.Column="8" 
+                                         Text="❌"
+                                         Command="{Binding BindingContext.RemoveComponentItemCommand, Source={x:Reference CreateBid}}"
+                                         CommandParameter="{Binding .}"
+                                         WidthRequest="40"
+                                         HeightRequest="40"
+                                         BackgroundColor="SlateBlue"
+                                         CornerRadius="8"
+                                         Padding="0"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+
+                                </CollectionView>
+                            </Border>
+
+                            <!-- Buttons -->
+
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <Button Grid.Column="0" Text="➕ Add Item" Command="{Binding AddComponentItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
+                                <Button Grid.Column="2" Text="Create Item" Command="{Binding CreateNewItemCommand}" BackgroundColor="Orange" TextColor="White" />
+                            </Grid>
+
+                            <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
+                                <Label Text="Cost" FontAttributes="Bold" TextColor="Red" Grid.Column="1" />
+                                <Label Text="Sale" FontAttributes="Bold" TextColor="Orange" Grid.Column="2" />
+                            </Grid>
+
+                            <!-- Totals -->
+                            <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
+                                <Label Text="Panel Totals:" FontAttributes="Bold" Grid.Column="0" />
+
+
+
+                                <!-- Cost total -->
+                                <Label Grid.Column="1"
+                    Text="{Binding Source={x:Reference CreateBid}, Path=BindingContext.PanelLineItemsCostTotal, StringFormat='${0:F2}'}"
+                    TextColor="Red"
+                    FontAttributes="Bold"
+                    HorizontalTextAlignment="Start" />
+
+                                <!-- Sale total -->
+                                <Label Grid.Column="2"
+                    Text="{Binding PanelLineItemsSaleTotal, StringFormat='${0:F2}'}"
+                    TextColor="Orange"
+                    FontAttributes="Bold"
+                    HorizontalTextAlignment="Start" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
 
                     <!-- === WIRE SUBSECTION === -->
                     <Border Stroke="Gray" StrokeThickness="1" Padding="10">
@@ -689,118 +812,7 @@ HorizontalTextAlignment="Start" />
                                 <Label Text="{Binding WireSaleTotal, StringFormat='${0:F2}'}" Grid.Column="2" />
                             </Grid>
                         </VerticalStackLayout>
-                    </Border>
-
-                    <!-- === PANEL COMPONENTS === -->
-                    <Border Stroke="Gray" StrokeThickness="1" Padding="10">
-                        <VerticalStackLayout Spacing="10">
-                            <Label Text="Panel Components" TextDecorations="Underline" FontAttributes="Bold" FontSize="18" TextColor="White" />
-
-                            <!-- Headers -->
-                            <Grid ColumnDefinitions="2*,2*,*,*,*,*,2*,2*,*" ColumnSpacing="10">
-                                <Label Text="Item" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="0" />
-                                <Label Text="Description" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="1" />
-                                <Label Text="Qty" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="2" />
-                                <Label Text="Unit Cost" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="3" />
-                                <Label Text="Unit Sale" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="4" />
-                                <Label Text="Piped" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="5" />
-                                <Label Text="Install Type" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="6" />
-                                <Label Text="Install Location" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="7" />
-                                <Label Text="Delete" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="8" />
-                            </Grid>
-
-                            <!-- Scrollable list -->
-                            <Border>
-                                <CollectionView  x:Name="BidComponentList"   
-                                                 ItemsSource="{Binding ComponentLineItems}"
-                                                 Margin="0,10"
-                                                 HeightRequest="200">
-                                    <CollectionView.ItemTemplate>
-                                        <DataTemplate>  
-                                            <Grid ColumnDefinitions="2*,2*,*,*,*,*,2*,2*,*">
-                                                    <controls:SearchableEntryView
-                                                        Suggestions="{Binding Source={x:Reference CreateBid}, Path=BindingContext.AvailableItems}"  
-                                                        SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
-                                                        SearchText="{Binding Name, Mode=TwoWay}"
-                                                        DisplayMemberPath="Name"
-                                                        Placeholder="Search for an item..." >
-                                                    <controls:SearchableEntryView.ItemTemplate>
-                                                        <DataTemplate>
-                                                            <Label Text="{Binding Name}" TextColor="Blue" Padding="10"/>
-                                                        </DataTemplate>
-                                                    </controls:SearchableEntryView.ItemTemplate>
-                                                </controls:SearchableEntryView>
-                                                <Entry Grid.Column="1" Text="{Binding Description, Mode=TwoWay, UpdateSourceEventName=TextChanged}" />
-                                                <Entry Grid.Column="2" Text="{Binding Qty, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
-                                                       Keyboard="Numeric"
-                                                       Placeholder="1"/>
-                                                
-                                                <Grid Grid.Column="3" VerticalOptions="Center">
-                                                    <Label Text="$" TextColor="White" VerticalOptions="Center" />
-                                                    <Entry Text="{Binding UnitCost, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
-                                                           Keyboard="Numeric" 
-                                                           Placeholder="0.00" />
-                                                </Grid>
-
-                                                <Grid Grid.Column="4" VerticalOptions="Center">
-                                                    <Label Text="$" TextColor="White" VerticalOptions="Center" />
-                                                    <Entry Text="{Binding UnitSale, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
-                                                           Keyboard="Numeric" 
-                                                           Placeholder="0.00" />
-                                                </Grid>
-                                                <CheckBox Grid.Column="5" HorizontalOptions="Center" IsChecked="{Binding Piped}" />
-                                                    <Picker Grid.Column="6" ItemsSource="{Binding InstallTypeOptions}" SelectedItem="{Binding InstallType}" />
-                                                    <Picker Grid.Column="7" ItemsSource="{Binding InstallLocationOptions}" SelectedItem="{Binding InstallLocation}" />
-                                                    <Button Grid.Column="8" 
-                                                            Text="❌"
-                                                            Command="{Binding BindingContext.RemoveComponentItemCommand, Source={x:Reference CreateBid}}"
-                                                            CommandParameter="{Binding .}"
-                                                            WidthRequest="40"
-                                                            HeightRequest="40"
-                                                            BackgroundColor="SlateBlue"
-                                                            CornerRadius="8"
-                                                            Padding="0"/>
-                                                </Grid>                                            
-                                        </DataTemplate>
-                                    </CollectionView.ItemTemplate>
-
-                                </CollectionView>
-                            </Border>
-
-                            <!-- Buttons -->
-                            
-                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                                <Button Grid.Column="0" Text="➕ Add Item" Command="{Binding AddComponentItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />                               
-                                <Button Grid.Column="2" Text="Create Item" Command="{Binding CreateNewItemCommand}" BackgroundColor="Orange" TextColor="White" />
-                            </Grid>
-
-                            <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
-                                <Label Text="Cost" FontAttributes="Bold" TextColor="Red" Grid.Column="1" />
-                                <Label Text="Sale" FontAttributes="Bold" TextColor="Orange" Grid.Column="2" />
-                            </Grid>
-
-                            <!-- Totals -->
-                            <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
-                                <Label Text="Panel Totals:" FontAttributes="Bold" Grid.Column="0" />
-
-                                
-
-                                <!-- Cost total -->                                
-                                    <Label Grid.Column="1"
-                                       Text="{Binding Source={x:Reference CreateBid}, Path=BindingContext.PanelLineItemsCostTotal, StringFormat='${0:F2}'}"
-                                       TextColor="Red"
-                                       FontAttributes="Bold"
-                                       HorizontalTextAlignment="Start" />                              
-
-                                <!-- Sale total -->
-                                <Label Grid.Column="2"
-                                       Text="{Binding PanelLineItemsSaleTotal, StringFormat='${0:F2}'}"
-                                       TextColor="Orange"
-                                       FontAttributes="Bold"
-                                       HorizontalTextAlignment="Start" />
-                            </Grid>
-                        </VerticalStackLayout>
-                    </Border>
+                    </Border>                   
 
                     <!-- === GENERAL MATERIALS === -->
                     <Border Stroke="Gray" StrokeThickness="1" Padding="10">
@@ -843,11 +855,7 @@ HorizontalTextAlignment="Start" />
                             <Grid ColumnDefinitions="4*,*,*,Auto" RowSpacing="10" Padding="0,10,0,0">
                                 <Label Text="Material Totals:" FontAttributes="Bold" Grid.Column="0" />
                                 <Label Text="{Binding MaterialCostTotal, StringFormat='${0:F2}'}" Grid.Column="1" />
-                                <Label Text="{Binding MaterialSaleTotal, StringFormat='${0:F2}'}" Grid.Column="2" />
-                                <StackLayout Orientation="Horizontal" Grid.Column="3" Spacing="5">
-                                    <Label Text="Markup %" />
-                                    <Entry Text="{Binding MaterialMarkupPercent}" WidthRequest="60" Keyboard="Numeric" />
-                                </StackLayout>
+                                <Label Text="{Binding MaterialSaleTotal, StringFormat='${0:F2}'}" Grid.Column="2" />                                
                             </Grid>
                         </VerticalStackLayout>
                     </Border>

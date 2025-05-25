@@ -1,4 +1,5 @@
 ﻿using FyreWorksPM.DataAccess.Data.Models;
+using FyreWorksPM.DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
@@ -20,7 +21,8 @@ public class BidModel
 
     // 💼 New hotness: Admin & Engineering Tasks
     public List<BidTaskModel> BidModelTasks { get; set; } = new();
-    
+    public List<BidComponentLineItemModel> BidModelComponentLineItems { get; set; } = new();
+
 
 
 

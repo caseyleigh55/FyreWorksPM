@@ -58,6 +58,9 @@ public partial class CreateBidViewModel : ObservableObject
         EngineeringTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseEngineeringTotalsChanged);
         //ComponentLineItems.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseComponentTotalsChanged);
 
+        MaterialMarkup = 40;
+        
+
         ViewModelHookHelper.AttachCollectionHandlers(ComponentLineItems, (_, __) => RaiseComponentTotalsChanged(),RaiseComponentTotalsChanged);
 
         Task.Run(async () => await InitializeAsync());
@@ -87,7 +90,6 @@ public partial class CreateBidViewModel : ObservableObject
     [ObservableProperty] private string jobName = string.Empty;
     [ObservableProperty] private DateTime createdDate;
     [ObservableProperty] private string projectName = string.Empty;
-    [ObservableProperty] private decimal materialMarkup;
     [ObservableProperty] private decimal laborSubtotal;
     [ObservableProperty] private decimal laborMarkup;
     [ObservableProperty] private ClientDto? selectedClient;
@@ -95,6 +97,10 @@ public partial class CreateBidViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<TaskDto> taskTemplates;
     [ObservableProperty] private TaskDto selectedTemplateTask;
     [ObservableProperty] private BidTaskModel currentTask;
+
+    [ObservableProperty] private decimal materialMarkup;
+
+
     // For SearchableEntryView's selected item
     [ObservableProperty]
     private ItemDto? selectedLibraryItem;
@@ -395,7 +401,7 @@ public partial class CreateBidViewModel : ObservableObject
             InstallLocation = "warehouse"
         };
 
-        var vm = new BidComponentLineItemViewModel(newModel, LaborOverrides)
+        var vm = new BidComponentLineItemViewModel(newModel, LaborOverrides, this)
         {
             InstallTypeOptions = InstallTypeOptions,
             InstallLocationOptions = InstallLocationOptions,
@@ -405,6 +411,20 @@ public partial class CreateBidViewModel : ObservableObject
         ComponentLineItems.Add(vm);
         
     }
+
+    partial void OnMaterialMarkupChanged(decimal value)
+    {
+        foreach (var item in ComponentLineItems)
+        {
+            item.ApplyGlobalMarkup(value);
+        }
+
+        RaiseComponentTotalsChanged();
+    }
+
+    
+
+
 
     private async Task LoadItemsAsync()
     {
@@ -506,6 +526,20 @@ public partial class CreateBidViewModel : ObservableObject
                 TaskName = t.Name,
                 Cost = t.Cost,
                 Sale = t.Sale
+            }).ToList(),
+
+            ComponentLineItems = ComponentLineItems.Select(c => new BidComponentLineItemDto
+            {
+                Id = c.Item?.ItemId ?? 0,
+                Name = c.ItemName,
+                Description = c.Description,
+                Type = c.Type,
+                Qty = c.Qty,
+                UnitCost = c.UnitCost,
+                UnitSale = c.UnitSale,
+                Piped = c.Piped,
+                InstallType = c.InstallType,
+                InstallLocation = c.InstallLocation
             }).ToList()
         };
 

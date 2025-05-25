@@ -1,10 +1,12 @@
 ﻿namespace FyreWorksPM.DataAccess.Models;
+
 public class BidComponentLineItemModel
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
 
     // Shared fields
     public string ItemName { get; set; } = string.Empty;
+    public int? ItemId { get; set; }
     public string Description { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;
 
@@ -17,6 +19,7 @@ public class BidComponentLineItemModel
     public string InstallType { get; set; } = string.Empty;
     public string InstallLocation { get; set; } = string.Empty;
 
-    // Optional future field: maybe link back to a Bid ID
-    public Guid BidId { get; set; }
+    // Relationship
+    public int BidId { get; set; }
+    public BidModel Bid { get; set; } = null!;
 }

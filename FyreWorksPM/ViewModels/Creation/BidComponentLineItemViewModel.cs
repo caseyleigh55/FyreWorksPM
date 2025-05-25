@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.DataAccess.Models;
 using FyreWorksPM.Services.BidLineItem;
+using FyreWorksPM.ViewModels.Creation;
 using System.Collections.ObjectModel;
 
 public partial class BidComponentLineItemViewModel : ObservableObject
@@ -10,12 +12,13 @@ public partial class BidComponentLineItemViewModel : ObservableObject
     public BidComponentLineItemModel Item { get; }
     private readonly BidLaborConfig _laborOverrides;
     public Action? RaiseComponentTotalsChanged { get; set; }
+    private readonly CreateBidViewModel _parentViewModel;
 
-
-    public BidComponentLineItemViewModel(BidComponentLineItemModel item, BidLaborConfig laborOverrides)
+    public BidComponentLineItemViewModel(BidComponentLineItemModel item, BidLaborConfig laborOverrides, CreateBidViewModel parent)
     {
         Item = item;
-        _laborOverrides = laborOverrides;        
+        _laborOverrides = laborOverrides;
+        _parentViewModel = parent;
     }
 
     public ObservableCollection<ItemDto> AvailableItems { get; set; } = new();
@@ -65,6 +68,27 @@ public partial class BidComponentLineItemViewModel : ObservableObject
             }
         }
     }
+    private bool unitSaleManuallySet = false;
+   
+    public void SetGlobalMarkup(decimal markup)
+    {
+        _parentViewModel.MaterialMarkup = markup;
+
+        if (!unitSaleManuallySet)
+        {
+            UnitSale = Math.Round(UnitCost * (1 + markup / 100), 2);
+        }
+
+        OnPropertyChanged(nameof(IsSaleOverridden));
+    }
+
+
+    /// <summary>
+    /// Whether the UnitSale differs from the calculated markup price.
+    /// Used to trigger visual highlighting.
+    /// </summary>
+    public bool IsSaleOverridden =>
+        Math.Round(UnitSale, 2) != Math.Round(UnitCost * (1 + _parentViewModel.MaterialMarkup / 100), 2);
 
     public decimal UnitCost
     {
@@ -74,8 +98,17 @@ public partial class BidComponentLineItemViewModel : ObservableObject
             if (Item.UnitCost != value)
             {
                 Item.UnitCost = value;
+                unitSaleManuallySet = false; // Reset override state when cost changes
                 OnPropertyChanged();
-                RaiseComponentTotalsChanged?.Invoke(); // 🔥 Fire the total update
+
+                    var markup = _parentViewModel.MaterialMarkup; // Get global markup from parent view model
+                    // Automatically apply markup if user hasn't overridden
+                    Item.UnitSale = Math.Round(Item.UnitCost * (1 + markup / 100), 2);
+                    OnPropertyChanged(nameof(UnitSale));
+                
+
+                OnPropertyChanged(nameof(IsSaleOverridden));
+                RaiseComponentTotalsChanged?.Invoke();
             }
         }
     }
@@ -88,16 +121,72 @@ public partial class BidComponentLineItemViewModel : ObservableObject
             if (Item.UnitSale != value)
             {
                 Item.UnitSale = value;
+                unitSaleManuallySet = true; // User has overridden markup
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(IsSaleOverridden));
                 RaiseComponentTotalsChanged?.Invoke();
             }
         }
     }
 
+    /// <summary>
+    /// Applies global markup to UnitSale, unless it's been overridden.
+    /// Call this when the global % changes.
+    /// </summary>
+    public void ApplyGlobalMarkup(decimal markupPercent)
+    {
+        _parentViewModel.MaterialMarkup = markupPercent;
 
-    public bool Piped => Item.Piped;
-    public string InstallType => Item.InstallType;
-    public string InstallLocation => Item.InstallLocation;
+        if (!unitSaleManuallySet)
+        {
+            Item.UnitSale = Math.Round(UnitCost * (1 + markupPercent / 100), 2);
+            OnPropertyChanged(nameof(UnitSale));
+        }
+
+        OnPropertyChanged(nameof(IsSaleOverridden));
+    }
+
+
+
+
+    public bool Piped
+    {
+        get => Item.Piped;
+        set
+        {
+            if (Item.Piped != value)
+            {
+                Item.Piped = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string InstallType
+    {
+        get => Item.InstallType;
+        set
+        {
+            if (Item.InstallType != value)
+            {
+                Item.InstallType = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string InstallLocation
+    {
+        get => Item.InstallLocation;
+        set
+        {
+            if (Item.InstallLocation != value)
+            {
+                Item.InstallLocation = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     public int PrewireMinutes
     {
