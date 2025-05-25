@@ -650,7 +650,10 @@ HorizontalTextAlignment="Start" />
                     <!-- === PANEL COMPONENTS === -->
                     <Border Stroke="Gray" StrokeThickness="1" Padding="10">
                         <VerticalStackLayout Spacing="10">
-                            <Label Text="Panel Components" TextDecorations="Underline" FontAttributes="Bold" FontSize="18" TextColor="White" />
+                            <Grid>
+                            <Label Text="Panel Components" TextDecorations="Underline" HorizontalOptions="Start" FontAttributes="Bold" FontSize="18" TextColor="Red" />
+                            </Grid>
+
 
                             <!-- Headers -->
                             <Grid ColumnDefinitions="2*,2*,*,*,*,*,2*,2*,*" ColumnSpacing="10">
@@ -769,93 +772,213 @@ HorizontalTextAlignment="Start" />
                     <!-- === WIRE SUBSECTION === -->
                     <Border Stroke="Gray" StrokeThickness="1" Padding="10">
                         <VerticalStackLayout Spacing="10">
-                            <Label Text="Wire" TextDecorations="Underline" FontAttributes="Bold" FontSize="18" TextColor="White" />
+                            <Grid>
+                            <Label Text="Wire" TextDecorations="Underline" HorizontalOptions="Start" FontAttributes="Bold" FontSize="18" TextColor="Red" />
+                            </Grid>
 
                             <!-- Headers -->
-                            <Grid ColumnDefinitions="2*,3*,Auto,*,*" ColumnSpacing="10">
+                            <Grid ColumnDefinitions="2*,3*,*,*,*,*" ColumnSpacing="10">
                                 <Label Text="Item" Grid.Column="0" FontAttributes="Bold" />
                                 <Label Text="Description" Grid.Column="1" FontAttributes="Bold" />
                                 <Label Text="Qty" Grid.Column="2" FontAttributes="Bold" />
                                 <Label Text="Unit Cost" Grid.Column="3" FontAttributes="Bold" />
                                 <Label Text="Unit Sale" Grid.Column="4" FontAttributes="Bold" />
+                                <Label Text="Delete" Grid.Column="5" HorizontalTextAlignment="Center" FontAttributes="Bold" />
                             </Grid>
 
                             <!-- Scrollable list of items -->
-                            <ScrollView HeightRequest="200">
-                                <VerticalStackLayout Spacing="5">
-                                    <CollectionView ItemsSource="{Binding WireItems}">
+                            <Border>
+                                <CollectionView x:Name="BidWireList"
+                                                ItemsSource="{Binding WireLineItems}"
+                                                Margin="0,10"
+                                                HeightRequest="200">
                                         <CollectionView.ItemTemplate>
                                             <DataTemplate>
-                                                <Grid ColumnDefinitions="2*,3*,Auto,*,*" ColumnSpacing="10">
-                                                    <Entry Grid.Column="0" Text="{Binding Item}" Placeholder="Item" />
-                                                    <Entry Grid.Column="1" Text="{Binding Description}" Placeholder="Description" />
-                                                    <Entry Grid.Column="2" Text="{Binding Quantity}" Keyboard="Numeric" Placeholder="Qty" />
-                                                    <Entry Grid.Column="3" Text="{Binding UnitCost}" Keyboard="Numeric" Placeholder="Unit Cost" />
-                                                    <Entry Grid.Column="4" Text="{Binding UnitSale}" Keyboard="Numeric" Placeholder="Unit Sale" />
+                                                <Grid ColumnDefinitions="2*,3*,*,*,*,*">
+                                                <controls:SearchableEntryView
+                                                        Suggestions="{Binding Source={x:Reference CreateBid}, Path=BindingContext.AvailableItems}"
+                                                        SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                                                        SearchText="{Binding Name, Mode=TwoWay}"
+                                                        DisplayMemberPath="Name"
+                                                        Placeholder="Search for an item..."/>
+
+                                                <Entry  Grid.Column="1" Text="{Binding Description, Mode=TwoWay, UpdateSourceEventName=TextChanged}" Placeholder="Description"/>
+                                                    
+                                                    <Entry  Grid.Column="2" Text="{Binding Qty, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
+                                                        Keyboard="Numeric"
+                                                        Placeholder="1"/>
+
+                                                    <Grid Grid.Column="3" VerticalOptions="Center">
+                                                        <Label Text="$" TextColor="White" VerticalOptions="Center" />
+                                                    <Entry Grid.Column="0" Text="{Binding UnitCost, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
+                                                           Keyboard="Numeric" 
+                                                           Placeholder="0.00" />
+                                                    </Grid>
+
+                                                    <Grid Grid.Column="4" VerticalOptions="Center">
+                                                        <Label Text="$" TextColor="White" VerticalOptions="Center" />
+                                                        <Entry Text="{Binding UnitSale, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
+                                                               Keyboard="Numeric" 
+                                                               Placeholder="0.00" >
+                                                            <Entry.Triggers>
+                                                                <DataTrigger TargetType="Entry" Binding="{Binding IsSaleOverridden}" Value="True">
+                                                                    <Setter Property="BackgroundColor" Value="orange"/>
+                                                                    <Setter Property="TextColor" Value="black"/>
+                                                                </DataTrigger>
+                                                            </Entry.Triggers>
+                                                        </Entry>
+                                                    </Grid>
+
+                                                    <Button Grid.Column="5" Text="❌"
+                                                            Command="{Binding BindingContext.RemoveWireItemCommand, Source={x:Reference CreateBid}}"
+                                                            CommandParameter="{Binding .}"
+                                                            WidthRequest="40"
+                                                            HeightRequest="40"
+                                                            BackgroundColor="SlateBlue"
+                                                            CornerRadius="8"
+                                                            Padding="0"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </CollectionView.ItemTemplate>
-                                    </CollectionView>
-                                </VerticalStackLayout>
-                            </ScrollView>
-
+                                </CollectionView>
+                            </Border>
+                            
                             <!-- Buttons -->
-                            <HorizontalStackLayout Spacing="10">
-                                <Button Text="➕ Add Item" Command="{Binding AddWireItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
-                                <Button Text="🗑️ Delete Item" Command="{Binding RemoveWireItemCommand}" BackgroundColor="DarkRed" TextColor="White" />
-                            </HorizontalStackLayout>
+
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <Button Grid.Column="0" Text="➕ Add Item" Command="{Binding AddWireItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
+                                <Button Grid.Column="2" Text="Create Item" Command="{Binding CreateNewItemCommand}" BackgroundColor="Orange" TextColor="White" />
+                            </Grid>
+
+                            <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
+                                <Label Text="Cost" FontAttributes="Bold" TextColor="Red" Grid.Column="1" />
+                                <Label Text="Sale" FontAttributes="Bold" TextColor="Orange" Grid.Column="2" />
+                            </Grid>
 
                             <!-- Totals -->
                             <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
-                                <Label Text="Wire Totals:" FontAttributes="Bold" Grid.Column="0" />
-                                <Label Text="{Binding WireCostTotal, StringFormat='${0:F2}'}" Grid.Column="1" />
-                                <Label Text="{Binding WireSaleTotal, StringFormat='${0:F2}'}" Grid.Column="2" />
-                            </Grid>
+                                <Label Text="Panel Totals:" FontAttributes="Bold" Grid.Column="0" />
+
+                                <!-- Cost total -->
+                                <Label Grid.Column="1"
+                                       Text="{Binding Source={x:Reference CreateBid}, Path=BindingContext.WireLineItemsCostTotal, StringFormat='${0:F2}'}"
+                                       TextColor="Red"
+                                       FontAttributes="Bold"
+                                       HorizontalTextAlignment="Start" />
+
+                                <!-- Sale total -->
+                                <Label Grid.Column="2"
+                                       Text="{Binding WireLineItemsSaleTotal, StringFormat='${0:F2}'}"
+                                       TextColor="Orange"
+                                       FontAttributes="Bold"
+                                       HorizontalTextAlignment="Start" />
+                            </Grid> 
                         </VerticalStackLayout>
                     </Border>                   
 
                     <!-- === GENERAL MATERIALS === -->
                     <Border Stroke="Gray" StrokeThickness="1" Padding="10">
                         <VerticalStackLayout Spacing="10">
-                            <Label Text="Materials" TextDecorations="Underline" FontAttributes="Bold" FontSize="18" TextColor="White" />
-
-                            <!-- Headers -->
-                            <Grid ColumnDefinitions="2*,3*,Auto,*,*" ColumnSpacing="10">
-                                <Label Text="Item" FontAttributes="Bold" Grid.Column="0" />
-                                <Label Text="Description" FontAttributes="Bold" Grid.Column="1" />
-                                <Label Text="Qty" FontAttributes="Bold" Grid.Column="2" />
-                                <Label Text="Unit Cost" FontAttributes="Bold" Grid.Column="3" />
-                                <Label Text="Unit Sale" FontAttributes="Bold" Grid.Column="4" />
+                            <Grid>
+                                <Label Text="Materials" TextDecorations="Underline" HorizontalOptions="Start" FontAttributes="Bold" FontSize="18" TextColor="Red" />
                             </Grid>
 
-                            <!-- Scrollable list -->
-                            <ScrollView HeightRequest="200">
-                                <CollectionView ItemsSource="{Binding MaterialItems}">
+                            <!-- Headers -->
+                            <Grid ColumnDefinitions="2*,3*,*,*,*,*" ColumnSpacing="10">
+                                <Label Text="Item" Grid.Column="0" FontAttributes="Bold" />
+                                <Label Text="Description" Grid.Column="1" FontAttributes="Bold" />
+                                <Label Text="Qty" Grid.Column="2" FontAttributes="Bold" />
+                                <Label Text="Unit Cost" Grid.Column="3" FontAttributes="Bold" />
+                                <Label Text="Unit Sale" Grid.Column="4" FontAttributes="Bold" />
+                                <Label Text="Delete" Grid.Column="5" HorizontalTextAlignment="Center" FontAttributes="Bold" />
+                            </Grid>
+
+                            <!-- Scrollable list of items -->
+                            <Border>
+                                <CollectionView x:Name="MaterialWireList"
+                            ItemsSource="{Binding MaterialLineItems}"
+                            Margin="0,10"
+                            HeightRequest="200">
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid ColumnDefinitions="2*,3*,Auto,*,*" ColumnSpacing="10" Padding="5">
-                                                <Entry Grid.Column="0" Text="{Binding Item}" Placeholder="Item" />
-                                                <Entry Grid.Column="1" Text="{Binding Description}" Placeholder="Description" />
-                                                <Entry Grid.Column="2" Text="{Binding Quantity}" Keyboard="Numeric" Placeholder="Qty" />
-                                                <Entry Grid.Column="3" Text="{Binding UnitCost}" Keyboard="Numeric" Placeholder="Unit Cost" />
-                                                <Entry Grid.Column="4" Text="{Binding UnitSale}" Keyboard="Numeric" Placeholder="Unit Sale" />
+                                            <Grid ColumnDefinitions="2*,3*,*,*,*,*">
+                                                <controls:SearchableEntryView
+                                    Suggestions="{Binding Source={x:Reference CreateBid}, Path=BindingContext.AvailableItems}"
+                                    SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                                    SearchText="{Binding Name, Mode=TwoWay}"
+                                    DisplayMemberPath="Name"
+                                    Placeholder="Search for an item..."/>
+
+                                                <Entry  Grid.Column="1" Text="{Binding Description, Mode=TwoWay, UpdateSourceEventName=TextChanged}" Placeholder="Description"/>
+
+                                                <Entry  Grid.Column="2" Text="{Binding Qty, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
+                                    Keyboard="Numeric"
+                                    Placeholder="1"/>
+
+                                                <Grid Grid.Column="3" VerticalOptions="Center">
+                                                    <Label Text="$" TextColor="White" VerticalOptions="Center" />
+                                                    <Entry Grid.Column="0" Text="{Binding UnitCost, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
+                                       Keyboard="Numeric" 
+                                       Placeholder="0.00" />
+                                                </Grid>
+
+                                                <Grid Grid.Column="4" VerticalOptions="Center">
+                                                    <Label Text="$" TextColor="White" VerticalOptions="Center" />
+                                                    <Entry Text="{Binding UnitSale, Mode=TwoWay, Converter={StaticResource DecimalConverter}, UpdateSourceEventName=TextChanged}" 
+                                           Keyboard="Numeric" 
+                                           Placeholder="0.00" >
+                                                        <Entry.Triggers>
+                                                            <DataTrigger TargetType="Entry" Binding="{Binding IsSaleOverridden}" Value="True">
+                                                                <Setter Property="BackgroundColor" Value="orange"/>
+                                                                <Setter Property="TextColor" Value="black"/>
+                                                            </DataTrigger>
+                                                        </Entry.Triggers>
+                                                    </Entry>
+                                                </Grid>
+
+                                                <Button Grid.Column="5" Text="❌"
+                                        Command="{Binding BindingContext.RemoveMaterialItemCommand, Source={x:Reference CreateBid}}"
+                                        CommandParameter="{Binding .}"
+                                        WidthRequest="40"
+                                        HeightRequest="40"
+                                        BackgroundColor="SlateBlue"
+                                        CornerRadius="8"
+                                        Padding="0"/>
                                             </Grid>
                                         </DataTemplate>
                                     </CollectionView.ItemTemplate>
                                 </CollectionView>
-                            </ScrollView>
+                            </Border>
 
                             <!-- Buttons -->
-                            <HorizontalStackLayout Spacing="10">
-                                <Button Text="➕ Add Item" Command="{Binding AddMaterialItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
-                                <Button Text="🗑️ Delete Item" Command="{Binding RemoveMaterialItemCommand}" BackgroundColor="DarkRed" TextColor="White" />
-                            </HorizontalStackLayout>
 
-                            <!-- Totals + Markup % -->
-                            <Grid ColumnDefinitions="4*,*,*,Auto" RowSpacing="10" Padding="0,10,0,0">
-                                <Label Text="Material Totals:" FontAttributes="Bold" Grid.Column="0" />
-                                <Label Text="{Binding MaterialCostTotal, StringFormat='${0:F2}'}" Grid.Column="1" />
-                                <Label Text="{Binding MaterialSaleTotal, StringFormat='${0:F2}'}" Grid.Column="2" />                                
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <Button Grid.Column="0" Text="➕ Add Item" Command="{Binding AddMaterialItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
+                                <Button Grid.Column="2" Text="Create Item" Command="{Binding CreateNewItemCommand}" BackgroundColor="Orange" TextColor="White" />
+                            </Grid>
+
+                            <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
+                                <Label Text="Cost" FontAttributes="Bold" TextColor="Red" Grid.Column="1" />
+                                <Label Text="Sale" FontAttributes="Bold" TextColor="Orange" Grid.Column="2" />
+                            </Grid>
+
+                            <!-- Totals -->
+                            <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
+                                <Label Text="Panel Totals:" FontAttributes="Bold" Grid.Column="0" />
+
+                                <!-- Cost total -->
+                                <Label Grid.Column="1"
+                   Text="{Binding Source={x:Reference CreateBid}, Path=BindingContext.MaterialLineItemsCostTotal, StringFormat='${0:F2}'}"
+                   TextColor="Red"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Start" />
+
+                                <!-- Sale total -->
+                                <Label Grid.Column="2"
+                   Text="{Binding MaterialLineItemsSaleTotal, StringFormat='${0:F2}'}"
+                   TextColor="Orange"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Start" />
                             </Grid>
                         </VerticalStackLayout>
                     </Border>

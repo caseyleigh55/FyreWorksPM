@@ -130,6 +130,11 @@ public partial class CreateBidViewModel : ObservableObject
     public ObservableCollection<BidTaskViewModel> AdminTasks { get; } = new();
     public ObservableCollection<BidTaskViewModel> EngineeringTasks { get; } = new();
     public ObservableCollection<BidComponentLineItemViewModel> ComponentLineItems { get; } = new();
+    
+    public ObservableCollection<BidLineItemViewModel> WireLineItems { get; } = new();
+    public ObservableCollection<BidLineItemViewModel> MaterialLineItems { get; } = new();
+
+
 
     #endregion
 
@@ -149,8 +154,8 @@ public partial class CreateBidViewModel : ObservableObject
         set => IsSprinklered = value == "Yes";
     }
 
-    public decimal MaterialSubtotal => LineItems.Sum(i => i.TotalCost);
-    public decimal GrandTotal => MaterialSubtotal * (1 + (MaterialMarkup / 100)) + LaborSubtotal * (1 + (LaborMarkup / 100));
+    
+    
 
     public decimal AdminCostTotal => AdminTasks.Sum(t => t.Cost);
     public decimal AdminSaleTotal => AdminTasks.Sum(t => t.Sale);
@@ -161,7 +166,14 @@ public partial class CreateBidViewModel : ObservableObject
 
     public decimal PanelLineItemsCostTotal => ComponentLineItems.Sum(t => t.UnitCost * t.Qty);
     public decimal PanelLineItemsSaleTotal => ComponentLineItems.Sum(t => t.UnitSale * t.Qty);
-   
+
+    public decimal WireLineItemsCostTotal => WireLineItems.Sum(i => i.UnitCost * i.Qty);
+    public decimal WireLineItemsSaleTotal => WireLineItems.Sum(i => i.UnitSale * i.Qty);
+
+    public decimal MaterialLineItemsCostTotal => MaterialLineItems.Sum(i => i.UnitCost * i.Qty);
+    public decimal MaterialLineItemsSaleTotal => MaterialLineItems.Sum(i => i.UnitSale * i.Qty);
+
+
     public int TotalComponentMinutes => ComponentLineItems.Sum(x => x.TotalMinutes);
     public double TotalComponentHours => Math.Round(TotalComponentMinutes / 60.0, 2);
 
@@ -193,8 +205,9 @@ public partial class CreateBidViewModel : ObservableObject
 
     [RelayCommand] private void RemoveComponentItem(BidComponentLineItemViewModel SelectedComponentLineItem) => RemoveComponentItem(ComponentLineItems, SelectedComponentLineItem, RaiseComponentTotalsChanged);
 
-    [RelayCommand] public async Task OpenItemLibraryAsync() => await OpenLibrary();
+    
     [RelayCommand] private void AddComponentItem() => AddNewComponent();
+    [RelayCommand] private void AddWireItem() => AddNewWireItem();
     [RelayCommand] public async Task AddNewClientAsync() => await AddClient();
     [RelayCommand] public async Task SaveBidAsync() => await SaveBid();
 
@@ -286,6 +299,18 @@ public partial class CreateBidViewModel : ObservableObject
         OnPropertyChanged(nameof(PanelLineItemsSaleTotal));
     }
 
+    private void RaiseWireTotalsChanged()
+    {
+        OnPropertyChanged(nameof(WireLineItemsCostTotal));
+        OnPropertyChanged(nameof(WireLineItemsSaleTotal));
+    }
+
+    private void RaiseMaterialTotalsChanged()
+    {
+        OnPropertyChanged(nameof(MaterialLineItemsCostTotal));
+        OnPropertyChanged(nameof(MaterialLineItemsSaleTotal));
+    }
+
 
     private void AddTask(ObservableCollection<BidTaskViewModel> tasks, Action raise)
     {
@@ -316,6 +341,42 @@ public partial class CreateBidViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    private void AddNewWireItem()
+    {
+        
+        var item = new BidLineItemModel { ItemName = "Wire", Qty = 1, UnitCost = 0, UnitSale = 0 };
+        var vm = new BidLineItemViewModel(item, this, RaiseWireTotalsChanged);
+        WireLineItems.Add(vm);
+        OnPropertyChanged(nameof(WireLineItems));
+        RaiseWireTotalsChanged();
+    }
+
+    [RelayCommand]
+    private void RemoveWireItem(BidLineItemViewModel item)
+    {
+        WireLineItems.Remove(item);
+        RaiseWireTotalsChanged();
+    }
+
+
+    [RelayCommand]
+    private void AddMaterialItem()
+    {
+        var item = new BidLineItemModel { ItemName = "Material", Qty = 1, UnitCost = 0, UnitSale = 0 };
+        var vm = new BidLineItemViewModel(item, this, RaiseMaterialTotalsChanged);
+        MaterialLineItems.Add(vm);
+        RaiseMaterialTotalsChanged();
+    }
+
+    [RelayCommand]
+    private void RemoveMaterialItem(BidLineItemViewModel item)
+    {
+        MaterialLineItems.Remove(item);
+        RaiseMaterialTotalsChanged();
+    }
+
+
     private void SaveValidTasks()
     {
         var validTasks = Tasks
@@ -342,49 +403,14 @@ public partial class CreateBidViewModel : ObservableObject
 
     #region Item Management
 
-    public ItemDto SelectedItemFromLibrary
-    {
-        get => _selectedItemFromLibrary;
-        set
-        {
-            _selectedItemFromLibrary = value;
-            if (value != null)
-            {
-                LineItems.Add(new BidLineItemModel
-                {
-                    ItemName = value.Name,
-                    UnitCost = 0,
-                    Quantity = 1,
-                    MarkupPercent = 0
-                });
-
-                _selectedItemFromLibrary = null;
-                OnPropertyChanged(nameof(LineItems));
-                OnPropertyChanged(nameof(MaterialSubtotal));
-                OnPropertyChanged(nameof(GrandTotal));
-            }
-        }
-    }
-
-    private ItemDto _selectedItemFromLibrary;
+   
 
     private async Task CreateNewItem()
     {
         await _navigationService.GoToAsync("createitems");
-
-        //var vm = new CreateItemsViewModel(_itemService, _itemTypeService, _navigationService);
-        //await Shell.Current.Navigation.PushModalAsync(new CreateItemsPage(vm, item =>
-        //{
-        //    SelectedItemFromLibrary = item;
-        //    _ = LoadItemsAsync();
-        //}));
     }
 
-    private async Task OpenLibrary()
-    {
-        var vm = new CreateItemsViewModel(_itemService, _itemTypeService, _navigationService);
-        await Shell.Current.Navigation.PushAsync(new CreateItemsPage(vm, item => SelectedItemFromLibrary = item));
-    }
+  
 
     private void AddNewComponent()
     {
@@ -540,7 +566,27 @@ public partial class CreateBidViewModel : ObservableObject
                 Piped = c.Piped,
                 InstallType = c.InstallType,
                 InstallLocation = c.InstallLocation
+            }).ToList(),
+
+            WireLineItems = WireLineItems.Select(c => new BidLineItemDto
+            {
+                ItemName = c.ItemName,
+                Description = c.Description,
+                Qty = c.Qty,
+                UnitCost = c.UnitCost,
+                UnitSale = c.UnitSale
+            }).ToList(),
+
+            MaterialLineItems = MaterialLineItems.Select(c => new BidLineItemDto
+            {
+                ItemName = c.ItemName,
+                Description = c.Description,
+                Qty = c.Qty,
+                UnitCost = c.UnitCost,
+                UnitSale = c.UnitSale
             }).ToList()
+
+
         };
 
         try

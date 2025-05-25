@@ -1,4 +1,5 @@
 ﻿using FyreWorksPM.DataAccess.DTO;
+using FyreWorksPM.ViewModels;
 
 public class CreateBidDto
 {
@@ -14,4 +15,6 @@ public class CreateBidDto
     //Admin and Engineering Tasks Section
     public List<CreateBidTaskDto> Tasks { get; set; } = new();
     public List<BidComponentLineItemDto> ComponentLineItems { get; set; } = new();
+    public List<BidLineItemDto> WireLineItems { get; set; } = new();
+    public List<BidLineItemDto> MaterialLineItems { get; set; } = new();
 }
