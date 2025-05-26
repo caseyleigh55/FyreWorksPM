@@ -53,6 +53,7 @@ public partial class CreateBidViewModel : ObservableObject
 
         CreatedDate = DateTime.Today;
         NavigateToCreateTasksCommand = new AsyncRelayCommand(NavigateToCreateTasksAsync);
+        NavigateToCreateItemsCommand = new AsyncRelayCommand(NavigateToCreateItemAsync);
 
         AdminTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseAdminTotalsChanged);
         EngineeringTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseEngineeringTotalsChanged);
@@ -184,6 +185,7 @@ public partial class CreateBidViewModel : ObservableObject
     #region Commands
 
     public IAsyncRelayCommand NavigateToCreateTasksCommand { get; }
+    public IAsyncRelayCommand NavigateToCreateItemsCommand { get; }
 
     [RelayCommand] private async Task OpenTaskManagerAsync() => await _navigationService.PushPageAsync<CreateTasksPage>();
     [RelayCommand] private void AddAdminTask() => AddTask(AdminTasks, RaiseAdminTotalsChanged);
@@ -191,7 +193,7 @@ public partial class CreateBidViewModel : ObservableObject
     [RelayCommand] private void AddEngineeringTask() => AddTask(EngineeringTasks, RaiseEngineeringTotalsChanged);
     [RelayCommand] private void RemoveEngineeringTask(BidTaskViewModel task) => RemoveTask(EngineeringTasks, task, RaiseEngineeringTotalsChanged);
     [RelayCommand] private void SaveTasks() => SaveValidTasks();
-    [RelayCommand] public async Task CreateNewItemAsync() => await CreateNewItem();
+    //[RelayCommand] public async Task CreateNewItemAsync() => await CreateNewItem();
 
 
 
@@ -405,8 +407,9 @@ public partial class CreateBidViewModel : ObservableObject
 
    
 
-    private async Task CreateNewItem()
+    private async Task NavigateToCreateItemAsync()
     {
+        
         await _navigationService.GoToAsync("createitems");
     }
 
@@ -452,7 +455,7 @@ public partial class CreateBidViewModel : ObservableObject
 
 
 
-    private async Task LoadItemsAsync()
+    public async Task LoadItemsAsync()
     {
         var items = await _itemService.GetAllItemsAsync();
         MainThread.BeginInvokeOnMainThread(() =>
@@ -510,7 +513,7 @@ public partial class CreateBidViewModel : ObservableObject
 
     private async Task NavigateToCreateTasksAsync()
     {
-        await _navigationService.GoToAsync(nameof(CreateTasksPage));
+        await _navigationService.GoToAsync("createtasks");
     }
 
     private async Task SaveBid()

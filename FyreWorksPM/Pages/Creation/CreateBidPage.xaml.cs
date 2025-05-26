@@ -38,6 +38,7 @@ public partial class CreateBidPage : ContentPage
         if (BindingContext is CreateBidViewModel bidVm)
         {
             await bidVm.LoadTaskTemplatesAsync();
+            await bidVm.LoadItemsAsync();
         }
     }
 

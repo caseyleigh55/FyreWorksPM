@@ -133,7 +133,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("bids", typeof(BidsPage));
         Routing.RegisterRoute("createitems", typeof(CreateItemsPage));
         Routing.RegisterRoute("createclient", typeof(CreateClientPage));
-        Routing.RegisterRoute("CreateTasksPage", typeof(CreateTasksPage));
+        Routing.RegisterRoute("createtasks", typeof(CreateTasksPage));
         Routing.RegisterRoute("createBid", typeof(CreateBidPage));
         Routing.RegisterRoute("projects", typeof(ProjectsPage));
         Routing.RegisterRoute("services", typeof(ServicePage));

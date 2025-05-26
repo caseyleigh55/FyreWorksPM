@@ -738,7 +738,7 @@ HorizontalTextAlignment="Start" />
 
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                                 <Button Grid.Column="0" Text="➕ Add Item" Command="{Binding AddComponentItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
-                                <Button Grid.Column="2" Text="Create Item" Command="{Binding CreateNewItemCommand}" BackgroundColor="Orange" TextColor="White" />
+                                <Button Grid.Column="2" Text="Create Item" Command="{Binding NavigateToCreateItemsCommand}" BackgroundColor="Orange" TextColor="White" />
                             </Grid>
 
                             <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
@@ -847,7 +847,7 @@ HorizontalTextAlignment="Start" />
 
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                                 <Button Grid.Column="0" Text="➕ Add Item" Command="{Binding AddWireItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
-                                <Button Grid.Column="2" Text="Create Item" Command="{Binding CreateNewItemCommand}" BackgroundColor="Orange" TextColor="White" />
+                                <Button Grid.Column="2" Text="Create Item" Command="{Binding NavigateToCreateItemsCommand}" BackgroundColor="Orange" TextColor="White" />
                             </Grid>
 
                             <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
@@ -954,7 +954,7 @@ HorizontalTextAlignment="Start" />
 
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                                 <Button Grid.Column="0" Text="➕ Add Item" Command="{Binding AddMaterialItemCommand}" BackgroundColor="MediumPurple" TextColor="White" />
-                                <Button Grid.Column="2" Text="Create Item" Command="{Binding CreateNewItemCommand}" BackgroundColor="Orange" TextColor="White" />
+                                <Button Grid.Column="2" Text="Create Item" Command="{Binding NavigateToCreateItemsCommand}" BackgroundColor="Orange" TextColor="White" />
                             </Grid>
 
                             <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
