@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.DataAccess.Models;
+using FyreWorksPM.ViewModels;
 
 namespace FyreWorksPM.DataAccess.Data;
 
@@ -90,7 +91,7 @@ public class ApplicationDbContext : DbContext
     /// </summary>
     public DbSet<BidComponentLineItemModel> BidComponents { get; set; } = default!;
 
-
+    public DbSet<BidLineItemModel> BidLineItems { get; set; } = default;
 
 
     #endregion    

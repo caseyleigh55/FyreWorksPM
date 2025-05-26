@@ -3,6 +3,7 @@ using FyreWorksPM.DataAccess.Data.Models;
 using FyreWorksPM.DataAccess.DTO;
 using FyreWorksPM.DataAccess.Enums;
 using FyreWorksPM.DataAccess.Models;
+using FyreWorksPM.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
@@ -120,6 +121,9 @@ namespace FyreWorksPM.Api.Controllers
                 InstallLocation = c.InstallLocation
             }).ToList();
 
+
+
+
             //
             //
             //
@@ -135,8 +139,33 @@ namespace FyreWorksPM.Api.Controllers
                 BidModelTasks = bidTasks,
                 BidModelComponentLineItems = bidComponentLineItems
             };
+            
 
             _db.BidInfo.Add(bid);
+            await _db.SaveChangesAsync();
+
+            var wireLineItems = dto.WireLineItems.Select(c => new BidLineItemModel
+            {
+                ItemName = c.ItemName,
+                Description = c.Description,
+                Qty = c.Qty,
+                UnitCost = c.UnitCost,
+                UnitSale = c.UnitSale,
+                BidId = bid.BidModelBidId
+            }).ToList();
+            var materialLineItems = dto.MaterialLineItems.Select(c => new BidLineItemModel
+            {
+                ItemName = c.ItemName,
+                Description = c.Description,
+                Qty = c.Qty,
+                UnitCost = c.UnitCost,
+                UnitSale = c.UnitSale,
+                BidId = bid.BidModelBidId
+            }).ToList();
+
+            _db.BidLineItems.AddRange(wireLineItems);
+            _db.BidLineItems.AddRange(materialLineItems);
+
             await _db.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetBid), new { id = bid.BidModelBidId }, new BidDto

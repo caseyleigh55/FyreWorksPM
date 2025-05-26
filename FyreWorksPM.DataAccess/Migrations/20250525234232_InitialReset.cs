@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FyreWorksPM.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCleanSlate : Migration
+    public partial class InitialReset : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -147,6 +147,71 @@ namespace FyreWorksPM.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BidComponents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ItemName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ItemId = table.Column<int>(type: "int", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Qty = table.Column<int>(type: "int", nullable: false),
+                    UnitCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    UnitSale = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Piped = table.Column<bool>(type: "bit", nullable: false),
+                    InstallType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InstallLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BidId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BidComponents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BidComponents_BidInfo_BidId",
+                        column: x => x.BidId,
+                        principalTable: "BidInfo",
+                        principalColumn: "BidModelBidId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BidLineItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ItemName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Qty = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    UnitCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    UnitSale = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    BidId = table.Column<int>(type: "int", nullable: false),
+                    WireBidBidModelBidId = table.Column<int>(type: "int", nullable: true),
+                    MaterialBidBidModelBidId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BidLineItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BidLineItems_BidInfo_BidId",
+                        column: x => x.BidId,
+                        principalTable: "BidInfo",
+                        principalColumn: "BidModelBidId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BidLineItems_BidInfo_MaterialBidBidModelBidId",
+                        column: x => x.MaterialBidBidModelBidId,
+                        principalTable: "BidInfo",
+                        principalColumn: "BidModelBidId");
+                    table.ForeignKey(
+                        name: "FK_BidLineItems_BidInfo_WireBidBidModelBidId",
+                        column: x => x.WireBidBidModelBidId,
+                        principalTable: "BidInfo",
+                        principalColumn: "BidModelBidId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BidTasks",
                 columns: table => new
                 {
@@ -175,6 +240,11 @@ namespace FyreWorksPM.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_BidComponents_BidId",
+                table: "BidComponents",
+                column: "BidId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BidInfo_BidModelClientId",
                 table: "BidInfo",
                 column: "BidModelClientId");
@@ -183,6 +253,21 @@ namespace FyreWorksPM.DataAccess.Migrations
                 name: "IX_BidInfo_BidModelSiteInfoId",
                 table: "BidInfo",
                 column: "BidModelSiteInfoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BidLineItems_BidId",
+                table: "BidLineItems",
+                column: "BidId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BidLineItems_MaterialBidBidModelBidId",
+                table: "BidLineItems",
+                column: "MaterialBidBidModelBidId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BidLineItems_WireBidBidModelBidId",
+                table: "BidLineItems",
+                column: "WireBidBidModelBidId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BidTasks_BidTaskModelBidId",
@@ -203,6 +288,12 @@ namespace FyreWorksPM.DataAccess.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "BidComponents");
+
+            migrationBuilder.DropTable(
+                name: "BidLineItems");
+
             migrationBuilder.DropTable(
                 name: "BidTasks");
 
