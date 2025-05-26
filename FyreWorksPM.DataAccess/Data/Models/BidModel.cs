@@ -8,22 +8,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 public class BidModel
 {
     [Key]
-    public int BidModelBidId { get; set; }
-    public string BidModelBidNumber { get; set; } = string.Empty;
-    public string BidModelProjectName { get; set; } = string.Empty;
-    public int BidModelClientId { get; set; }
-    public ClientModel BidModelClient { get; set; }
-    public DateTime BidModelCreatedDate { get; set; }
-    public bool BidModelIsActive { get; set; } = true; // default to true
+    public int BidId { get; set; }
+    public string BidNumber { get; set; } = string.Empty;
+    public string ProjectName { get; set; } = string.Empty;
+    public int ClientId { get; set; }
+    public ClientModel Client { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public bool IsActive { get; set; } = true; // default to true
 
 
     //SiteInfo Section
-    public SiteInfoModel? BidModelSiteInfo { get; set; }
-    public int? BidModelSiteInfoId { get; set; }
+    public SiteInfoModel? SiteInfo { get; set; }
+    public int? SiteInfoId { get; set; }
 
     // 💼 New hotness: Admin & Engineering Tasks
-    public List<BidTaskModel> BidModelTasks { get; set; } = new();
-    public List<BidComponentLineItemModel> BidModelComponentLineItems { get; set; } = new();
+    public List<BidTaskModel> Tasks { get; set; } = new();
+    public List<BidComponentLineItemModel> ComponentLineItems { get; set; } = new();
   
     public List<BidWireLineItemModel> WireLineItems { get; set; } = new();
     

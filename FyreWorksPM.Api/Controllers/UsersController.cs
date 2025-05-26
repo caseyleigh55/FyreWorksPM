@@ -50,7 +50,7 @@ public class UsersController : ControllerBase
 
         // Check for existing username/email
         bool exists = await _db.Users.AnyAsync(u =>
-            u.UserModelUsername == dto.Username || u.UserModelEmail == dto.Email);
+            u.Username == dto.Username || u.Email == dto.Email);
 
         if (exists)
             return BadRequest("A user with this username or email already exists.");
@@ -60,9 +60,9 @@ public class UsersController : ControllerBase
 
         var user = new UserModel
         {
-            UserModelUsername = dto.Username.Trim(),
-            UserModelEmail = dto.Email.Trim(),
-            UserModelPasswordHash = hashedPassword
+            Username = dto.Username.Trim(),
+            Email = dto.Email.Trim(),
+            PasswordHash = hashedPassword
         };
 
         _db.Users.Add(user);
@@ -78,10 +78,10 @@ public class UsersController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserDto dto)
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.UserModelUsername == dto.Username);
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
 
         // Validate credentials
-        if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.UserModelPasswordHash))
+        if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
             return Unauthorized("Invalid username or password");
 
         // Load JWT configuration values
@@ -92,8 +92,8 @@ public class UsersController : ControllerBase
         // Build claims to embed into token
         var authClaims = new[]
         {
-            new Claim(ClaimTypes.Name, user.UserModelUsername),
-            new Claim(ClaimTypes.NameIdentifier, user.UserModelId.ToString()),
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

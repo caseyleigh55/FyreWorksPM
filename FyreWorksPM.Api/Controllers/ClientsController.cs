@@ -27,11 +27,11 @@ public class ClientsController : ControllerBase
         var clients = await _db.Clients
             .Select(c => new ClientDto
             {
-                Id = c.ClientModelId,
-                Name = c.ClientModelName,
-                Contact = c.ClientModelContact,
-                Email = c.ClientModelEmail,
-                Phone = c.ClientModelPhone
+                Id = c.Id,
+                Name = c.Name,
+                Contact = c.Contact,
+                Email = c.Email,
+                Phone = c.Phone
             })
             .ToListAsync();
 
@@ -50,11 +50,11 @@ public class ClientsController : ControllerBase
 
         var dto = new ClientDto
         {
-            Id = client.ClientModelId,
-            Name = client.ClientModelName,
-            Contact = client.ClientModelContact,
-            Email = client.ClientModelEmail,
-            Phone = client.ClientModelPhone
+            Id = client.Id,
+            Name = client.Name,
+            Contact = client.Contact,
+            Email = client.Email,
+            Phone = client.Phone
         };
 
         return Ok(dto);
@@ -72,17 +72,17 @@ public class ClientsController : ControllerBase
             return BadRequest("Client name and contact are required.");
         }
         bool exists = await _db.Clients.AnyAsync(c =>
-            c.ClientModelName == dto.Name || c.ClientModelContact == dto.Contact);
+            c.Name == dto.Name || c.Contact == dto.Contact);
 
         if (exists)
             return BadRequest("A client with this name or contact already exists.");
 
         var client = new ClientModel
         {
-            ClientModelName = dto.Name,
-            ClientModelContact = dto.Contact,
-            ClientModelEmail = dto.Email,
-            ClientModelPhone = dto.Phone
+            Name = dto.Name,
+            Contact = dto.Contact,
+            Email = dto.Email,
+            Phone = dto.Phone
         };
 
         _db.Clients.Add(client);
@@ -90,20 +90,20 @@ public class ClientsController : ControllerBase
 
         var createdDto = new ClientDto
         {
-            Id = client.ClientModelId,
-            Name = client.ClientModelName,
-            Contact = client.ClientModelContact,
-            Email = client.ClientModelEmail,
-            Phone = client.ClientModelPhone
+            Id = client.Id,
+            Name = client.Name,
+            Contact = client.Contact,
+            Email = client.Email,
+            Phone = client.Phone
         };
 
-        return CreatedAtAction(nameof(GetClient), new { id = client.ClientModelId }, new ClientDto
+        return CreatedAtAction(nameof(GetClient), new { id = client.Id }, new ClientDto
         {
-            Id = client.ClientModelId,
-            Name = client.ClientModelName,
-            Contact = client.ClientModelContact,
-            Email = client.ClientModelEmail,
-            Phone = client.ClientModelPhone
+            Id = client.Id,
+            Name = client.Name,
+            Contact = client.Contact,
+            Email = client.Email,
+            Phone = client.Phone
         });
     }
 
@@ -117,10 +117,10 @@ public class ClientsController : ControllerBase
         var client = await _db.Clients.FindAsync(id);
         if (client == null) return NotFound();
 
-        client.ClientModelName = dto.Name;
-        client.ClientModelContact = dto.Contact;
-        client.ClientModelEmail = dto.Email;
-        client.ClientModelPhone = dto.Phone;
+        client.Name = dto.Name;
+        client.Contact = dto.Contact;
+        client.Email = dto.Email;
+        client.Phone = dto.Phone;
 
         _db.Clients.Update(client);
         await _db.SaveChangesAsync();

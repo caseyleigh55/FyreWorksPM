@@ -27,18 +27,18 @@ namespace FyreWorksPM.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<BidDto>> GetBid(int id)
         {
-            var bid = await _db.BidInfo.Include(b => b.BidModelClient)
-                                     .FirstOrDefaultAsync(b => b.BidModelBidId == id);
+            var bid = await _db.BidInfo.Include(b => b.Client)
+                                     .FirstOrDefaultAsync(b => b.BidId == id);
             if (bid == null) return NotFound();
 
             return Ok(new BidDto
             {
-                Id = bid.BidModelBidId,
-                BidNumber = bid.BidModelBidNumber,
-                ProjectName = bid.BidModelProjectName,
-                ClientId = bid.BidModelClientId,
-                CreatedDate = bid.BidModelCreatedDate,
-                IsActive = bid.BidModelIsActive
+                Id = bid.BidId,
+                BidNumber = bid.BidNumber,
+                ProjectName = bid.ProjectName,
+                ClientId = bid.ClientId,
+                CreatedDate = bid.CreatedDate,
+                IsActive = bid.IsActive
             });
         }
 
@@ -46,10 +46,10 @@ namespace FyreWorksPM.Api.Controllers
         [HttpGet("next-number")]
         public async Task<ActionResult<string>> GetNextBidNumber()
         {
-            var lastBid = await _db.BidInfo.OrderByDescending(b => b.BidModelBidId).FirstOrDefaultAsync();
+            var lastBid = await _db.BidInfo.OrderByDescending(b => b.BidId).FirstOrDefaultAsync();
             int nextNum = 1;
 
-            if (lastBid != null && Regex.Match(lastBid.BidModelBidNumber, @"B-(\d{3})") is Match match && match.Success)
+            if (lastBid != null && Regex.Match(lastBid.BidNumber, @"B-(\d{3})") is Match match && match.Success)
             {
                 nextNum = int.Parse(match.Groups[1].Value) + 1;
             }
@@ -61,30 +61,30 @@ namespace FyreWorksPM.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<BidDto>> CreateBid([FromBody] CreateBidDto dto)
         {
-            var lastBid = await _db.BidInfo.OrderByDescending(b => b.BidModelBidId).FirstOrDefaultAsync();
+            var lastBid = await _db.BidInfo.OrderByDescending(b => b.BidId).FirstOrDefaultAsync();
             int nextNum = 1;
 
-            if (lastBid != null && Regex.Match(lastBid.BidModelBidNumber, @"B-(\d{3})") is Match match && match.Success)
+            if (lastBid != null && Regex.Match(lastBid.BidNumber, @"B-(\d{3})") is Match match && match.Success)
             {
                 nextNum = int.Parse(match.Groups[1].Value) + 1;
             }
 
             var siteInfo = new SiteInfoModel
             {
-                SiteInfoModelScopeOfWork = dto.SiteInfo.ScopeOfWork,
-                SiteInfoModelAddressLine1 = dto.SiteInfo.AddressLine1,
-                SiteInfoModelAddressLine2 = dto.SiteInfo.AddressLine2,
-                SiteInfoModelCity = dto.SiteInfo.City,
-                SiteInfoModelState = dto.SiteInfo.State,
-                SiteInfoModelZipCode = dto.SiteInfo.ZipCode,
-                SiteInfoModelParcelNumber = dto.SiteInfo.ParcelNumber,
-                SiteInfoModelJurisdiction = dto.SiteInfo.Jurisdiction,
-                SiteInfoModelBuildingArea = dto.SiteInfo.BuildingArea,
-                SiteInfoModelNumberOfStories = dto.SiteInfo.NumberOfStories,
-                SiteInfoModelOccupancyGroup = dto.SiteInfo.OccupancyGroup,
-                SiteInfoModelOccupantLoad = dto.SiteInfo.OccupantLoad,
-                SiteInfoModelConstructionType = dto.SiteInfo.ConstructionType,
-                SiteInfoModelIsSprinklered = dto.SiteInfo.IsSprinklered
+                ScopeOfWork = dto.SiteInfo.ScopeOfWork,
+                AddressLine1 = dto.SiteInfo.AddressLine1,
+                AddressLine2 = dto.SiteInfo.AddressLine2,
+                City = dto.SiteInfo.City,
+                State = dto.SiteInfo.State,
+                ZipCode = dto.SiteInfo.ZipCode,
+                ParcelNumber = dto.SiteInfo.ParcelNumber,
+                Jurisdiction = dto.SiteInfo.Jurisdiction,
+                BuildingArea = dto.SiteInfo.BuildingArea,
+                NumberOfStories = dto.SiteInfo.NumberOfStories,
+                OccupancyGroup = dto.SiteInfo.OccupancyGroup,
+                OccupantLoad = dto.SiteInfo.OccupantLoad,
+                ConstructionType = dto.SiteInfo.ConstructionType,
+                IsSprinklered = dto.SiteInfo.IsSprinklered
             };
 
             // 🎯 Task usage only, no creation
@@ -98,9 +98,9 @@ namespace FyreWorksPM.Api.Controllers
 
                 bidTasks.Add(new BidTaskModel
                 {
-                    BidTaskModelTaskModelId = template.TaskModelId,
-                    BidTaskModelCost = t.Cost,
-                    BidTaskModelSale = t.Sale
+                    TaskModelId = template.Id,
+                    Cost = t.Cost,
+                    Sale = t.Sale
                 });
             }
 
@@ -130,14 +130,14 @@ namespace FyreWorksPM.Api.Controllers
 
             var bid = new BidModel
             {
-                BidModelBidNumber = $"B-{nextNum:D3}",
-                BidModelProjectName = dto.ProjectName,
-                BidModelClientId = dto.ClientId,
-                BidModelCreatedDate = dto.CreatedDate,
-                BidModelIsActive = dto.IsActive,
-                BidModelSiteInfo = siteInfo,
-                BidModelTasks = bidTasks,
-                BidModelComponentLineItems = bidComponentLineItems
+                BidNumber = $"B-{nextNum:D3}",
+                ProjectName = dto.ProjectName,
+                ClientId = dto.ClientId,
+                CreatedDate = dto.CreatedDate,
+                IsActive = dto.IsActive,
+                SiteInfo = siteInfo,
+                Tasks = bidTasks,
+                ComponentLineItems = bidComponentLineItems
             };
             
 
@@ -151,7 +151,7 @@ namespace FyreWorksPM.Api.Controllers
                 Qty = c.Qty,
                 UnitCost = c.UnitCost,
                 UnitSale = c.UnitSale,
-                BidId = bid.BidModelBidId
+                BidId = bid.BidId
             }).ToList();
             var materialLineItems = dto.MaterialLineItems.Select(c => new BidMaterialLineItemModel
             {
@@ -160,7 +160,7 @@ namespace FyreWorksPM.Api.Controllers
                 Qty = c.Qty,
                 UnitCost = c.UnitCost,
                 UnitSale = c.UnitSale,
-                BidId = bid.BidModelBidId
+                BidId = bid.BidId
             }).ToList();
 
             _db.BidWireLineItems.AddRange(wireLineItems);
@@ -168,14 +168,14 @@ namespace FyreWorksPM.Api.Controllers
 
             await _db.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetBid), new { id = bid.BidModelBidId }, new BidDto
+            return CreatedAtAction(nameof(GetBid), new { id = bid.BidId }, new BidDto
             {
-                Id = bid.BidModelBidId,
-                BidNumber = bid.BidModelBidNumber,
-                ProjectName = bid.BidModelProjectName,
-                ClientId = bid.BidModelClientId,
-                CreatedDate = bid.BidModelCreatedDate,
-                IsActive = bid.BidModelIsActive
+                Id = bid.BidId,
+                BidNumber = bid.BidNumber,
+                ProjectName = bid.ProjectName,
+                ClientId = bid.ClientId,
+                CreatedDate = bid.CreatedDate,
+                IsActive = bid.IsActive
             });
         }
 
@@ -188,9 +188,9 @@ namespace FyreWorksPM.Api.Controllers
             var bid = await _db.BidInfo.FindAsync(id);
             if (bid == null) return NotFound();
 
-            bid.BidModelProjectName = dto.ProjectName;
-            bid.BidModelClientId = dto.ClientId;
-            bid.BidModelCreatedDate = dto.CreatedDate;
+            bid.ProjectName = dto.ProjectName;
+            bid.ClientId = dto.ClientId;
+            bid.CreatedDate = dto.CreatedDate;
 
             await _db.SaveChangesAsync();
             return NoContent();

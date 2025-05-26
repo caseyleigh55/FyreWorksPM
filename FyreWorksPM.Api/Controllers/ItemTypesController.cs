@@ -27,8 +27,8 @@ public class ItemTypesController : ControllerBase
         var types = await _db.ItemTypes
             .Select(t => new ItemTypeDto
             {
-                Id = t.ItemTypeModelId,
-                Name = t.ItemTypeModelName
+                Id = t.Id,
+                Name = t.Name
             })
             .ToListAsync();
 
@@ -49,8 +49,8 @@ public class ItemTypesController : ControllerBase
 
         var dto = new ItemTypeDto
         {
-            Id = type.ItemTypeModelId,
-            Name = type.ItemTypeModelName
+            Id = type.Id,
+            Name = type.Name
         };
 
         return Ok(dto);
@@ -66,20 +66,20 @@ public class ItemTypesController : ControllerBase
         if (string.IsNullOrWhiteSpace(dto.Name))
             return BadRequest("Name is required.");
 
-        var exists = await _db.ItemTypes.AnyAsync(t => t.ItemTypeModelName == dto.Name);
+        var exists = await _db.ItemTypes.AnyAsync(t => t.Name == dto.Name);
         if (exists)
             return Conflict("An item type with that name already exists.");
 
         var itemType = new ItemTypeModel
         {
-            ItemTypeModelName = dto.Name,
-            ItemTypeModelItems = new List<ItemModel>() // 🚨 Required because of 'required' modifier
+            Name = dto.Name,
+            Items = new List<ItemModel>() // 🚨 Required because of 'required' modifier
         };
 
         _db.ItemTypes.Add(itemType);
         await _db.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetItemType), new { id = itemType.ItemTypeModelId }, itemType);
+        return CreatedAtAction(nameof(GetItemType), new { id = itemType.Id }, itemType);
     }
 
     // ================================================
@@ -93,7 +93,7 @@ public class ItemTypesController : ControllerBase
         if (itemType == null)
             return NotFound();
 
-        itemType.ItemTypeModelName = dto.Name;
+        itemType.Name = dto.Name;
 
         _db.ItemTypes.Update(itemType);
         await _db.SaveChangesAsync();
@@ -109,13 +109,13 @@ public class ItemTypesController : ControllerBase
     public async Task<IActionResult> DeleteItemType(int id)
     {
         var itemType = await _db.ItemTypes
-            .Include(t => t.ItemTypeModelItems)
-            .FirstOrDefaultAsync(t => t.ItemTypeModelId == id);
+            .Include(t => t.Items)
+            .FirstOrDefaultAsync(t => t.Id == id);
 
         if (itemType == null)
             return NotFound();
 
-        if (itemType.ItemTypeModelItems.Any())
+        if (itemType.Items.Any())
             return BadRequest("Cannot delete item type with existing items.");
 
         _db.ItemTypes.Remove(itemType);

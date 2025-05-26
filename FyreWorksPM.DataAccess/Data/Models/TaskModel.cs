@@ -6,16 +6,16 @@ namespace FyreWorksPM.DataAccess.Data.Models
     public class TaskModel
     {
         [Key]
-        public int TaskModelId { get; set; }
+        public int Id { get; set; }
 
         [Required]
-        public string TaskModelTaskName { get; set; } = string.Empty;
+        public string TaskName { get; set; } = string.Empty;
 
         [Required]
-        public TaskType TaskModelType { get; set; }
+        public TaskType Type { get; set; }
 
-        public decimal TaskModelDefaultCost { get; set; }
+        public decimal DefaultCost { get; set; }
 
-        public decimal TaskModelDefaultSale { get; set; }
+        public decimal DefaultSale { get; set; }
     }
 }

@@ -11,31 +11,31 @@ public class ItemModel : INotifyPropertyChanged
     /// <summary>
     /// Primary key for the item.
     /// </summary>
-    public int ItemModelId { get; set; }
+    public int Id { get; set; }
 
-    private string ItemModelname = string.Empty;
+    private string name = string.Empty;
 
     /// <summary>
     /// The name or title of the item.
     /// </summary>
-    public string ItemModelName
+    public string Name
     {
-        get => ItemModelname;
-        set => SetProperty(ref ItemModelname, value);
+        get => name;
+        set => SetProperty(ref name, value);
     }
 
-    private string ItemModeldescription = string.Empty;
+    private string description = string.Empty;
 
     /// <summary>
     /// Optional description or additional details.
     /// </summary>
-    public string ItemModelDescription
+    public string Description
     {
-        get => ItemModeldescription;
-        set => SetProperty(ref ItemModeldescription, value);
+        get => description;
+        set => SetProperty(ref description, value);
     }
 
-    private decimal ItemModelunitCost = 0;
+    private decimal unitCost = 0;
 
     ///// <summary>
     ///// Default unit cost of the item.
@@ -48,22 +48,22 @@ public class ItemModel : INotifyPropertyChanged
     //    set => SetProperty(ref unitCost, value);
     //}
 
-    private ItemTypeModel? ItemModelitemType;
+    private ItemTypeModel?itemType;
 
     /// <summary>
     /// Navigation property for the item's type.
     /// </summary>
-    public ItemTypeModel? ItemModelItemType
+    public ItemTypeModel? ItemType
     {
-        get => ItemModelitemType;
-        set => SetProperty(ref ItemModelitemType, value);
+        get => itemType;
+        set => SetProperty(ref itemType, value);
     }
 
     /// <summary>
     /// Foreign key reference to the associated item type.
     /// Nullable in case it's not set yet.
     /// </summary>
-    public int? ItemModelItemTypeId { get; set; }
+    public int? ItemTypeId { get; set; }
 
     #region INotifyPropertyChanged
 

@@ -8,25 +8,25 @@ namespace FyreWorksPM.DataAccess.Data.Models
     public class BidTaskModel
     {
         [Key]
-        public int BidTaskModelId { get; set; }
+        public int Id { get; set; }
 
         // --- Relationships ---
 
         // FK to Bid
-        [ForeignKey(nameof(BidTaskModelBid))]
-        public int BidTaskModelBidId { get; set; }
-        public virtual BidModel BidTaskModelBid { get; set; } = null!;
+        [ForeignKey(nameof(Bid))]
+        public int BidId { get; set; }
+        public virtual BidModel Bid { get; set; } = null!;
 
         // FK to Task Template
-        [ForeignKey(nameof(BidTaskModelTask))]
-        public int BidTaskModelTaskModelId { get; set; }
-        public virtual TaskModel BidTaskModelTask { get; set; } = null!;
+        [ForeignKey(nameof(Task))]
+        public int TaskModelId { get; set; }
+        public virtual TaskModel Task { get; set; } = null!;
 
         // --- Task-specific pricing for this bid ---
         [Column(TypeName = "decimal(18,2)")]
-        public decimal BidTaskModelCost { get; set; }
+        public decimal Cost { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal BidTaskModelSale { get; set; }
+        public decimal Sale { get; set; }
     }
 }

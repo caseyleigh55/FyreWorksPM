@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FyreWorksPM.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250526005925_InitialReset")]
+    [Migration("20250526032941_InitialReset")]
     partial class InitialReset
     {
         /// <inheritdoc />
@@ -27,37 +27,37 @@ namespace FyreWorksPM.DataAccess.Migrations
 
             modelBuilder.Entity("BidModel", b =>
                 {
-                    b.Property<int>("BidModelBidId")
+                    b.Property<int>("BidId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BidModelBidId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BidId"));
 
-                    b.Property<string>("BidModelBidNumber")
+                    b.Property<string>("BidNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("BidModelClientId")
+                    b.Property<int>("ClientId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("BidModelCreatedDate")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("BidModelIsActive")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<string>("BidModelProjectName")
+                    b.Property<string>("ProjectName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("BidModelSiteInfoId")
+                    b.Property<int?>("SiteInfoId")
                         .HasColumnType("int");
 
-                    b.HasKey("BidModelBidId");
+                    b.HasKey("BidId");
 
-                    b.HasIndex("BidModelClientId");
+                    b.HasIndex("ClientId");
 
-                    b.HasIndex("BidModelSiteInfoId");
+                    b.HasIndex("SiteInfoId");
 
                     b.ToTable("BidInfo", (string)null);
                 });
@@ -99,126 +99,126 @@ namespace FyreWorksPM.DataAccess.Migrations
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidTaskModel", b =>
                 {
-                    b.Property<int>("BidTaskModelId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BidTaskModelId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BidTaskModelBidId")
+                    b.Property<int>("BidId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("BidTaskModelCost")
+                    b.Property<decimal>("Cost")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("BidTaskModelSale")
+                    b.Property<decimal>("Sale")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("BidTaskModelTaskModelId")
+                    b.Property<int>("TaskModelId")
                         .HasColumnType("int");
 
-                    b.HasKey("BidTaskModelId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("BidTaskModelBidId");
+                    b.HasIndex("BidId");
 
-                    b.HasIndex("BidTaskModelTaskModelId");
+                    b.HasIndex("TaskModelId");
 
                     b.ToTable("BidTasks", (string)null);
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.ClientModel", b =>
                 {
-                    b.Property<int>("ClientModelId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClientModelId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ClientModelContact")
+                    b.Property<string>("Contact")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ClientModelEmail")
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ClientModelName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ClientModelPhone")
+                    b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ClientModelId");
+                    b.HasKey("Id");
 
                     b.ToTable("Clients");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.ItemTypeModel", b =>
                 {
-                    b.Property<int>("ItemTypeModelId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ItemTypeModelId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ItemTypeModelName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ItemTypeModelId");
+                    b.HasKey("Id");
 
                     b.ToTable("ItemTypes");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.TaskModel", b =>
                 {
-                    b.Property<int>("TaskModelId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaskModelId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("TaskModelDefaultCost")
+                    b.Property<decimal>("DefaultCost")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("TaskModelDefaultSale")
+                    b.Property<decimal>("DefaultSale")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("TaskModelTaskName")
+                    b.Property<string>("TaskName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TaskModelType")
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.HasKey("TaskModelId");
+                    b.HasKey("Id");
 
                     b.ToTable("TaskTemplates");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.UserModel", b =>
                 {
-                    b.Property<int>("UserModelId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserModelId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("UserModelEmail")
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserModelPasswordHash")
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserModelUsername")
+                    b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("UserModelId");
+                    b.HasKey("Id");
 
                     b.ToTable("Users");
                 });
@@ -273,7 +273,7 @@ namespace FyreWorksPM.DataAccess.Migrations
 
                     b.HasIndex("BidId");
 
-                    b.ToTable("BidComponents");
+                    b.ToTable("BidComponentLineItems");
                 });
 
             modelBuilder.Entity("FyreWorksPM.ViewModels.BidWireLineItemModel", b =>
@@ -313,110 +313,110 @@ namespace FyreWorksPM.DataAccess.Migrations
 
             modelBuilder.Entity("ItemModel", b =>
                 {
-                    b.Property<int>("ItemModelId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ItemModelId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ItemModelDescription")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ItemModelItemTypeId")
+                    b.Property<int?>("ItemTypeId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ItemModelName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ItemModelId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("ItemModelItemTypeId");
+                    b.HasIndex("ItemTypeId");
 
                     b.ToTable("Items");
                 });
 
             modelBuilder.Entity("SiteInfoModel", b =>
                 {
-                    b.Property<int>("SiteInfoModelId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SiteInfoModelId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("SiteInfoModelAddressLine1")
+                    b.Property<string>("AddressLine1")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SiteInfoModelAddressLine2")
+                    b.Property<string>("AddressLine2")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("SiteInfoModelBuildingArea")
+                    b.Property<double>("BuildingArea")
                         .HasColumnType("float");
 
-                    b.Property<string>("SiteInfoModelCity")
+                    b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SiteInfoModelConstructionType")
+                    b.Property<string>("ConstructionType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("SiteInfoModelIsSprinklered")
+                    b.Property<bool>("IsSprinklered")
                         .HasColumnType("bit");
 
-                    b.Property<string>("SiteInfoModelJurisdiction")
+                    b.Property<string>("Jurisdiction")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SiteInfoModelNumberOfStories")
+                    b.Property<int>("NumberOfStories")
                         .HasColumnType("int");
 
-                    b.Property<string>("SiteInfoModelOccupancyGroup")
+                    b.Property<string>("OccupancyGroup")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SiteInfoModelOccupantLoad")
+                    b.Property<int>("OccupantLoad")
                         .HasColumnType("int");
 
-                    b.Property<string>("SiteInfoModelParcelNumber")
+                    b.Property<string>("ParcelNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SiteInfoModelScopeOfWork")
+                    b.Property<string>("ScopeOfWork")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SiteInfoModelState")
+                    b.Property<string>("State")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SiteInfoModelZipCode")
+                    b.Property<string>("ZipCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("SiteInfoModelId");
+                    b.HasKey("Id");
 
                     b.ToTable("BidSiteInfo", (string)null);
                 });
 
             modelBuilder.Entity("BidModel", b =>
                 {
-                    b.HasOne("FyreWorksPM.DataAccess.Data.Models.ClientModel", "BidModelClient")
+                    b.HasOne("FyreWorksPM.DataAccess.Data.Models.ClientModel", "Client")
                         .WithMany()
-                        .HasForeignKey("BidModelClientId")
+                        .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SiteInfoModel", "BidModelSiteInfo")
+                    b.HasOne("SiteInfoModel", "SiteInfo")
                         .WithMany()
-                        .HasForeignKey("BidModelSiteInfoId");
+                        .HasForeignKey("SiteInfoId");
 
-                    b.Navigation("BidModelClient");
+                    b.Navigation("Client");
 
-                    b.Navigation("BidModelSiteInfo");
+                    b.Navigation("SiteInfo");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidMaterialLineItemModel", b =>
@@ -432,27 +432,27 @@ namespace FyreWorksPM.DataAccess.Migrations
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidTaskModel", b =>
                 {
-                    b.HasOne("BidModel", "BidTaskModelBid")
-                        .WithMany("BidModelTasks")
-                        .HasForeignKey("BidTaskModelBidId")
+                    b.HasOne("BidModel", "Bid")
+                        .WithMany("Tasks")
+                        .HasForeignKey("BidId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FyreWorksPM.DataAccess.Data.Models.TaskModel", "BidTaskModelTask")
+                    b.HasOne("FyreWorksPM.DataAccess.Data.Models.TaskModel", "Task")
                         .WithMany()
-                        .HasForeignKey("BidTaskModelTaskModelId")
+                        .HasForeignKey("TaskModelId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("BidTaskModelBid");
+                    b.Navigation("Bid");
 
-                    b.Navigation("BidTaskModelTask");
+                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Models.BidComponentLineItemModel", b =>
                 {
                     b.HasOne("BidModel", "Bid")
-                        .WithMany("BidModelComponentLineItems")
+                        .WithMany("ComponentLineItems")
                         .HasForeignKey("BidId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -473,27 +473,27 @@ namespace FyreWorksPM.DataAccess.Migrations
 
             modelBuilder.Entity("ItemModel", b =>
                 {
-                    b.HasOne("FyreWorksPM.DataAccess.Data.Models.ItemTypeModel", "ItemModelItemType")
-                        .WithMany("ItemTypeModelItems")
-                        .HasForeignKey("ItemModelItemTypeId");
+                    b.HasOne("FyreWorksPM.DataAccess.Data.Models.ItemTypeModel", "ItemType")
+                        .WithMany("Items")
+                        .HasForeignKey("ItemTypeId");
 
-                    b.Navigation("ItemModelItemType");
+                    b.Navigation("ItemType");
                 });
 
             modelBuilder.Entity("BidModel", b =>
                 {
-                    b.Navigation("BidModelComponentLineItems");
-
-                    b.Navigation("BidModelTasks");
+                    b.Navigation("ComponentLineItems");
 
                     b.Navigation("MaterialLineItems");
+
+                    b.Navigation("Tasks");
 
                     b.Navigation("WireLineItems");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.ItemTypeModel", b =>
                 {
-                    b.Navigation("ItemTypeModelItems");
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

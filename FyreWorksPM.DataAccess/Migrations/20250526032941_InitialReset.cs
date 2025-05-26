@@ -15,114 +15,114 @@ namespace FyreWorksPM.DataAccess.Migrations
                 name: "BidSiteInfo",
                 columns: table => new
                 {
-                    SiteInfoModelId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SiteInfoModelScopeOfWork = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SiteInfoModelAddressLine1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SiteInfoModelAddressLine2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SiteInfoModelCity = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SiteInfoModelState = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SiteInfoModelZipCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SiteInfoModelParcelNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SiteInfoModelJurisdiction = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SiteInfoModelBuildingArea = table.Column<double>(type: "float", nullable: false),
-                    SiteInfoModelNumberOfStories = table.Column<int>(type: "int", nullable: false),
-                    SiteInfoModelOccupancyGroup = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SiteInfoModelOccupantLoad = table.Column<int>(type: "int", nullable: false),
-                    SiteInfoModelConstructionType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SiteInfoModelIsSprinklered = table.Column<bool>(type: "bit", nullable: false)
+                    ScopeOfWork = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AddressLine1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AddressLine2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    State = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ZipCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ParcelNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Jurisdiction = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BuildingArea = table.Column<double>(type: "float", nullable: false),
+                    NumberOfStories = table.Column<int>(type: "int", nullable: false),
+                    OccupancyGroup = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OccupantLoad = table.Column<int>(type: "int", nullable: false),
+                    ConstructionType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsSprinklered = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BidSiteInfo", x => x.SiteInfoModelId);
+                    table.PrimaryKey("PK_BidSiteInfo", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Clients",
                 columns: table => new
                 {
-                    ClientModelId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientModelName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ClientModelContact = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ClientModelEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ClientModelPhone = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Contact = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Clients", x => x.ClientModelId);
+                    table.PrimaryKey("PK_Clients", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "ItemTypes",
                 columns: table => new
                 {
-                    ItemTypeModelId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ItemTypeModelName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ItemTypes", x => x.ItemTypeModelId);
+                    table.PrimaryKey("PK_ItemTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "TaskTemplates",
                 columns: table => new
                 {
-                    TaskModelId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TaskModelTaskName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TaskModelType = table.Column<int>(type: "int", nullable: false),
-                    TaskModelDefaultCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TaskModelDefaultSale = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    TaskName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    DefaultCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    DefaultSale = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TaskTemplates", x => x.TaskModelId);
+                    table.PrimaryKey("PK_TaskTemplates", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
-                    UserModelId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserModelUsername = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserModelEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserModelPasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.UserModelId);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "BidInfo",
                 columns: table => new
                 {
-                    BidModelBidId = table.Column<int>(type: "int", nullable: false)
+                    BidId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    BidModelBidNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BidModelProjectName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BidModelClientId = table.Column<int>(type: "int", nullable: false),
-                    BidModelCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    BidModelIsActive = table.Column<bool>(type: "bit", nullable: false),
-                    BidModelSiteInfoId = table.Column<int>(type: "int", nullable: true)
+                    BidNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProjectName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    SiteInfoId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BidInfo", x => x.BidModelBidId);
+                    table.PrimaryKey("PK_BidInfo", x => x.BidId);
                     table.ForeignKey(
-                        name: "FK_BidInfo_BidSiteInfo_BidModelSiteInfoId",
-                        column: x => x.BidModelSiteInfoId,
+                        name: "FK_BidInfo_BidSiteInfo_SiteInfoId",
+                        column: x => x.SiteInfoId,
                         principalTable: "BidSiteInfo",
-                        principalColumn: "SiteInfoModelId");
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_BidInfo_Clients_BidModelClientId",
-                        column: x => x.BidModelClientId,
+                        name: "FK_BidInfo_Clients_ClientId",
+                        column: x => x.ClientId,
                         principalTable: "Clients",
-                        principalColumn: "ClientModelId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -130,24 +130,24 @@ namespace FyreWorksPM.DataAccess.Migrations
                 name: "Items",
                 columns: table => new
                 {
-                    ItemModelId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ItemModelName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ItemModelDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ItemModelItemTypeId = table.Column<int>(type: "int", nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ItemTypeId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Items", x => x.ItemModelId);
+                    table.PrimaryKey("PK_Items", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Items_ItemTypes_ItemModelItemTypeId",
-                        column: x => x.ItemModelItemTypeId,
+                        name: "FK_Items_ItemTypes_ItemTypeId",
+                        column: x => x.ItemTypeId,
                         principalTable: "ItemTypes",
-                        principalColumn: "ItemTypeModelId");
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "BidComponents",
+                name: "BidComponentLineItems",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -166,12 +166,12 @@ namespace FyreWorksPM.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BidComponents", x => x.Id);
+                    table.PrimaryKey("PK_BidComponentLineItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BidComponents_BidInfo_BidId",
+                        name: "FK_BidComponentLineItems_BidInfo_BidId",
                         column: x => x.BidId,
                         principalTable: "BidInfo",
-                        principalColumn: "BidModelBidId",
+                        principalColumn: "BidId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -195,7 +195,7 @@ namespace FyreWorksPM.DataAccess.Migrations
                         name: "FK_BidMaterialLineItems_BidInfo_BidId",
                         column: x => x.BidId,
                         principalTable: "BidInfo",
-                        principalColumn: "BidModelBidId",
+                        principalColumn: "BidId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -203,27 +203,27 @@ namespace FyreWorksPM.DataAccess.Migrations
                 name: "BidTasks",
                 columns: table => new
                 {
-                    BidTaskModelId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    BidTaskModelBidId = table.Column<int>(type: "int", nullable: false),
-                    BidTaskModelTaskModelId = table.Column<int>(type: "int", nullable: false),
-                    BidTaskModelCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    BidTaskModelSale = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    BidId = table.Column<int>(type: "int", nullable: false),
+                    TaskModelId = table.Column<int>(type: "int", nullable: false),
+                    Cost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Sale = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BidTasks", x => x.BidTaskModelId);
+                    table.PrimaryKey("PK_BidTasks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BidTasks_BidInfo_BidTaskModelBidId",
-                        column: x => x.BidTaskModelBidId,
+                        name: "FK_BidTasks_BidInfo_BidId",
+                        column: x => x.BidId,
                         principalTable: "BidInfo",
-                        principalColumn: "BidModelBidId",
+                        principalColumn: "BidId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_BidTasks_TaskTemplates_BidTaskModelTaskModelId",
-                        column: x => x.BidTaskModelTaskModelId,
+                        name: "FK_BidTasks_TaskTemplates_TaskModelId",
+                        column: x => x.TaskModelId,
                         principalTable: "TaskTemplates",
-                        principalColumn: "TaskModelId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -247,24 +247,24 @@ namespace FyreWorksPM.DataAccess.Migrations
                         name: "FK_BidWireLineItems_BidInfo_BidId",
                         column: x => x.BidId,
                         principalTable: "BidInfo",
-                        principalColumn: "BidModelBidId",
+                        principalColumn: "BidId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_BidComponents_BidId",
-                table: "BidComponents",
+                name: "IX_BidComponentLineItems_BidId",
+                table: "BidComponentLineItems",
                 column: "BidId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BidInfo_BidModelClientId",
+                name: "IX_BidInfo_ClientId",
                 table: "BidInfo",
-                column: "BidModelClientId");
+                column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BidInfo_BidModelSiteInfoId",
+                name: "IX_BidInfo_SiteInfoId",
                 table: "BidInfo",
-                column: "BidModelSiteInfoId");
+                column: "SiteInfoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BidMaterialLineItems_BidId",
@@ -272,14 +272,14 @@ namespace FyreWorksPM.DataAccess.Migrations
                 column: "BidId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BidTasks_BidTaskModelBidId",
+                name: "IX_BidTasks_BidId",
                 table: "BidTasks",
-                column: "BidTaskModelBidId");
+                column: "BidId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BidTasks_BidTaskModelTaskModelId",
+                name: "IX_BidTasks_TaskModelId",
                 table: "BidTasks",
-                column: "BidTaskModelTaskModelId");
+                column: "TaskModelId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BidWireLineItems_BidId",
@@ -287,16 +287,16 @@ namespace FyreWorksPM.DataAccess.Migrations
                 column: "BidId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Items_ItemModelItemTypeId",
+                name: "IX_Items_ItemTypeId",
                 table: "Items",
-                column: "ItemModelItemTypeId");
+                column: "ItemTypeId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BidComponents");
+                name: "BidComponentLineItems");
 
             migrationBuilder.DropTable(
                 name: "BidMaterialLineItems");

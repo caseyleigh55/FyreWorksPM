@@ -6,11 +6,11 @@ namespace FyreWorksPM.DataAccess.Data.Models
     public class ClientModel
     {
         [Key]
-        public int ClientModelId { get; set; }
+        public int Id { get; set; }
 
-        public string ClientModelName { get; set; } = default!;
-        public string ClientModelContact { get; set; } = default!;
-        public string ClientModelEmail { get; set; } = default!;
-        public string ClientModelPhone { get; set; } = default!;
+        public string Name { get; set; } = default!;
+        public string Contact { get; set; } = default!;
+        public string Email { get; set; } = default!;
+        public string Phone { get; set; } = default!;
     }
 }
