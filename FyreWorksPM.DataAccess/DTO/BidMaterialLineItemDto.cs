@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FyreWorksPM.DataAccess.DTO
 {
-    public class BidLineItemDto
+    public class BidMaterialLineItemDto
     {
         public string ItemName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
@@ -14,5 +14,4 @@ namespace FyreWorksPM.DataAccess.DTO
         public decimal UnitCost { get; set; }
         public decimal UnitSale { get; set; }
     }
-
 }

@@ -176,7 +176,7 @@ namespace FyreWorksPM.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BidLineItems",
+                name: "BidMaterialLineItems",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -186,29 +186,17 @@ namespace FyreWorksPM.DataAccess.Migrations
                     Qty = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     UnitCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     UnitSale = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    BidId = table.Column<int>(type: "int", nullable: false),
-                    WireBidBidModelBidId = table.Column<int>(type: "int", nullable: true),
-                    MaterialBidBidModelBidId = table.Column<int>(type: "int", nullable: true)
+                    BidId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BidLineItems", x => x.Id);
+                    table.PrimaryKey("PK_BidMaterialLineItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BidLineItems_BidInfo_BidId",
+                        name: "FK_BidMaterialLineItems_BidInfo_BidId",
                         column: x => x.BidId,
                         principalTable: "BidInfo",
                         principalColumn: "BidModelBidId",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BidLineItems_BidInfo_MaterialBidBidModelBidId",
-                        column: x => x.MaterialBidBidModelBidId,
-                        principalTable: "BidInfo",
-                        principalColumn: "BidModelBidId");
-                    table.ForeignKey(
-                        name: "FK_BidLineItems_BidInfo_WireBidBidModelBidId",
-                        column: x => x.WireBidBidModelBidId,
-                        principalTable: "BidInfo",
-                        principalColumn: "BidModelBidId");
                 });
 
             migrationBuilder.CreateTable(
@@ -239,6 +227,30 @@ namespace FyreWorksPM.DataAccess.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "BidWireLineItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ItemName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Qty = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    UnitCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    UnitSale = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    BidId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BidWireLineItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BidWireLineItems_BidInfo_BidId",
+                        column: x => x.BidId,
+                        principalTable: "BidInfo",
+                        principalColumn: "BidModelBidId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_BidComponents_BidId",
                 table: "BidComponents",
@@ -255,19 +267,9 @@ namespace FyreWorksPM.DataAccess.Migrations
                 column: "BidModelSiteInfoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BidLineItems_BidId",
-                table: "BidLineItems",
+                name: "IX_BidMaterialLineItems_BidId",
+                table: "BidMaterialLineItems",
                 column: "BidId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BidLineItems_MaterialBidBidModelBidId",
-                table: "BidLineItems",
-                column: "MaterialBidBidModelBidId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BidLineItems_WireBidBidModelBidId",
-                table: "BidLineItems",
-                column: "WireBidBidModelBidId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BidTasks_BidTaskModelBidId",
@@ -278,6 +280,11 @@ namespace FyreWorksPM.DataAccess.Migrations
                 name: "IX_BidTasks_BidTaskModelTaskModelId",
                 table: "BidTasks",
                 column: "BidTaskModelTaskModelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BidWireLineItems_BidId",
+                table: "BidWireLineItems",
+                column: "BidId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Items_ItemModelItemTypeId",
@@ -292,10 +299,13 @@ namespace FyreWorksPM.DataAccess.Migrations
                 name: "BidComponents");
 
             migrationBuilder.DropTable(
-                name: "BidLineItems");
+                name: "BidMaterialLineItems");
 
             migrationBuilder.DropTable(
                 name: "BidTasks");
+
+            migrationBuilder.DropTable(
+                name: "BidWireLineItems");
 
             migrationBuilder.DropTable(
                 name: "Items");
@@ -304,10 +314,10 @@ namespace FyreWorksPM.DataAccess.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "BidInfo");
+                name: "TaskTemplates");
 
             migrationBuilder.DropTable(
-                name: "TaskTemplates");
+                name: "BidInfo");
 
             migrationBuilder.DropTable(
                 name: "ItemTypes");

@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace FyreWorksPM.ViewModels.Creation
 {
-    public partial class BidLineItemViewModel : ObservableObject
+    public partial class BidWireLineItemViewModel : ObservableObject
     {
         private readonly CreateBidViewModel _parent;
         private bool unitSaleManuallySet;
 
-        public BidLineItemViewModel(BidLineItemModel item, CreateBidViewModel parent, Action raiseTotalsCallback)
+        public BidWireLineItemViewModel(BidWireLineItemModel item, CreateBidViewModel parent, Action raiseTotalsCallback)
         {
             Item = item;
             _parent = parent;
@@ -46,7 +46,7 @@ namespace FyreWorksPM.ViewModels.Creation
 
 
 
-        public BidLineItemModel Item { get; }
+        public BidWireLineItemModel Item { get; }
 
         public string ItemName
         {

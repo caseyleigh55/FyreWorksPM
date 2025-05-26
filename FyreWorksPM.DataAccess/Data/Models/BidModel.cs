@@ -24,10 +24,10 @@ public class BidModel
     // 💼 New hotness: Admin & Engineering Tasks
     public List<BidTaskModel> BidModelTasks { get; set; } = new();
     public List<BidComponentLineItemModel> BidModelComponentLineItems { get; set; } = new();
-    [InverseProperty("WireBid")]
-    public List<BidLineItemModel> WireLineItems { get; set; } = new();
-    [InverseProperty("MaterialBid")]
-    public List<BidLineItemModel> MaterialLineItems { get; set; } = new();
+  
+    public List<BidWireLineItemModel> WireLineItems { get; set; } = new();
+    
+    public List<BidMaterialLineItemModel> MaterialLineItems { get; set; } = new();
 
 
 

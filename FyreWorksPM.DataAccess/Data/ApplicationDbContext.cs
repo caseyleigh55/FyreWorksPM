@@ -89,9 +89,10 @@ public class ApplicationDbContext : DbContext
     /// <summary>
     /// Table for BidComponentLineItems categories.
     /// </summary>
-    public DbSet<BidComponentLineItemModel> BidComponents { get; set; } = default!;
+    public DbSet<BidComponentLineItemModel> BidComponentLineItems { get; set; } = default!;
 
-    public DbSet<BidLineItemModel> BidLineItems { get; set; } = default;
+    public DbSet<BidWireLineItemModel> BidWireLineItems { get; set; } = default;
+    public DbSet<BidMaterialLineItemModel> BidMaterialLineItems { get; set; } = default;
 
 
     #endregion    

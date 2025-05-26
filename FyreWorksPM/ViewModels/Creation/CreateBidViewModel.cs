@@ -126,13 +126,13 @@ public partial class CreateBidViewModel : ObservableObject
     public ObservableCollection<BidTaskViewModel> Tasks { get; set; } = new();
     public ObservableCollection<ClientDto> Clients { get; } = new();
     public ObservableCollection<ItemDto> AvailableItems { get; } = new();
-    public ObservableCollection<BidLineItemModel> LineItems { get; } = new();
+    public ObservableCollection<BidWireLineItemModel> LineItems { get; } = new();
     public ObservableCollection<BidTaskViewModel> AdminTasks { get; } = new();
     public ObservableCollection<BidTaskViewModel> EngineeringTasks { get; } = new();
     public ObservableCollection<BidComponentLineItemViewModel> ComponentLineItems { get; } = new();
     
-    public ObservableCollection<BidLineItemViewModel> WireLineItems { get; } = new();
-    public ObservableCollection<BidLineItemViewModel> MaterialLineItems { get; } = new();
+    public ObservableCollection<BidWireLineItemViewModel> WireLineItems { get; } = new();
+    public ObservableCollection<BidMaterialLineItemViewModel> MaterialLineItems { get; } = new();
 
 
 
@@ -345,15 +345,15 @@ public partial class CreateBidViewModel : ObservableObject
     private void AddNewWireItem()
     {
         
-        var item = new BidLineItemModel { ItemName = "Wire", Qty = 1, UnitCost = 0, UnitSale = 0 };
-        var vm = new BidLineItemViewModel(item, this, RaiseWireTotalsChanged);
+        var item = new BidWireLineItemModel { ItemName = "Wire", Qty = 1, UnitCost = 0, UnitSale = 0 };
+        var vm = new BidWireLineItemViewModel(item, this, RaiseWireTotalsChanged);
         WireLineItems.Add(vm);
         OnPropertyChanged(nameof(WireLineItems));
         RaiseWireTotalsChanged();
     }
 
     [RelayCommand]
-    private void RemoveWireItem(BidLineItemViewModel item)
+    private void RemoveWireItem(BidWireLineItemViewModel item)
     {
         WireLineItems.Remove(item);
         RaiseWireTotalsChanged();
@@ -363,14 +363,14 @@ public partial class CreateBidViewModel : ObservableObject
     [RelayCommand]
     private void AddMaterialItem()
     {
-        var item = new BidLineItemModel { ItemName = "Material", Qty = 1, UnitCost = 0, UnitSale = 0 };
-        var vm = new BidLineItemViewModel(item, this, RaiseMaterialTotalsChanged);
+        var item = new BidMaterialLineItemModel { ItemName = "Material", Qty = 1, UnitCost = 0, UnitSale = 0 };
+        var vm = new BidMaterialLineItemViewModel(item, this, RaiseMaterialTotalsChanged);
         MaterialLineItems.Add(vm);
         RaiseMaterialTotalsChanged();
     }
 
     [RelayCommand]
-    private void RemoveMaterialItem(BidLineItemViewModel item)
+    private void RemoveMaterialItem(BidMaterialLineItemViewModel item)
     {
         MaterialLineItems.Remove(item);
         RaiseMaterialTotalsChanged();
@@ -568,7 +568,7 @@ public partial class CreateBidViewModel : ObservableObject
                 InstallLocation = c.InstallLocation
             }).ToList(),
 
-            WireLineItems = WireLineItems.Select(c => new BidLineItemDto
+            WireLineItems = WireLineItems.Select(c => new BidWireLineItemDto
             {
                 ItemName = c.ItemName,
                 Description = c.Description,
@@ -577,7 +577,7 @@ public partial class CreateBidViewModel : ObservableObject
                 UnitSale = c.UnitSale
             }).ToList(),
 
-            MaterialLineItems = MaterialLineItems.Select(c => new BidLineItemDto
+            MaterialLineItems = MaterialLineItems.Select(c => new BidMaterialLineItemDto
             {
                 ItemName = c.ItemName,
                 Description = c.Description,

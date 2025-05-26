@@ -144,7 +144,7 @@ namespace FyreWorksPM.Api.Controllers
             _db.BidInfo.Add(bid);
             await _db.SaveChangesAsync();
 
-            var wireLineItems = dto.WireLineItems.Select(c => new BidLineItemModel
+            var wireLineItems = dto.WireLineItems.Select(c => new BidWireLineItemModel
             {
                 ItemName = c.ItemName,
                 Description = c.Description,
@@ -153,7 +153,7 @@ namespace FyreWorksPM.Api.Controllers
                 UnitSale = c.UnitSale,
                 BidId = bid.BidModelBidId
             }).ToList();
-            var materialLineItems = dto.MaterialLineItems.Select(c => new BidLineItemModel
+            var materialLineItems = dto.MaterialLineItems.Select(c => new BidMaterialLineItemModel
             {
                 ItemName = c.ItemName,
                 Description = c.Description,
@@ -163,8 +163,8 @@ namespace FyreWorksPM.Api.Controllers
                 BidId = bid.BidModelBidId
             }).ToList();
 
-            _db.BidLineItems.AddRange(wireLineItems);
-            _db.BidLineItems.AddRange(materialLineItems);
+            _db.BidWireLineItems.AddRange(wireLineItems);
+            _db.BidMaterialLineItems.AddRange(materialLineItems);
 
             await _db.SaveChangesAsync();
 

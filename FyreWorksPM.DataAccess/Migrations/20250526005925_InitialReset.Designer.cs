@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FyreWorksPM.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250525234232_InitialReset")]
+    [Migration("20250526005925_InitialReset")]
     partial class InitialReset
     {
         /// <inheritdoc />
@@ -60,6 +60,41 @@ namespace FyreWorksPM.DataAccess.Migrations
                     b.HasIndex("BidModelSiteInfoId");
 
                     b.ToTable("BidInfo", (string)null);
+                });
+
+            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidMaterialLineItemModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BidId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Qty")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitSale")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BidId");
+
+                    b.ToTable("BidMaterialLineItems");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidTaskModel", b =>
@@ -241,7 +276,7 @@ namespace FyreWorksPM.DataAccess.Migrations
                     b.ToTable("BidComponents");
                 });
 
-            modelBuilder.Entity("FyreWorksPM.ViewModels.BidLineItemModel", b =>
+            modelBuilder.Entity("FyreWorksPM.ViewModels.BidWireLineItemModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -260,9 +295,6 @@ namespace FyreWorksPM.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("MaterialBidBidModelBidId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("Qty")
                         .HasColumnType("decimal(18,2)");
 
@@ -272,18 +304,11 @@ namespace FyreWorksPM.DataAccess.Migrations
                     b.Property<decimal>("UnitSale")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("WireBidBidModelBidId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BidId");
 
-                    b.HasIndex("MaterialBidBidModelBidId");
-
-                    b.HasIndex("WireBidBidModelBidId");
-
-                    b.ToTable("BidLineItems");
+                    b.ToTable("BidWireLineItems");
                 });
 
             modelBuilder.Entity("ItemModel", b =>
@@ -394,6 +419,17 @@ namespace FyreWorksPM.DataAccess.Migrations
                     b.Navigation("BidModelSiteInfo");
                 });
 
+            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidMaterialLineItemModel", b =>
+                {
+                    b.HasOne("BidModel", "Bid")
+                        .WithMany("MaterialLineItems")
+                        .HasForeignKey("BidId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bid");
+                });
+
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidTaskModel", b =>
                 {
                     b.HasOne("BidModel", "BidTaskModelBid")
@@ -424,27 +460,15 @@ namespace FyreWorksPM.DataAccess.Migrations
                     b.Navigation("Bid");
                 });
 
-            modelBuilder.Entity("FyreWorksPM.ViewModels.BidLineItemModel", b =>
+            modelBuilder.Entity("FyreWorksPM.ViewModels.BidWireLineItemModel", b =>
                 {
                     b.HasOne("BidModel", "Bid")
-                        .WithMany()
+                        .WithMany("WireLineItems")
                         .HasForeignKey("BidId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BidModel", "MaterialBid")
-                        .WithMany("MaterialLineItems")
-                        .HasForeignKey("MaterialBidBidModelBidId");
-
-                    b.HasOne("BidModel", "WireBid")
-                        .WithMany("WireLineItems")
-                        .HasForeignKey("WireBidBidModelBidId");
-
                     b.Navigation("Bid");
-
-                    b.Navigation("MaterialBid");
-
-                    b.Navigation("WireBid");
                 });
 
             modelBuilder.Entity("ItemModel", b =>

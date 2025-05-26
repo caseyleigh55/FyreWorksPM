@@ -9,7 +9,7 @@ namespace FyreWorksPM.ViewModels;
 /// Represents a single line item in a bid,
 /// including quantity, unit cost, markup, and calculated total.
 /// </summary>
-public class BidLineItemModel
+public class BidWireLineItemModel
 {
     public int Id { get; set; }
     public string ItemName { get; set; } = string.Empty;
@@ -21,8 +21,4 @@ public class BidLineItemModel
     // Foreign key relationship
     public int BidId { get; set; }
     public BidModel Bid { get; set; } = null!;
-    
-    public BidModel? WireBid { get; set; }
-    
-    public BidModel? MaterialBid { get; set; }
 }
