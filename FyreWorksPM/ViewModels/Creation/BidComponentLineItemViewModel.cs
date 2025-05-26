@@ -9,7 +9,7 @@ using System.Collections.ObjectModel;
 
 public partial class BidComponentLineItemViewModel : ObservableObject
 {
-    public BidComponentLineItemModel Item { get; }
+    
     private readonly BidLaborConfig _laborOverrides;
     public Action? RaiseComponentTotalsChanged { get; set; }
     private readonly CreateBidViewModel _parentViewModel;
@@ -27,6 +27,20 @@ public partial class BidComponentLineItemViewModel : ObservableObject
     public List<string> InstallTypeOptions { get; set; } = new();
     public List<string> InstallLocationOptions { get; set; } = new();
 
+    public BidComponentLineItemModel Item { get; }
+
+    public int? ItemId
+    {
+        get => Item.ItemId;
+        set
+        {
+            if (Item.ItemId != value)
+            {
+                Item.ItemId = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     public string ItemName
     {
@@ -228,9 +242,11 @@ public partial class BidComponentLineItemViewModel : ObservableObject
 
         Item.ItemName = value.Name;
         Item.Description = value.Description;
+        Item.ItemId = value.Id;
         // Could add more later like default cost suggestions, etc.
         OnPropertyChanged(nameof(ItemName));
         OnPropertyChanged(nameof(Description));
+        OnPropertyChanged(nameof(ItemId));
     }
 
 

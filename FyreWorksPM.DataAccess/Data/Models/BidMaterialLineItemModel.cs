@@ -10,6 +10,7 @@ namespace FyreWorksPM.DataAccess.Data.Models
     {
         public int Id { get; set; }
         public string ItemName { get; set; } = string.Empty;
+        public int? ItemId { get; set; }
         public string Description { get; set; } = string.Empty;
         public decimal Qty { get; set; }
         public decimal UnitCost { get; set; }

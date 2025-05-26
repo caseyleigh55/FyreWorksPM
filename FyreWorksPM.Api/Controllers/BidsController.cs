@@ -109,7 +109,7 @@ namespace FyreWorksPM.Api.Controllers
             //
             var bidComponentLineItems = dto.ComponentLineItems.Select(c => new BidComponentLineItemModel
             {
-                ItemId = c.Id, // keep this if you're referencing an existing item/template
+                ItemId = c.ItemId, // keep this if you're referencing an existing item/template
                 ItemName = c.Name,
                 Description = c.Description,
                 Type = c.Type,
@@ -146,6 +146,7 @@ namespace FyreWorksPM.Api.Controllers
 
             var wireLineItems = dto.WireLineItems.Select(c => new BidWireLineItemModel
             {
+                ItemId = c.ItemId,
                 ItemName = c.ItemName,
                 Description = c.Description,
                 Qty = c.Qty,
@@ -155,6 +156,7 @@ namespace FyreWorksPM.Api.Controllers
             }).ToList();
             var materialLineItems = dto.MaterialLineItems.Select(c => new BidMaterialLineItemModel
             {
+                ItemId = c.ItemId,
                 ItemName = c.ItemName,
                 Description = c.Description,
                 Qty = c.Qty,

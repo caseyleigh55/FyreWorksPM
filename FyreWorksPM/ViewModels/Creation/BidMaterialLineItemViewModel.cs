@@ -32,6 +32,7 @@ namespace FyreWorksPM.ViewModels.Creation
                     {
                         ItemName = value.Name;
                         Description = value.Description;
+                        ItemId = value.Id;
                         // optionally UnitCost and UnitSale, if you ever save them from the item
                     }
 
@@ -43,6 +44,19 @@ namespace FyreWorksPM.ViewModels.Creation
 
 
         public BidMaterialLineItemModel Item { get; }
+
+        public int? ItemId
+        {
+            get => Item.ItemId;
+            set
+            {
+                if (Item.ItemId != value)
+                {
+                    Item.ItemId = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public string ItemName
         {

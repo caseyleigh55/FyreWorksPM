@@ -462,7 +462,11 @@ public partial class CreateBidViewModel : ObservableObject
         {
             AvailableItems.Clear();
             foreach (var item in items)
+            {
+                Debug.WriteLine($"🧠 Item: {item.Name} - ID: {item.Id}");
                 AvailableItems.Add(item);
+            }
+            
         });
         Debug.WriteLine($"Loaded {items.Count} items from API");
         foreach (var i in items)
@@ -559,7 +563,7 @@ public partial class CreateBidViewModel : ObservableObject
 
             ComponentLineItems = ComponentLineItems.Select(c => new BidComponentLineItemDto
             {
-                Id = c.Item?.ItemId ?? 0,
+                ItemId = c.Item?.ItemId ?? 0,
                 Name = c.ItemName,
                 Description = c.Description,
                 Type = c.Type,
@@ -573,6 +577,7 @@ public partial class CreateBidViewModel : ObservableObject
 
             WireLineItems = WireLineItems.Select(c => new BidWireLineItemDto
             {
+                ItemId = c.Item?.ItemId ?? 0,
                 ItemName = c.ItemName,
                 Description = c.Description,
                 Qty = c.Qty,
@@ -582,6 +587,7 @@ public partial class CreateBidViewModel : ObservableObject
 
             MaterialLineItems = MaterialLineItems.Select(c => new BidMaterialLineItemDto
             {
+                ItemId = c.Item?.ItemId ?? 0,
                 ItemName = c.ItemName,
                 Description = c.Description,
                 Qty = c.Qty,

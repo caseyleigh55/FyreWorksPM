@@ -9,6 +9,7 @@ namespace FyreWorksPM.DataAccess.DTO
     public class BidWireLineItemDto
     {
         public string ItemName { get; set; } = string.Empty;
+        public int? ItemId { get; set; }
         public string Description { get; set; } = string.Empty;
         public decimal Qty { get; set; }
         public decimal UnitCost { get; set; }
