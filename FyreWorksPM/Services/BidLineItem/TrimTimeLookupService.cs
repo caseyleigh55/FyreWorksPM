@@ -2,23 +2,25 @@
 {
     public static class TrimTimeLookupService
     {
-        private static readonly Dictionary<string, int> _trimTimes = new()
-        {
-            ["Normal"] = 15,
-            ["Lift"] = 30,
-            ["Panel"] = 45,
-            ["Pipe"] = 60
-        };
+        private static readonly Dictionary<string, double> _trimHoursByType =
+            new()
+            {
+                ["normal"] = 0.5,
+                ["lift"] = 1.0,
+                ["panel"] = 1.0,
+                ["pipe"] = 1.0
+            };
 
-        public static int GetMinutes(string installType)
+        public static double GetHours(string installType)
         {
             if (string.IsNullOrWhiteSpace(installType))
                 return 0;
 
-            return _trimTimes.TryGetValue(installType.Trim(), out var minutes)
-                ? minutes
+            return _trimHoursByType.TryGetValue(installType.Trim().ToLowerInvariant(), out var hours)
+                ? hours
                 : 0;
         }
     }
+
 
 }

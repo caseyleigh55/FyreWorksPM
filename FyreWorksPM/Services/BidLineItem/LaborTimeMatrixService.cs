@@ -8,28 +8,35 @@ namespace FyreWorksPM.Services.BidLineItem
 {
     public static class LaborTimeMatrixService
     {
-        private static readonly Dictionary<string, Dictionary<string, int>> _matrix = new()
-        {
-            ["warehouse"] = new() { ["Normal"] = 30, ["Lift"] = 60, ["Pipe"] = 60 },
-            ["hardlid"] = new() { ["Normal"] = 30, ["Lift"] = 60, ["Pipe"] = 60 },
-            ["tbar"] = new() { ["Normal"] = 15, ["Lift"] = 60, ["Pipe"] = 60 },
-            ["underground"] = new() { ["Pipe"] = 60 },
-            ["panel room"] = new() { ["Panel"] = 60 }
-        };
+        private static readonly Dictionary<string, Dictionary<string, double>> _hourMatrix =
+            new()
+            {
+                ["warehouse"] = new() { ["normal"] = 0.5, ["lift"] = 1.0, ["panel"] = 1.0, ["pipe"] = 0.5 },
+                ["hardlid"] = new() { ["normal"] = 0.5, ["lift"] = 1.0, ["panel"] = 1.0, ["pipe"] = 0.5 },
+                ["tbar"] = new() { ["normal"] = 0.25, ["lift"] = 0.5, ["panel"] = 1.0, ["pipe"] = 1.0 },
+                ["underground"] = new() { ["normal"] = 0.25, ["lift"] = 1.5, ["panel"] = 1.0, ["pipe"] = 1.5 },
+                ["panel room"] = new() { ["normal"] = 0.25, ["lift"] = 1.0, ["panel"] = 1.0, ["pipe"] = 1.0 },
+                ["demo"] = new() { ["normal"] = 0.5 },
+                ["trim"] = new() { ["normal"] = 0.5, ["lift"] = 1.0, ["panel"] = 1.0, ["pipe"] = 1.0 }
+            };
 
-        public static int? GetMinutes(string location, string installType)
+        public static double? GetHours(string location, string installType)
         {
             if (string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(installType))
                 return null;
 
-            location = location.Trim().ToLowerInvariant();
-            installType = installType.Trim();
+            var loc = location.Trim().ToLowerInvariant();
+            var type = installType.Trim().ToLowerInvariant();
 
-            return _matrix.TryGetValue(location, out var installMap) &&
-                   installMap.TryGetValue(installType, out var minutes)
-                   ? minutes
-                   : null;
+            if (_hourMatrix.TryGetValue(loc, out var typeDict) &&
+                typeDict.TryGetValue(type, out var hours))
+            {
+                return hours;
+            }
+
+            return null;
         }
     }
+
 
 }

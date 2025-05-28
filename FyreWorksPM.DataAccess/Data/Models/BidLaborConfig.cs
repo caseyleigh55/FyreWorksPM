@@ -4,11 +4,13 @@
     {
         public Guid BidId { get; set; }
 
-        // Per-location & install-type override
-        public Dictionary<string, Dictionary<string, int>> PrewireMinutes { get; set; } = new();
+        // Prewire hours per location + install type
+        public Dictionary<string, Dictionary<string, double>> PrewireHours { get; set; } = new();
 
-        // Per-install-type override
-        public Dictionary<string, int> TrimMinutes { get; set; } = new();
+        // Trim hours per install type
+        public Dictionary<string, double> TrimHours { get; set; } = new();
+
+        // Optional: Demo hours per install type
+        public Dictionary<string, double> DemoHours { get; set; } = new();
     }
-
 }

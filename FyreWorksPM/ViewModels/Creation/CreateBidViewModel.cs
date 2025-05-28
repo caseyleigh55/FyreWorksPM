@@ -11,10 +11,9 @@ using FyreWorksPM.Services.Item;
 using FyreWorksPM.Services.Navigation;
 using FyreWorksPM.Services.Tasks;
 using FyreWorksPM.Utilities;
-using Microsoft.Maui.ApplicationModel;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
+
 
 namespace FyreWorksPM.ViewModels.Creation;
 
@@ -52,11 +51,32 @@ public partial class CreateBidViewModel : ObservableObject
         _navigationService = navigationService;
 
         CreatedDate = DateTime.Today;
+
+        LaborHourMatrix = new ObservableCollection<InstallLocationHoursViewModel>
+{
+    new() { LocationName = "Warehouse", NormalHours = 0.5, LiftHours = 1.0, PanelHours = 0.0, PipeHours = 1.0 },
+    new() { LocationName = "Hardlid", NormalHours = 0.5, LiftHours = 1.0, PanelHours = 0.0, PipeHours = 1.0 },
+    new() { LocationName = "T-Bar", NormalHours = 0.25, LiftHours = 1.0, PanelHours = 0.0, PipeHours = 1.0 },
+    new() { LocationName = "Underground", NormalHours = 1.0, LiftHours = 0.0, PanelHours = 0.0, PipeHours = 0.0 },
+    new() { LocationName = "Panel Room", NormalHours = 1.0, LiftHours = 0.0, PanelHours = 1.0, PipeHours = 0.0 },
+    new() { LocationName = "Demo", NormalHours = 0.25, LiftHours = 0.75, PanelHours = 1.0, PipeHours = 1.0 },
+    new() { LocationName = "Trim", NormalHours = 0.25, LiftHours = 0.5, PanelHours = 3.0, PipeHours = 0.0 }
+};
+        DeviceHourSummaries = new ObservableCollection<DeviceHourSummaryViewModel>
+{
+    new() { ActivityType = "PreWire" },
+    new() { ActivityType = "Trim" },
+    new() { ActivityType = "Demo" }
+};
+
         NavigateToCreateTasksCommand = new AsyncRelayCommand(NavigateToCreateTasksAsync);
         NavigateToCreateItemsCommand = new AsyncRelayCommand(NavigateToCreateItemAsync);
 
         AdminTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseAdminTotalsChanged);
         EngineeringTasks.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseEngineeringTotalsChanged);
+
+        PrewireDeviceHours.CollectionChanged += (_, __) => RaiseComponentTotalsChanged();
+
         //ComponentLineItems.CollectionChanged += (s, e) => HookTaskHandlers(e, RaiseComponentTotalsChanged);
 
         MaterialMarkup = 40;
@@ -130,8 +150,18 @@ public partial class CreateBidViewModel : ObservableObject
     public ObservableCollection<BidWireLineItemModel> LineItems { get; } = new();
     public ObservableCollection<BidTaskViewModel> AdminTasks { get; } = new();
     public ObservableCollection<BidTaskViewModel> EngineeringTasks { get; } = new();
-    public ObservableCollection<BidComponentLineItemViewModel> ComponentLineItems { get; } = new();
-    
+
+    public ObservableCollection<InstallLocationHoursViewModel> LaborHourMatrix { get; set; }
+    public ObservableCollection<DeviceHourSummaryViewModel> DeviceHourSummaries { get; set; }
+    public ObservableCollection<LaborSummaryRowViewModel> PrewireDeviceHours { get; set; } = new();
+    [ObservableProperty]
+    private LaborSummaryRowViewModel trimSummaryRow = new() { Location = "Trim" };
+    [ObservableProperty]
+    private LaborSummaryRowViewModel demoSummaryRow = new() { Location = "Demo" };
+
+
+
+    public ObservableCollection<BidComponentLineItemViewModel> ComponentLineItems { get; } = new();    
     public ObservableCollection<BidWireLineItemViewModel> WireLineItems { get; } = new();
     public ObservableCollection<BidMaterialLineItemViewModel> MaterialLineItems { get; } = new();
 
@@ -143,7 +173,7 @@ public partial class CreateBidViewModel : ObservableObject
 
     public ObservableCollection<string> YesNoOptions { get; } = new() { "Yes", "No" };
     public List<string> InstallTypeOptions { get; } = new() { "Normal", "Lift", "Panel", "Pipe" };
-    public List<string> InstallLocationOptions { get; } = new() { "warehouse", "hardlid", "tbar", "underground", "panel room" };
+    public List<string> InstallLocationOptions { get; } = new() { "Warehouse", "Hardlid", "T-Bar", "Underground", "Panel Room", "Demo"};
 
     #endregion
 
@@ -165,6 +195,44 @@ public partial class CreateBidViewModel : ObservableObject
     public decimal AdminEngCostTotal => AdminCostTotal + EngineeringCostTotal;
     public decimal AdminEngSaleTotal => AdminSaleTotal + EngineeringSaleTotal;
 
+    //public double PrewireTotalHours => PrewireDeviceHours?.Sum(x => x.TotalHours) ?? 0;
+    //public double DemoTotalHours => DemoSummaryRow?.TotalHours ?? 0;
+    //public double TrimTotalHours => TrimSummaryRow?.TotalHours ?? 0;
+    //public double TotalCombinedHours => PrewireTotalHours + DemoTotalHours + TrimTotalHours;
+
+    // Backing fields
+    private double _prewireTotalHours;
+    private double _demoTotalHours;
+    private double _trimTotalHours;
+    private double _totalCombinedHours;
+
+    // Public properties
+    public double PrewireTotalHours
+    {
+        get => _prewireTotalHours;
+        set => SetProperty(ref _prewireTotalHours, value);
+    }
+
+    public double DemoTotalHours
+    {
+        get => _demoTotalHours;
+        set => SetProperty(ref _demoTotalHours, value);
+    }
+
+    public double TrimTotalHours
+    {
+        get => _trimTotalHours;
+        set => SetProperty(ref _trimTotalHours, value);
+    }
+
+    public double TotalCombinedHours
+    {
+        get => _totalCombinedHours;
+        set => SetProperty(ref _totalCombinedHours, value);
+    }
+
+
+
     public decimal PanelLineItemsCostTotal => ComponentLineItems.Sum(t => t.UnitCost * t.Qty);
     public decimal PanelLineItemsSaleTotal => ComponentLineItems.Sum(t => t.UnitSale * t.Qty);
 
@@ -175,8 +243,9 @@ public partial class CreateBidViewModel : ObservableObject
     public decimal MaterialLineItemsSaleTotal => MaterialLineItems.Sum(i => i.UnitSale * i.Qty);
 
 
-    public int TotalComponentMinutes => ComponentLineItems.Sum(x => x.TotalMinutes);
-    public double TotalComponentHours => Math.Round(TotalComponentMinutes / 60.0, 2);
+
+    public double TotalComponentHours => ComponentLineItems.Sum(item => item.TotalHours);
+
 
     public BidLaborConfig LaborOverrides { get; set; } = new();
 
@@ -250,6 +319,268 @@ public partial class CreateBidViewModel : ObservableObject
 
     #endregion
 
+    public double GetLaborRate(string location, string installType)
+    {
+        var match = LaborHourMatrix.FirstOrDefault(x =>
+            string.Equals(x.LocationName, location, StringComparison.OrdinalIgnoreCase));
+
+        if (match == null)
+            return 0;
+
+        return installType.ToLower() switch
+        {
+            "normal" => match.NormalHours,
+            "lift" => match.LiftHours,
+            "panel" => match.PanelHours,
+            "pipe" => match.PipeHours,
+            _ => 0
+        };
+    }
+
+    public void RecalculateDemoSummary()
+    {
+        var matrix = LaborHourMatrix.FirstOrDefault(x =>
+            x.LocationName.Trim().Equals("demo", StringComparison.OrdinalIgnoreCase));
+
+        if (matrix == null)
+        {
+            Debug.WriteLine("[DEMO] Matrix row for 'demo' not found!");
+            return;
+        }
+
+        DemoSummaryRow.Location = "Demo";
+        DemoSummaryRow.NormalCount = 0;
+        DemoSummaryRow.LiftCount = 0;
+        DemoSummaryRow.PanelCount = 0;
+        DemoSummaryRow.PipeCount = 0;
+        DemoSummaryRow.TotalHours = 0;
+
+        foreach (var item in ComponentLineItems.Where(i => i.InstallLocation?.Trim().ToLower() == "demo"))
+        {
+            switch (item.InstallType?.Trim().ToLower())
+            {
+                case "normal":
+                    DemoSummaryRow.NormalCount += item.Qty;
+                    DemoSummaryRow.TotalHours += item.Qty * matrix.NormalHours;
+                    break;
+                case "lift":
+                    DemoSummaryRow.LiftCount += item.Qty;
+                    DemoSummaryRow.TotalHours += item.Qty * matrix.LiftHours;
+                    break;
+                case "panel":
+                    DemoSummaryRow.PanelCount += item.Qty;
+                    DemoSummaryRow.TotalHours += item.Qty * matrix.PanelHours;
+                    break;
+                case "pipe":
+                    DemoSummaryRow.PipeCount += item.Qty;
+                    DemoSummaryRow.TotalHours += item.Qty * matrix.PipeHours;
+                    break;
+            }
+
+            if (item.Piped)
+            {
+                DemoSummaryRow.PipeCount += item.Qty;
+                DemoSummaryRow.TotalHours += item.Qty * matrix.PipeHours;
+            }
+        }
+    }
+
+
+    public void RecalculatePrewireDeviceHours()
+    {
+        PrewireDeviceHours.Clear();
+
+        var grouped = ComponentLineItems
+            .Where(i => i.InstallLocation?.ToLower() != "demo") // Exclude demo
+            .GroupBy(i => i.InstallLocation?.ToLower());
+
+        foreach (var group in grouped)
+        {
+            var location = group.Key ?? string.Empty;
+            var matrix = LaborHourMatrix.FirstOrDefault(x =>
+    x.LocationName.Trim().Equals(location?.Trim(), StringComparison.OrdinalIgnoreCase));
+
+
+            if (matrix == null)
+                continue;
+
+            var row = new LaborSummaryRowViewModel
+            {
+                Location = matrix.LocationName,
+            };
+
+            foreach (var item in group)
+            {
+                switch (item.InstallType.ToLower())
+                {
+                    case "normal":
+                        row.NormalCount += item.Qty;
+                        row.TotalHours += item.Qty * matrix.NormalHours;
+                        break;
+                    case "lift":
+                        row.LiftCount += item.Qty;
+                        row.TotalHours += item.Qty * matrix.LiftHours;
+                        break;
+                    case "panel":
+                        row.PanelCount += item.Qty;
+                        row.TotalHours += item.Qty * matrix.PanelHours;
+                        break;
+                    case "pipe":
+                        row.PipeCount += item.Qty;
+                        row.TotalHours += item.Qty * matrix.PipeHours;
+                        break;
+                }
+                if (item.Piped)
+                {
+                    row.PipeCount += item.Qty;
+                    row.TotalHours += item.Qty * matrix.PipeHours;
+                }
+            }
+
+            PrewireDeviceHours.Add(row);
+        }
+    }
+
+
+    public void RecalculateDeviceHourTotals()
+    {
+        var trimSummary = DeviceHourSummaries.FirstOrDefault(x => x.ActivityType == "Trim");
+        if (trimSummary != null)
+        {
+            trimSummary.NormalCount = 0;
+            trimSummary.LiftCount = 0;
+            trimSummary.PanelCount = 0;
+            trimSummary.PipeCount = 0;
+            trimSummary.TotalHours = 0;
+
+            foreach (var item in ComponentLineItems)
+            {
+                switch (item.InstallType.ToLower())
+                {
+                    case "normal":
+                        trimSummary.NormalCount += item.Qty;
+                        trimSummary.TotalHours += item.Qty * LaborHourMatrix.First(x => x.LocationName.ToLower() == item.InstallLocation.ToLower()).NormalHours;
+                        break;
+                    case "lift":
+                        trimSummary.LiftCount += item.Qty;
+                        trimSummary.TotalHours += item.Qty * LaborHourMatrix.First(x => x.LocationName.ToLower() == item.InstallLocation.ToLower()).LiftHours;
+                        break;
+                    case "panel":
+                        trimSummary.PanelCount += item.Qty;
+                        trimSummary.TotalHours += item.Qty * LaborHourMatrix.First(x => x.LocationName.ToLower() == item.InstallLocation.ToLower()).PanelHours;
+                        break;
+                    case "pipe":
+                        trimSummary.PipeCount += item.Qty;
+                        trimSummary.TotalHours += item.Qty * LaborHourMatrix.First(x => x.LocationName.ToLower() == item.InstallLocation.ToLower()).PipeHours;
+                        break;
+                }
+               
+            }
+        }
+
+        var demoSummary = DeviceHourSummaries.FirstOrDefault(x => x.ActivityType == "Demo");
+        if (demoSummary != null)
+        {
+            demoSummary.NormalCount = 0;
+            demoSummary.LiftCount = 0;
+            demoSummary.PanelCount = 0;
+            demoSummary.PipeCount = 0;
+            demoSummary.TotalHours = 0;
+
+            foreach (var item in ComponentLineItems.Where(i => i.InstallLocation?.ToLower() == "demo"))
+            {
+                switch (item.InstallType.ToLower())
+                {
+                    case "normal": demoSummary.NormalCount += item.Qty; break;
+                    case "lift": demoSummary.LiftCount += item.Qty; break;
+                    case "panel": demoSummary.PanelCount += item.Qty; break;
+                    case "pipe": demoSummary.PipeCount += item.Qty; break;
+                }
+
+                demoSummary.TotalHours += item.TotalHours;
+            }
+        }
+
+        var prewireSummary = DeviceHourSummaries.FirstOrDefault(x => x.ActivityType == "PreWire");
+        if (prewireSummary != null)
+        {
+            prewireSummary.NormalCount = 0;
+            prewireSummary.LiftCount = 0;
+            prewireSummary.PanelCount = 0;
+            prewireSummary.PipeCount = 0;
+            prewireSummary.TotalHours = 0;
+
+            foreach (var item in ComponentLineItems.Where(i => i.InstallLocation?.ToLower() != "demo"))
+            {
+                switch (item.InstallType.ToLower())
+                {
+                    case "normal": prewireSummary.NormalCount += item.Qty; break;
+                    case "lift": prewireSummary.LiftCount += item.Qty; break;
+                    case "panel": prewireSummary.PanelCount += item.Qty; break;
+                    case "pipe": prewireSummary.PipeCount += item.Qty; break;
+                }
+
+                prewireSummary.TotalHours += item.TotalHours;
+            }
+        }
+
+
+    }
+
+    public void RecalculateTrimSummary()
+    {
+
+        var matrix = LaborHourMatrix.FirstOrDefault(x =>
+            x.LocationName.Trim().Equals("Trim", StringComparison.OrdinalIgnoreCase));
+
+        if (matrix == null)
+        {
+            return;
+        }
+
+        trimSummaryRow.Location = "Trim";
+        trimSummaryRow.NormalCount = 0;
+        trimSummaryRow.LiftCount = 0;
+        trimSummaryRow.PanelCount = 0;
+        trimSummaryRow.PipeCount = 0;
+        trimSummaryRow.TotalHours = 0;
+
+        foreach (var item in ComponentLineItems)
+        {
+            if (item.InstallLocation?.Trim().ToLower() == "demo")
+                continue; // 🛑 Skip demo items!
+            switch (item.InstallType.ToLower())
+            {
+                case "normal":
+                    trimSummaryRow.NormalCount += item.Qty;
+                    trimSummaryRow.TotalHours += item.Qty * matrix.NormalHours;
+                    break;
+                case "lift":
+                    trimSummaryRow.LiftCount += item.Qty;
+                    trimSummaryRow.TotalHours += item.Qty * matrix.LiftHours;
+                    break;
+                case "panel":
+                    trimSummaryRow.PanelCount += item.Qty;
+                    trimSummaryRow.TotalHours += item.Qty * matrix.PanelHours;
+                    break;
+                case "pipe":
+                    trimSummaryRow.PipeCount += item.Qty;
+                    trimSummaryRow.TotalHours += item.Qty * matrix.PipeHours;
+                    break;               
+            }
+            if (item.Piped)
+            {
+                TrimSummaryRow.PipeCount += item.Qty;
+                TrimSummaryRow.TotalHours += item.Qty * matrix.PipeHours;
+            }
+        }
+    }
+
+
+
+
+
+
     #region Task Templates
 
     public async Task LoadTaskTemplatesAsync()
@@ -295,10 +626,19 @@ public partial class CreateBidViewModel : ObservableObject
 
     private void RaiseComponentTotalsChanged()
     {
-        OnPropertyChanged(nameof(TotalComponentMinutes));
         OnPropertyChanged(nameof(TotalComponentHours));
         OnPropertyChanged(nameof(PanelLineItemsCostTotal));
         OnPropertyChanged(nameof(PanelLineItemsSaleTotal));
+        RecalculatePrewireDeviceHours();
+        RecalculateTrimSummary();
+        RecalculateDemoSummary();
+
+        PrewireTotalHours = PrewireDeviceHours.Sum(x => x.TotalHours);
+        DemoTotalHours = DemoSummaryRow?.TotalHours ?? 0;
+        TrimTotalHours = TrimSummaryRow?.TotalHours ?? 0;
+        TotalCombinedHours = PrewireTotalHours + DemoTotalHours + TrimTotalHours;
+
+
     }
 
     private void RaiseWireTotalsChanged()

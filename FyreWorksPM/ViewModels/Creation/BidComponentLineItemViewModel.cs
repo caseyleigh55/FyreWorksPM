@@ -202,38 +202,60 @@ public partial class BidComponentLineItemViewModel : ObservableObject
         }
     }
 
-    public int PrewireMinutes
+    public double PrewireHours
     {
         get
         {
             var loc = Item.InstallLocation?.ToLowerInvariant().Trim();
             var type = Item.InstallType?.Trim();
 
-            if (_laborOverrides?.PrewireMinutes.TryGetValue(loc, out var byType) == true &&
-                byType.TryGetValue(type, out var mins))
-                return mins;
+            if (_laborOverrides?.PrewireHours.TryGetValue(loc, out var byType) == true &&
+                byType.TryGetValue(type, out var hours))
+                return hours;
 
-            return LaborTimeMatrixService.GetMinutes(loc, type) ?? 0;
+            return LaborTimeMatrixService.GetHours(loc, type) ?? 0;
         }
     }
 
-    public int TrimMinutes
+    public double TrimHours
     {
         get
         {
             if (_laborOverrides != null &&
-                _laborOverrides.TrimMinutes.TryGetValue(Item.InstallType, out var mins))
+                _laborOverrides.TrimHours.TryGetValue(Item.InstallType, out var hours))
             {
-                return mins;
+                return hours;
             }
 
-            return TrimTimeLookupService.GetMinutes(Item.InstallType);
+            return TrimTimeLookupService.GetHours(Item.InstallType);
+        }
+    }
+
+    public double DemoHours
+    {
+        get
+        {
+            // Optional: create a new DemoHour override dictionary or just hardcode for now
+            if (_laborOverrides?.DemoHours.TryGetValue(Item.InstallType, out var hours) == true)
+            {
+                return hours;
+            }
+
+            // Example fallback:
+            return 0.5;
         }
     }
 
 
-    public int TotalMinutes => Qty * (PrewireMinutes + TrimMinutes);
-    public double TotalHours => Math.Round(TotalMinutes / 60.0, 2);
+    public double PrewireTotalHours => Math.Round(Qty * PrewireHours, 2);
+    public double TrimTotalHours => Math.Round(Qty * TrimHours, 2);
+    public double DemoTotalHours => Math.Round(Qty * DemoHours, 2);
+
+
+    public double TotalHours => PrewireTotalHours + TrimTotalHours + DemoTotalHours;
+
+
+    //public double TotalHours => Math.Round(TotalMinutes / 60.0, 2);
 
     [ObservableProperty] private ItemDto selectedItem;
     partial void OnSelectedItemChanged(ItemDto? value)
