@@ -988,7 +988,7 @@ HorizontalTextAlignment="Start" />
 
                             <!-- Totals -->
                             <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
-                                <Label Text="Panel Totals:" FontAttributes="Bold" Grid.Column="0" />
+                                <Label Text="Wire Totals:" FontAttributes="Bold" Grid.Column="0" />
 
                                 <!-- Cost total -->
                                 <Label Grid.Column="1"
@@ -1095,7 +1095,7 @@ HorizontalTextAlignment="Start" />
 
                             <!-- Totals -->
                             <Grid ColumnDefinitions="4*,*,*" Padding="0,10,0,0">
-                                <Label Text="Panel Totals:" FontAttributes="Bold" Grid.Column="0" />
+                                <Label Text="Materials Totals:" FontAttributes="Bold" Grid.Column="0" />
 
                                 <!-- Cost total -->
                                 <Label Grid.Column="1"

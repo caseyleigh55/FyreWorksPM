@@ -384,60 +384,75 @@ public partial class CreateBidViewModel : ObservableObject
             }
         }
     }
+    private bool _isUpdatingPrewire;
 
 
     public void RecalculatePrewireDeviceHours()
     {
-        PrewireDeviceHours.Clear();
+        if (_isUpdatingPrewire) return;
+
+        _isUpdatingPrewire = true;
+
+        try
+        {
+            PrewireDeviceHours.Clear();
+        
 
         var grouped = ComponentLineItems
             .Where(i => i.InstallLocation?.ToLower() != "demo") // Exclude demo
             .GroupBy(i => i.InstallLocation?.ToLower());
 
-        foreach (var group in grouped)
-        {
-            var location = group.Key ?? string.Empty;
-            var matrix = LaborHourMatrix.FirstOrDefault(x =>
-    x.LocationName.Trim().Equals(location?.Trim(), StringComparison.OrdinalIgnoreCase));
-
-
-            if (matrix == null)
-                continue;
-
-            var row = new LaborSummaryRowViewModel
+            foreach (var group in grouped)
             {
-                Location = matrix.LocationName,
-            };
+                var location = group.Key ?? string.Empty;
+                var matrix = LaborHourMatrix.FirstOrDefault(x =>
+        x.LocationName.Trim().Equals(location?.Trim(), StringComparison.OrdinalIgnoreCase));
 
-            foreach (var item in group)
-            {
-                switch (item.InstallType.ToLower())
+
+                if (matrix == null)
+                    continue;
+
+                var row = new LaborSummaryRowViewModel
                 {
-                    case "normal":
-                        row.NormalCount += item.Qty;
-                        row.TotalHours += item.Qty * matrix.NormalHours;
-                        break;
-                    case "lift":
-                        row.LiftCount += item.Qty;
-                        row.TotalHours += item.Qty * matrix.LiftHours;
-                        break;
-                    case "panel":
-                        row.PanelCount += item.Qty;
-                        row.TotalHours += item.Qty * matrix.PanelHours;
-                        break;
-                    case "pipe":
+                    Location = matrix.LocationName,
+                };
+
+                foreach (var item in group)
+                {
+                    switch (item.InstallType.ToLower())
+                    {
+                        case "normal":
+                            row.NormalCount += item.Qty;
+                            row.TotalHours += item.Qty * matrix.NormalHours;
+                            break;
+                        case "lift":
+                            row.LiftCount += item.Qty;
+                            row.TotalHours += item.Qty * matrix.LiftHours;
+                            break;
+                        case "panel":
+                            row.PanelCount += item.Qty;
+                            row.TotalHours += item.Qty * matrix.PanelHours;
+                            break;
+                        case "pipe":
+                            row.PipeCount += item.Qty;
+                            row.TotalHours += item.Qty * matrix.PipeHours;
+                            break;
+                    }
+                    if (item.Piped)
+                    {
                         row.PipeCount += item.Qty;
                         row.TotalHours += item.Qty * matrix.PipeHours;
-                        break;
+                    }
                 }
-                if (item.Piped)
-                {
-                    row.PipeCount += item.Qty;
-                    row.TotalHours += item.Qty * matrix.PipeHours;
-                }
+
+                PrewireDeviceHours.Add(row);
             }
 
-            PrewireDeviceHours.Add(row);
+        }
+        finally
+        {
+            _isUpdatingPrewire = false;
+
         }
     }
 
