@@ -13,6 +13,7 @@ using FyreWorksPM.Services.Tasks;
 using FyreWorksPM.Utilities;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Windows.Input;
 
 
 namespace FyreWorksPM.ViewModels.Creation;
@@ -121,6 +122,65 @@ public partial class CreateBidViewModel : ObservableObject
 
     [ObservableProperty] private decimal materialMarkup;
 
+    public string MaterialExpandButtonText => IsMaterialExpanded ? "△" : "▽";
+    public double MaterialListHeight => IsMaterialExpanded ? -1 : 200;
+    public ICommand ToggleMaterialExpandCommand => new RelayCommand(() => IsMaterialExpanded = !IsMaterialExpanded);
+    private bool _isMaterialExpanded;
+    public bool IsMaterialExpanded
+    {
+        get => _isMaterialExpanded;
+        set
+        {
+            if (SetProperty(ref _isMaterialExpanded, value))
+            {
+                OnPropertyChanged(nameof(MaterialListHeight));
+                OnPropertyChanged(nameof(MaterialExpandButtonText));
+            }
+        }
+    }
+
+    public string WireExpandButtonText => IsWireExpanded ? "△" : "▽";
+    public double WireListHeight => IsWireExpanded ? -1 : 200;
+    public ICommand ToggleWireExpandCommand => new RelayCommand(() => IsWireExpanded = !IsWireExpanded);
+    private bool _isWireExpanded;
+    public bool IsWireExpanded
+    {
+        get => _isWireExpanded;
+        set
+        {
+            if (SetProperty(ref _isWireExpanded, value))
+            {
+                OnPropertyChanged(nameof(WireListHeight));
+                OnPropertyChanged(nameof(WireExpandButtonText));
+            }
+        }
+    }
+
+    public string ComponentExpandButtonText => IsComponentExpanded ? "△" : "▽";
+    public double ComponentListHeight => IsComponentExpanded ? -1 : 200;
+    public ICommand ToggleComponentExpandCommand => new RelayCommand(() => IsComponentExpanded = !IsComponentExpanded);
+    private bool _isComponentExpanded;
+    public bool IsComponentExpanded
+    {
+        get => _isComponentExpanded;
+        set
+        {
+            if (SetProperty(ref _isComponentExpanded, value))
+            {
+                OnPropertyChanged(nameof(ComponentListHeight));
+                OnPropertyChanged(nameof(ComponentExpandButtonText));
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
 
     // For SearchableEntryView's selected item
     [ObservableProperty]
@@ -195,10 +255,186 @@ public partial class CreateBidViewModel : ObservableObject
     public decimal AdminEngCostTotal => AdminCostTotal + EngineeringCostTotal;
     public decimal AdminEngSaleTotal => AdminSaleTotal + EngineeringSaleTotal;
 
-    //public double PrewireTotalHours => PrewireDeviceHours?.Sum(x => x.TotalHours) ?? 0;
-    //public double DemoTotalHours => DemoSummaryRow?.TotalHours ?? 0;
-    //public double TrimTotalHours => TrimSummaryRow?.TotalHours ?? 0;
-    //public double TotalCombinedHours => PrewireTotalHours + DemoTotalHours + TrimTotalHours;
+    // Regular Hours
+    private decimal _prewireJourneymanHours;
+    public decimal PrewireJourneymanHours
+    {
+        get => _prewireJourneymanHours;
+        set
+        {
+            if (SetProperty(ref _prewireJourneymanHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
+    private decimal _trimJourneymanHours;
+    public decimal TrimJourneymanHours
+    {
+        get => _trimJourneymanHours;
+        set
+        {
+            if (SetProperty(ref _trimJourneymanHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
+    private decimal _testJourneymanHours;
+    public decimal TestJourneymanHours
+    {
+        get => _testJourneymanHours;
+        set
+        {
+            if (SetProperty(ref _testJourneymanHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
+    private decimal _prewireApprenticeHours;
+    public decimal PrewireApprenticeHours
+    {
+        get => _prewireApprenticeHours;
+        set
+        {
+            if (SetProperty(ref _prewireApprenticeHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
+    private decimal _trimApprenticeHours;
+    public decimal TrimApprenticeHours
+    {
+        get => _trimApprenticeHours;
+        set
+        {
+            if (SetProperty(ref _trimApprenticeHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
+    private decimal _testApprenticeHours;
+    public decimal TestApprenticeHours
+    {
+        get => _testApprenticeHours;
+        set
+        {
+            if (SetProperty(ref _testApprenticeHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
+    // Overnight Hours
+    private decimal _overnightPrewireJourneymanHours;
+    public decimal OvernightPrewireJourneymanHours
+    {
+        get => _overnightPrewireJourneymanHours;
+        set
+        {
+            if (SetProperty(ref _overnightPrewireJourneymanHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
+    private decimal _overnightTrimJourneymanHours;
+    public decimal OvernightTrimJourneymanHours
+    {
+        get => _overnightTrimJourneymanHours;
+        set
+        {
+            if (SetProperty(ref _overnightTrimJourneymanHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
+    private decimal _overnightTestJourneymanHours;
+    public decimal OvernightTestJourneymanHours
+    {
+        get => _overnightTestJourneymanHours;
+        set
+        {
+            if (SetProperty(ref _overnightTestJourneymanHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
+    private decimal _overnightPrewireApprenticeHours;
+    public decimal OvernightPrewireApprenticeHours
+    {
+        get => _overnightPrewireApprenticeHours;
+        set
+        {
+            if (SetProperty(ref _overnightPrewireApprenticeHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
+    private decimal _overnightTrimApprenticeHours;
+    public decimal OvernightTrimApprenticeHours
+    {
+        get => _overnightTrimApprenticeHours;
+        set
+        {
+            if (SetProperty(ref _overnightTrimApprenticeHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
+    private decimal _overnightTestApprenticeHours;
+    public decimal OvernightTestApprenticeHours
+    {
+        get => _overnightTestApprenticeHours;
+        set
+        {
+            if (SetProperty(ref _overnightTestApprenticeHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
+    public decimal JourneymanRegularDirectRate { get; set; } = 65;
+    public decimal JourneymanRegularBilledRate { get; set; } = 90;
+    public decimal JourneymanOvernightDirectRate { get; set; } = 75;
+    public decimal JourneymanOvernightBilledRate { get; set; } = 115;
+    public decimal ApprenticeRegularDirectRate { get; set; } = 30;
+    public decimal ApprenticeRegularBilledRate { get; set; } = 54;
+    public decimal ApprenticeOvernightDirectRate { get; set; } = 45;
+    public decimal ApprenticeOvernightBilledRate { get; set; } = 83;
+
+    public decimal JourneymanRegularHoursTotal =>
+    PrewireJourneymanHours + TrimJourneymanHours + TestJourneymanHours;
+
+    public decimal JourneymanOvernightHoursTotal =>
+        OvernightPrewireJourneymanHours + OvernightTrimJourneymanHours + OvernightTestJourneymanHours;
+
+    public decimal ApprenticeRegularHoursTotal =>
+        PrewireApprenticeHours + TrimApprenticeHours + TestApprenticeHours;
+
+    public decimal ApprenticeOvernightHoursTotal =>
+        OvernightPrewireApprenticeHours + OvernightTrimApprenticeHours + OvernightTestApprenticeHours;
+
+    public decimal JourneymanCostTotal =>
+    (JourneymanRegularHoursTotal * JourneymanRegularDirectRate) +
+    (JourneymanOvernightHoursTotal * JourneymanOvernightDirectRate);
+
+    public decimal JourneymanSaleTotal =>
+        (JourneymanRegularHoursTotal * JourneymanRegularBilledRate) +
+        (JourneymanOvernightHoursTotal * JourneymanOvernightBilledRate);
+
+    public decimal ApprenticeCostTotal =>
+        (ApprenticeRegularHoursTotal * ApprenticeRegularDirectRate) +
+        (ApprenticeOvernightHoursTotal * ApprenticeOvernightDirectRate);
+
+    public decimal ApprenticeSaleTotal =>
+        (ApprenticeRegularHoursTotal * ApprenticeRegularBilledRate) +
+        (ApprenticeOvernightHoursTotal * ApprenticeOvernightBilledRate);
+
+    // Combined Hour Totals
+    public decimal TotalRegularHours => JourneymanRegularHoursTotal + ApprenticeRegularHoursTotal;
+    public decimal TotalOvernightHours => JourneymanOvernightHoursTotal + ApprenticeOvernightHoursTotal;
+
+    // Combined Cost and Sale Totals
+    public decimal TotalLaborCost => JourneymanCostTotal + ApprenticeCostTotal;
+    public decimal TotalLaborSale => JourneymanSaleTotal + ApprenticeSaleTotal;
+
+
 
     // Backing fields
     private double _prewireTotalHours;
@@ -255,6 +491,9 @@ public partial class CreateBidViewModel : ObservableObject
 
     public IAsyncRelayCommand NavigateToCreateTasksCommand { get; }
     public IAsyncRelayCommand NavigateToCreateItemsCommand { get; }
+
+    
+
 
     [RelayCommand] private async Task OpenTaskManagerAsync() => await _navigationService.PushPageAsync<CreateTasksPage>();
     [RelayCommand] private void AddAdminTask() => AddTask(AdminTasks, RaiseAdminTotalsChanged);
@@ -591,7 +830,7 @@ public partial class CreateBidViewModel : ObservableObject
         }
     }
 
-
+   
 
 
 
@@ -637,7 +876,24 @@ public partial class CreateBidViewModel : ObservableObject
         OnPropertyChanged(nameof(AdminEngSaleTotal));
     }
 
-   
+    private void RaiseLaborHourTotalsChanged()
+    {
+        OnPropertyChanged(nameof(JourneymanRegularHoursTotal));
+        OnPropertyChanged(nameof(JourneymanOvernightHoursTotal));
+        OnPropertyChanged(nameof(ApprenticeRegularHoursTotal));
+        OnPropertyChanged(nameof(ApprenticeOvernightHoursTotal));
+
+        OnPropertyChanged(nameof(JourneymanCostTotal));
+        OnPropertyChanged(nameof(JourneymanSaleTotal));
+        OnPropertyChanged(nameof(ApprenticeCostTotal));
+        OnPropertyChanged(nameof(ApprenticeSaleTotal));
+
+        OnPropertyChanged(nameof(TotalRegularHours));
+        OnPropertyChanged(nameof(TotalOvernightHours));
+        OnPropertyChanged(nameof(TotalLaborCost));
+        OnPropertyChanged(nameof(TotalLaborSale));
+    }
+
 
     private void RaiseComponentTotalsChanged()
     {
