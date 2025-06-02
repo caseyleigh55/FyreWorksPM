@@ -255,6 +255,45 @@ public partial class CreateBidViewModel : ObservableObject
     public decimal AdminEngCostTotal => AdminCostTotal + EngineeringCostTotal;
     public decimal AdminEngSaleTotal => AdminSaleTotal + EngineeringSaleTotal;
 
+    public decimal CalculatedCostTotal => TotalLaborCost + AdminEngCostTotal + MaterialLineItemsCostTotal + WireLineItemsCostTotal + PanelLineItemsCostTotal;
+    public decimal CalculatedSaleTotal => TotalLaborSale + AdminEngSaleTotal + MaterialLineItemsSaleTotal + WireLineItemsSaleTotal + PanelLineItemsSaleTotal;
+    public decimal CalculatedProfit => CalculatedSaleTotal - CalculatedCostTotal;
+    public decimal CalculatedMargin => CalculatedCostTotal == 0 ? 0 : (CalculatedProfit / CalculatedCostTotal);
+    public decimal AdjustedProfit => AdjustedSaleTotal - CalculatedCostTotal;
+    public decimal AdjustedMargin => CalculatedCostTotal == 0 ? 0 : (AdjustedProfit / CalculatedCostTotal);
+    private bool _userAdjustedSaleManually = false;
+
+    private decimal _adjustedSaleTotal;
+    public decimal AdjustedSaleTotal
+    {
+        get => _adjustedSaleTotal;
+        set
+        {
+            if (SetProperty(ref _adjustedSaleTotal, value))
+            {
+                _userAdjustedSaleManually = true;
+                OnPropertyChanged(nameof(AdjustedProfit));
+                OnPropertyChanged(nameof(AdjustedMargin));
+                
+            }
+        }
+    }
+
+    private void RaiseCostSaleTotalsChanged()
+    {
+        OnPropertyChanged(nameof(CalculatedCostTotal));
+        OnPropertyChanged(nameof(CalculatedSaleTotal));
+        OnPropertyChanged(nameof(CalculatedProfit));
+        OnPropertyChanged(nameof(CalculatedMargin));
+        OnPropertyChanged(nameof(AdjustedMargin));
+
+        if (!_userAdjustedSaleManually)
+        {
+            _adjustedSaleTotal = CalculatedSaleTotal;
+            OnPropertyChanged(nameof(AdjustedSaleTotal));
+        }
+    }
+
     // Regular Hours
     private decimal _prewireJourneymanHours;
     public decimal PrewireJourneymanHours
@@ -866,6 +905,7 @@ public partial class CreateBidViewModel : ObservableObject
         OnPropertyChanged(nameof(AdminSaleTotal));
         OnPropertyChanged(nameof(AdminEngCostTotal));
         OnPropertyChanged(nameof(AdminEngSaleTotal));
+        RaiseCostSaleTotalsChanged();
     }
 
     private void RaiseEngineeringTotalsChanged()
@@ -874,6 +914,7 @@ public partial class CreateBidViewModel : ObservableObject
         OnPropertyChanged(nameof(EngineeringSaleTotal));
         OnPropertyChanged(nameof(AdminEngCostTotal));
         OnPropertyChanged(nameof(AdminEngSaleTotal));
+        RaiseCostSaleTotalsChanged();
     }
 
     private void RaiseLaborHourTotalsChanged()
@@ -892,6 +933,7 @@ public partial class CreateBidViewModel : ObservableObject
         OnPropertyChanged(nameof(TotalOvernightHours));
         OnPropertyChanged(nameof(TotalLaborCost));
         OnPropertyChanged(nameof(TotalLaborSale));
+        RaiseCostSaleTotalsChanged();
     }
 
 
@@ -903,6 +945,7 @@ public partial class CreateBidViewModel : ObservableObject
         RecalculatePrewireDeviceHours();
         RecalculateTrimSummary();
         RecalculateDemoSummary();
+        RaiseCostSaleTotalsChanged();
 
         PrewireTotalHours = PrewireDeviceHours.Sum(x => x.TotalHours);
         DemoTotalHours = DemoSummaryRow?.TotalHours ?? 0;
@@ -916,12 +959,14 @@ public partial class CreateBidViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(WireLineItemsCostTotal));
         OnPropertyChanged(nameof(WireLineItemsSaleTotal));
+        RaiseCostSaleTotalsChanged();
     }
 
     private void RaiseMaterialTotalsChanged()
     {
         OnPropertyChanged(nameof(MaterialLineItemsCostTotal));
         OnPropertyChanged(nameof(MaterialLineItemsSaleTotal));
+        RaiseCostSaleTotalsChanged();
     }
 
 
