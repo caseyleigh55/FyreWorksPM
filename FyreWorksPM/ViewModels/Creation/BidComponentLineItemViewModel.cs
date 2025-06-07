@@ -24,8 +24,8 @@ public partial class BidComponentLineItemViewModel : ObservableObject
     public ObservableCollection<ItemDto> AvailableItems { get; set; } = new();
 
 
-    public List<string> InstallTypeOptions { get; set; } = new();
-    public List<string> InstallLocationOptions { get; set; } = new();
+    public ObservableCollection<string> InstallTypeOptions { get; set; } = new();
+    public ObservableCollection<string> InstallLocationOptions { get; set; } = new();
 
     public BidComponentLineItemModel Item { get; }
 

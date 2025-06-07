@@ -232,8 +232,8 @@ public partial class CreateBidViewModel : ObservableObject
     #region Static Option Lists
 
     public ObservableCollection<string> YesNoOptions { get; } = new() { "Yes", "No" };
-    public List<string> InstallTypeOptions { get; } = new() { "Normal", "Lift", "Panel", "Pipe" };
-    public List<string> InstallLocationOptions { get; } = new() { "Warehouse", "Hardlid", "T-Bar", "Underground", "Panel Room", "Demo"};
+    public ObservableCollection<string> InstallTypeOptions { get; } = new() { "Normal", "Lift", "Panel", "Pipe" };
+    public ObservableCollection<string> InstallLocationOptions { get; } = new() { "Warehouse", "Hardlid", "T-Bar", "Underground", "Panel Room", "Demo"};
 
     #endregion
 
@@ -1083,7 +1083,7 @@ public partial class CreateBidViewModel : ObservableObject
             UnitSale = 0,
             Piped = false,
             InstallType = "Normal",
-            InstallLocation = "warehouse"
+            InstallLocation = "Warehouse"
         };
 
         var vm = new BidComponentLineItemViewModel(newModel, LaborOverrides, this)
