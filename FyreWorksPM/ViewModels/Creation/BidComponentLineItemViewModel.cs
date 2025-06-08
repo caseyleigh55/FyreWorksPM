@@ -202,7 +202,7 @@ public partial class BidComponentLineItemViewModel : ObservableObject
         }
     }
 
-    public double PrewireHours
+    public decimal PrewireHours
     {
         get
         {
@@ -217,7 +217,7 @@ public partial class BidComponentLineItemViewModel : ObservableObject
         }
     }
 
-    public double TrimHours
+    public decimal TrimHours
     {
         get
         {
@@ -231,7 +231,7 @@ public partial class BidComponentLineItemViewModel : ObservableObject
         }
     }
 
-    public double DemoHours
+    public decimal DemoHours
     {
         get
         {
@@ -242,17 +242,17 @@ public partial class BidComponentLineItemViewModel : ObservableObject
             }
 
             // Example fallback:
-            return 0.5;
+            return 0.5m;
         }
     }
 
 
-    public double PrewireTotalHours => Math.Round(Qty * PrewireHours, 2);
-    public double TrimTotalHours => Math.Round(Qty * TrimHours, 2);
-    public double DemoTotalHours => Math.Round(Qty * DemoHours, 2);
+    public decimal PrewireTotalHours => Math.Round(Qty * PrewireHours, 2);
+    public decimal TrimTotalHours => Math.Round(Qty * TrimHours, 2);
+    public decimal DemoTotalHours => Math.Round(Qty * DemoHours, 2);
 
 
-    public double TotalHours => PrewireTotalHours + TrimTotalHours + DemoTotalHours;
+    public decimal TotalHours => PrewireTotalHours + TrimTotalHours + DemoTotalHours;
 
 
     //public double TotalHours => Math.Round(TotalMinutes / 60.0, 2);

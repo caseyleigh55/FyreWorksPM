@@ -8,6 +8,7 @@ using FyreWorksPM.Pages.Creation;
 using FyreWorksPM.Services.Bid;
 using FyreWorksPM.Services.Client;
 using FyreWorksPM.Services.Item;
+using FyreWorksPM.Services.Labor;
 using FyreWorksPM.Services.Navigation;
 using FyreWorksPM.Services.Tasks;
 using FyreWorksPM.Utilities;
@@ -31,6 +32,7 @@ public partial class CreateBidViewModel : ObservableObject
     private readonly IBidService _bidService;
     private readonly ITaskService _taskService;
     private readonly INavigationServices _navigationService;
+    private readonly ILaborTemplateService _laborTemplateService;
 
     #endregion
 
@@ -42,7 +44,8 @@ public partial class CreateBidViewModel : ObservableObject
         IItemService itemService,
         IItemTypeService itemTypeService,
         ITaskService taskService,
-        INavigationServices navigationService)
+        INavigationServices navigationService,
+        ILaborTemplateService laborTemplateService)
     {
         _bidService = bidService;
         _clientService = clientService;
@@ -50,18 +53,19 @@ public partial class CreateBidViewModel : ObservableObject
         _itemTypeService = itemTypeService;
         _taskService = taskService;
         _navigationService = navigationService;
+        _laborTemplateService = laborTemplateService;
 
         CreatedDate = DateTime.Today;
 
         LaborHourMatrix = new ObservableCollection<InstallLocationHoursViewModel>
 {
-    new() { LocationName = "Warehouse", NormalHours = 0.5, LiftHours = 1.0, PanelHours = 0.0, PipeHours = 1.0 },
-    new() { LocationName = "Hardlid", NormalHours = 0.5, LiftHours = 1.0, PanelHours = 0.0, PipeHours = 1.0 },
-    new() { LocationName = "T-Bar", NormalHours = 0.25, LiftHours = 1.0, PanelHours = 0.0, PipeHours = 1.0 },
-    new() { LocationName = "Underground", NormalHours = 1.0, LiftHours = 0.0, PanelHours = 0.0, PipeHours = 0.0 },
-    new() { LocationName = "Panel Room", NormalHours = 1.0, LiftHours = 0.0, PanelHours = 1.0, PipeHours = 0.0 },
-    new() { LocationName = "Demo", NormalHours = 0.25, LiftHours = 0.75, PanelHours = 1.0, PipeHours = 1.0 },
-    new() { LocationName = "Trim", NormalHours = 0.25, LiftHours = 0.5, PanelHours = 3.0, PipeHours = 0.0 }
+    new() { LocationName = "Warehouse", NormalHours = 0.5m, LiftHours = 1.0m, PanelHours = 0.0m, PipeHours = 1.0m },
+    new() { LocationName = "Hardlid", NormalHours = 0.5m, LiftHours = 1.0m, PanelHours = 0.0m, PipeHours = 1.0m },
+    new() { LocationName = "T-Bar", NormalHours = 0.25m, LiftHours = 1.0m, PanelHours = 0.0m, PipeHours = 1.0m },
+    new() { LocationName = "Underground", NormalHours = 1.0m, LiftHours = 0.0m, PanelHours = 0.0m, PipeHours = 0.0m },
+    new() { LocationName = "Panel Room", NormalHours = 1.0m, LiftHours = 0.0m, PanelHours = 1.0m, PipeHours = 0.0m },
+    new() { LocationName = "Demo", NormalHours = 0.25m, LiftHours = 0.75m, PanelHours = 1.0m, PipeHours = 1.0m },
+    new() { LocationName = "Trim", NormalHours = 0.25m, LiftHours = 0.5m, PanelHours = 3.0m, PipeHours = 0.0m }
 };
         DeviceHourSummaries = new ObservableCollection<DeviceHourSummaryViewModel>
 {
@@ -69,6 +73,7 @@ public partial class CreateBidViewModel : ObservableObject
     new() { ActivityType = "Trim" },
     new() { ActivityType = "Demo" }
 };
+       
 
         NavigateToCreateTasksCommand = new AsyncRelayCommand(NavigateToCreateTasksAsync);
         NavigateToCreateItemsCommand = new AsyncRelayCommand(NavigateToCreateItemAsync);
@@ -174,6 +179,19 @@ public partial class CreateBidViewModel : ObservableObject
     }
 
 
+    private string _templateName;
+    public string TemplateName
+    {
+        get => _templateName;
+        set => SetProperty(ref _templateName, value);
+    }
+
+    private bool _isDefaultTemplate;
+    public bool IsDefaultTemplate
+    {
+        get => _isDefaultTemplate;
+        set => SetProperty(ref _isDefaultTemplate, value);
+    }
 
 
 
@@ -245,8 +263,8 @@ public partial class CreateBidViewModel : ObservableObject
         set => IsSprinklered = value == "Yes";
     }
 
-    
-    
+
+   
 
     public decimal AdminCostTotal => AdminTasks.Sum(t => t.Cost);
     public decimal AdminSaleTotal => AdminTasks.Sum(t => t.Sale);
@@ -259,8 +277,7 @@ public partial class CreateBidViewModel : ObservableObject
     public decimal CalculatedSaleTotal => TotalLaborSale + AdminEngSaleTotal + MaterialLineItemsSaleTotal + WireLineItemsSaleTotal + PanelLineItemsSaleTotal;
     public decimal CalculatedProfit => CalculatedSaleTotal - CalculatedCostTotal;
     public decimal CalculatedMargin => CalculatedCostTotal == 0 ? 0 : (CalculatedProfit / CalculatedCostTotal);
-    public decimal AdjustedProfit => AdjustedSaleTotal - CalculatedCostTotal;
-    public decimal AdjustedMargin => CalculatedCostTotal == 0 ? 0 : (AdjustedProfit / CalculatedCostTotal);
+    
     private bool _userAdjustedSaleManually = false;
 
     private decimal _adjustedSaleTotal;
@@ -278,6 +295,8 @@ public partial class CreateBidViewModel : ObservableObject
             }
         }
     }
+    public decimal AdjustedProfit => AdjustedSaleTotal - CalculatedCostTotal;
+    public decimal AdjustedMargin => CalculatedCostTotal == 0 ? 0 : (AdjustedProfit / CalculatedCostTotal);
 
     private void RaiseCostSaleTotalsChanged()
     {
@@ -285,16 +304,51 @@ public partial class CreateBidViewModel : ObservableObject
         OnPropertyChanged(nameof(CalculatedSaleTotal));
         OnPropertyChanged(nameof(CalculatedProfit));
         OnPropertyChanged(nameof(CalculatedMargin));
+        OnPropertyChanged(nameof(AdjustedProfit));
         OnPropertyChanged(nameof(AdjustedMargin));
 
         if (!_userAdjustedSaleManually)
         {
             _adjustedSaleTotal = CalculatedSaleTotal;
+            // Even if the value is the same, notify dependents manually
             OnPropertyChanged(nameof(AdjustedSaleTotal));
+            OnPropertyChanged(nameof(AdjustedProfit));
+            OnPropertyChanged(nameof(AdjustedMargin));
+            
         }
+
+    }
+    private void RaiseLaborHourTotalsChanged()
+    {
+        OnPropertyChanged(nameof(JourneymanRegularHoursTotal));
+        OnPropertyChanged(nameof(JourneymanOvernightHoursTotal));
+        OnPropertyChanged(nameof(ApprenticeRegularHoursTotal));
+        OnPropertyChanged(nameof(ApprenticeOvernightHoursTotal));
+
+        OnPropertyChanged(nameof(JourneymanCostTotal));
+        OnPropertyChanged(nameof(JourneymanSaleTotal));
+        OnPropertyChanged(nameof(ApprenticeCostTotal));
+        OnPropertyChanged(nameof(ApprenticeSaleTotal));
+
+        OnPropertyChanged(nameof(TotalRegularHours));
+        OnPropertyChanged(nameof(TotalOvernightHours));
+        OnPropertyChanged(nameof(TotalLaborCost));
+        OnPropertyChanged(nameof(TotalLaborSale));
+        RaiseCostSaleTotalsChanged();
     }
 
     // Regular Hours
+    private decimal _demoJourneymanHours;
+    public decimal DemoJourneymanHours
+    {
+        get => _demoJourneymanHours;
+        set
+        {
+            if (SetProperty(ref _demoJourneymanHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
     private decimal _prewireJourneymanHours;
     public decimal PrewireJourneymanHours
     {
@@ -324,6 +378,17 @@ public partial class CreateBidViewModel : ObservableObject
         set
         {
             if (SetProperty(ref _testJourneymanHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
+    private decimal _demoApprenticeHours;
+    public decimal DemoApprenticeHours
+    {
+        get => _demoApprenticeHours;
+        set
+        {
+            if (SetProperty(ref _demoApprenticeHours, value))
                 RaiseLaborHourTotalsChanged();
         }
     }
@@ -362,6 +427,17 @@ public partial class CreateBidViewModel : ObservableObject
     }
 
     // Overnight Hours
+    private decimal _overnightDemoJourneymanHours;
+    public decimal OvernightDemoJourneymanHours
+    {
+        get => _overnightDemoJourneymanHours;
+        set
+        {
+            if (SetProperty(ref _overnightDemoJourneymanHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
     private decimal _overnightPrewireJourneymanHours;
     public decimal OvernightPrewireJourneymanHours
     {
@@ -391,6 +467,17 @@ public partial class CreateBidViewModel : ObservableObject
         set
         {
             if (SetProperty(ref _overnightTestJourneymanHours, value))
+                RaiseLaborHourTotalsChanged();
+        }
+    }
+
+    private decimal _overnightDemoApprenticeHours;
+    public decimal OvernightDemoApprenticeHours
+    {
+        get => _overnightDemoApprenticeHours;
+        set
+        {
+            if (SetProperty(ref _overnightDemoApprenticeHours, value))
                 RaiseLaborHourTotalsChanged();
         }
     }
@@ -438,16 +525,16 @@ public partial class CreateBidViewModel : ObservableObject
     public decimal ApprenticeOvernightBilledRate { get; set; } = 83;
 
     public decimal JourneymanRegularHoursTotal =>
-    PrewireJourneymanHours + TrimJourneymanHours + TestJourneymanHours;
+    DemoJourneymanHours + PrewireJourneymanHours + TrimJourneymanHours + TestJourneymanHours;
 
     public decimal JourneymanOvernightHoursTotal =>
-        OvernightPrewireJourneymanHours + OvernightTrimJourneymanHours + OvernightTestJourneymanHours;
+        OvernightDemoJourneymanHours + OvernightPrewireJourneymanHours + OvernightTrimJourneymanHours + OvernightTestJourneymanHours;
 
     public decimal ApprenticeRegularHoursTotal =>
-        PrewireApprenticeHours + TrimApprenticeHours + TestApprenticeHours;
+        DemoApprenticeHours + PrewireApprenticeHours + TrimApprenticeHours + TestApprenticeHours;
 
     public decimal ApprenticeOvernightHoursTotal =>
-        OvernightPrewireApprenticeHours + OvernightTrimApprenticeHours + OvernightTestApprenticeHours;
+        OvernightDemoApprenticeHours + OvernightPrewireApprenticeHours + OvernightTrimApprenticeHours + OvernightTestApprenticeHours;
 
     public decimal JourneymanCostTotal =>
     (JourneymanRegularHoursTotal * JourneymanRegularDirectRate) +
@@ -476,31 +563,31 @@ public partial class CreateBidViewModel : ObservableObject
 
 
     // Backing fields
-    private double _prewireTotalHours;
-    private double _demoTotalHours;
-    private double _trimTotalHours;
-    private double _totalCombinedHours;
+    private decimal _prewireTotalHours;
+    private decimal _demoTotalHours;
+    private decimal _trimTotalHours;
+    private decimal _totalCombinedHours;
 
     // Public properties
-    public double PrewireTotalHours
+    public decimal PrewireTotalHours
     {
         get => _prewireTotalHours;
         set => SetProperty(ref _prewireTotalHours, value);
     }
 
-    public double DemoTotalHours
+    public decimal DemoTotalHours
     {
         get => _demoTotalHours;
         set => SetProperty(ref _demoTotalHours, value);
     }
 
-    public double TrimTotalHours
+    public decimal TrimTotalHours
     {
         get => _trimTotalHours;
         set => SetProperty(ref _trimTotalHours, value);
     }
 
-    public double TotalCombinedHours
+    public decimal TotalCombinedHours
     {
         get => _totalCombinedHours;
         set => SetProperty(ref _totalCombinedHours, value);
@@ -519,7 +606,7 @@ public partial class CreateBidViewModel : ObservableObject
 
 
 
-    public double TotalComponentHours => ComponentLineItems.Sum(item => item.TotalHours);
+    public decimal TotalComponentHours => ComponentLineItems.Sum(item => item.TotalHours);
 
 
     public BidLaborConfig LaborOverrides { get; set; } = new();
@@ -531,7 +618,6 @@ public partial class CreateBidViewModel : ObservableObject
     public IAsyncRelayCommand NavigateToCreateTasksCommand { get; }
     public IAsyncRelayCommand NavigateToCreateItemsCommand { get; }
 
-    
 
 
     [RelayCommand] private async Task OpenTaskManagerAsync() => await _navigationService.PushPageAsync<CreateTasksPage>();
@@ -541,7 +627,7 @@ public partial class CreateBidViewModel : ObservableObject
     [RelayCommand] private void RemoveEngineeringTask(BidTaskViewModel task) => RemoveTask(EngineeringTasks, task, RaiseEngineeringTotalsChanged);
     [RelayCommand] private void SaveTasks() => SaveValidTasks();
     //[RelayCommand] public async Task CreateNewItemAsync() => await CreateNewItem();
-
+    
 
 
     [RelayCommand]
@@ -597,7 +683,73 @@ public partial class CreateBidViewModel : ObservableObject
 
     #endregion
 
-    public double GetLaborRate(string location, string installType)
+    [RelayCommand]
+    private async Task SaveTemplateAsync()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(TemplateName))
+            {
+                await Shell.Current.DisplayAlert("Missing Info", "Please enter a name for the template.", "OK");
+                return;
+            }
+
+            var template = new LaborTemplateDto
+            {
+                Id = Guid.NewGuid(),
+                TemplateName = TemplateName,
+                IsDefault = IsDefaultTemplate,
+                LaborRates = new List<LaborRateDto>
+            {
+                new LaborRateDto
+                {
+                    Role = "Journeyman",
+                    RegularDirectRate = JourneymanRegularDirectRate,
+                    RegularBilledRate = JourneymanRegularBilledRate,
+                    OvernightDirectRate = JourneymanOvernightDirectRate,
+                    OvernightBilledRate = JourneymanOvernightBilledRate
+                },
+                new LaborRateDto
+                {
+                    Role = "Apprentice",
+                    RegularDirectRate = ApprenticeRegularDirectRate,
+                    RegularBilledRate = ApprenticeRegularBilledRate,
+                    OvernightDirectRate = ApprenticeOvernightDirectRate,
+                    OvernightBilledRate = ApprenticeOvernightBilledRate
+                }
+            },
+                
+                LocationHours = LaborHourMatrix.Select(l => new LocationHourDto
+                {
+                    LocationName = l.LocationName,
+                    Normal = l.NormalHours,
+                    Lift = l.LiftHours,
+                    Panel = l.PanelHours,
+                    Pipe = l.PipeHours
+                }).ToList()
+            };
+
+            await _laborTemplateService.CreateTemplateAsync(template);
+
+            await Shell.Current.DisplayAlert("Success", "Template saved successfully!", "OK");
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Error", $"Could not save template: {ex.Message}", "OK");
+        }
+    }
+
+
+    [RelayCommand]
+    private async Task LoadTemplateAsync()
+    {
+        // Load logic here
+        Debug.WriteLine("Template loaded!");
+    }
+
+
+
+    public decimal GetLaborRate(string location, string installType)
     {
         var match = LaborHourMatrix.FirstOrDefault(x =>
             string.Equals(x.LocationName, location, StringComparison.OrdinalIgnoreCase));
@@ -627,11 +779,11 @@ public partial class CreateBidViewModel : ObservableObject
         }
 
         DemoSummaryRow.Location = "Demo";
-        DemoSummaryRow.NormalCount = 0;
-        DemoSummaryRow.LiftCount = 0;
-        DemoSummaryRow.PanelCount = 0;
-        DemoSummaryRow.PipeCount = 0;
-        DemoSummaryRow.TotalHours = 0;
+        DemoSummaryRow.NormalCount = 0m;
+        DemoSummaryRow.LiftCount = 0m;
+        DemoSummaryRow.PanelCount = 0m;
+        DemoSummaryRow.PipeCount = 0m;
+        DemoSummaryRow.TotalHours = 0.0m;
 
         foreach (var item in ComponentLineItems.Where(i => i.InstallLocation?.Trim().ToLower() == "demo"))
         {
@@ -740,11 +892,11 @@ public partial class CreateBidViewModel : ObservableObject
         var trimSummary = DeviceHourSummaries.FirstOrDefault(x => x.ActivityType == "Trim");
         if (trimSummary != null)
         {
-            trimSummary.NormalCount = 0;
-            trimSummary.LiftCount = 0;
-            trimSummary.PanelCount = 0;
-            trimSummary.PipeCount = 0;
-            trimSummary.TotalHours = 0;
+            trimSummary.NormalCount = 0.0m;
+            trimSummary.LiftCount = 0.0m;
+            trimSummary.PanelCount = 0.0m;
+            trimSummary.PipeCount = 0.0m;
+            trimSummary.TotalHours = 0.0m;
 
             foreach (var item in ComponentLineItems)
             {
@@ -774,11 +926,11 @@ public partial class CreateBidViewModel : ObservableObject
         var demoSummary = DeviceHourSummaries.FirstOrDefault(x => x.ActivityType == "Demo");
         if (demoSummary != null)
         {
-            demoSummary.NormalCount = 0;
-            demoSummary.LiftCount = 0;
-            demoSummary.PanelCount = 0;
-            demoSummary.PipeCount = 0;
-            demoSummary.TotalHours = 0;
+            demoSummary.NormalCount = 0.0m;
+            demoSummary.LiftCount = 0.0m;
+            demoSummary.PanelCount = 0.0m;
+            demoSummary.PipeCount = 0.0m;
+            demoSummary.TotalHours = 0.0m;
 
             foreach (var item in ComponentLineItems.Where(i => i.InstallLocation?.ToLower() == "demo"))
             {
@@ -917,24 +1069,7 @@ public partial class CreateBidViewModel : ObservableObject
         RaiseCostSaleTotalsChanged();
     }
 
-    private void RaiseLaborHourTotalsChanged()
-    {
-        OnPropertyChanged(nameof(JourneymanRegularHoursTotal));
-        OnPropertyChanged(nameof(JourneymanOvernightHoursTotal));
-        OnPropertyChanged(nameof(ApprenticeRegularHoursTotal));
-        OnPropertyChanged(nameof(ApprenticeOvernightHoursTotal));
-
-        OnPropertyChanged(nameof(JourneymanCostTotal));
-        OnPropertyChanged(nameof(JourneymanSaleTotal));
-        OnPropertyChanged(nameof(ApprenticeCostTotal));
-        OnPropertyChanged(nameof(ApprenticeSaleTotal));
-
-        OnPropertyChanged(nameof(TotalRegularHours));
-        OnPropertyChanged(nameof(TotalOvernightHours));
-        OnPropertyChanged(nameof(TotalLaborCost));
-        OnPropertyChanged(nameof(TotalLaborSale));
-        RaiseCostSaleTotalsChanged();
-    }
+    
 
 
     private void RaiseComponentTotalsChanged()

@@ -5,12 +5,12 @@
         public Guid BidId { get; set; }
 
         // Prewire hours per location + install type
-        public Dictionary<string, Dictionary<string, double>> PrewireHours { get; set; } = new();
+        public Dictionary<string, Dictionary<string, decimal>> PrewireHours { get; set; } = new();
 
         // Trim hours per install type
-        public Dictionary<string, double> TrimHours { get; set; } = new();
+        public Dictionary<string, decimal> TrimHours { get; set; } = new();
 
         // Optional: Demo hours per install type
-        public Dictionary<string, double> DemoHours { get; set; } = new();
+        public Dictionary<string, decimal> DemoHours { get; set; } = new();
     }
 }

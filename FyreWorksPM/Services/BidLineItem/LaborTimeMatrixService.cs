@@ -8,19 +8,19 @@ namespace FyreWorksPM.Services.BidLineItem
 {
     public static class LaborTimeMatrixService
     {
-        private static readonly Dictionary<string, Dictionary<string, double>> _hourMatrix =
+        private static readonly Dictionary<string, Dictionary<string, decimal>> _hourMatrix =
             new()
             {
-                ["warehouse"] = new() { ["normal"] = 0.5, ["lift"] = 1.0, ["panel"] = 1.0, ["pipe"] = 0.5 },
-                ["hardlid"] = new() { ["normal"] = 0.5, ["lift"] = 1.0, ["panel"] = 1.0, ["pipe"] = 0.5 },
-                ["tbar"] = new() { ["normal"] = 0.25, ["lift"] = 0.5, ["panel"] = 1.0, ["pipe"] = 1.0 },
-                ["underground"] = new() { ["normal"] = 0.25, ["lift"] = 1.5, ["panel"] = 1.0, ["pipe"] = 1.5 },
-                ["panel room"] = new() { ["normal"] = 0.25, ["lift"] = 1.0, ["panel"] = 1.0, ["pipe"] = 1.0 },
-                ["demo"] = new() { ["normal"] = 0.5 },
-                ["trim"] = new() { ["normal"] = 0.5, ["lift"] = 1.0, ["panel"] = 1.0, ["pipe"] = 1.0 }
+                ["warehouse"] = new() { ["normal"] = 0.5m, ["lift"] = 1.0m, ["panel"] = 1.0m, ["pipe"] = 0.5m },
+                ["hardlid"] = new() { ["normal"] = 0.5m, ["lift"] = 1.0m, ["panel"] = 1.0m, ["pipe"] = 0.5m },
+                ["tbar"] = new() { ["normal"] = 0.25m, ["lift"] = 0.5m, ["panel"] = 1.0m, ["pipe"] = 1.0m },
+                ["underground"] = new() { ["normal"] = 0.25m, ["lift"] = 1.5m, ["panel"] = 1.0m, ["pipe"] = 1.5m },
+                ["panel room"] = new() { ["normal"] = 0.25m, ["lift"] = 1.0m, ["panel"] = 1.0m, ["pipe"] = 1.0m },
+                ["demo"] = new() { ["normal"] = 0.5m },
+                ["trim"] = new() { ["normal"] = 0.5m, ["lift"] = 1.0m, ["panel"] = 1.0m, ["pipe"] = 1.0m }
             };
 
-        public static double? GetHours(string location, string installType)
+        public static decimal? GetHours(string location, string installType)
         {
             if (string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(installType))
                 return null;

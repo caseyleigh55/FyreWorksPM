@@ -6,12 +6,12 @@ namespace FyreWorksPM.Pages.Creation
     {
         [ObservableProperty] private string activityType;
 
-        [ObservableProperty] private int normalCount;
-        [ObservableProperty] private int liftCount;
-        [ObservableProperty] private int panelCount;
-        [ObservableProperty] private int pipeCount;
+        [ObservableProperty] private decimal normalCount;
+        [ObservableProperty] private decimal liftCount;
+        [ObservableProperty] private decimal panelCount;
+        [ObservableProperty] private decimal pipeCount;
 
-        [ObservableProperty] private double totalHours;
+        [ObservableProperty] private decimal totalHours;
     }
 
 }

@@ -94,6 +94,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<BidWireLineItemModel> BidWireLineItems { get; set; } = default;
     public DbSet<BidMaterialLineItemModel> BidMaterialLineItems { get; set; } = default;
 
+    public DbSet<LaborTemplateModel> LaborTemplates { get; set; }
+    public DbSet<LaborRateModel> LaborRates { get; set; }
+    public DbSet<LocationHourModel> LocationHours { get; set; }
 
     #endregion    
 }

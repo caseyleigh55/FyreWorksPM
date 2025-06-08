@@ -9,16 +9,16 @@ namespace FyreWorksPM.ViewModels.Creation
         private string locationName;
 
         [ObservableProperty]
-        private double normalHours;
+        private decimal normalHours;
 
         [ObservableProperty]
-        private double liftHours;
+        private decimal liftHours;
 
         [ObservableProperty]
-        private double panelHours;
+        private decimal panelHours;
 
         [ObservableProperty]
-        private double pipeHours;
+        private decimal pipeHours;
     }
 
 }

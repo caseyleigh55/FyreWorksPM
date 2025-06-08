@@ -1,23 +1,24 @@
-﻿using FyreWorksPM.Services.Auth;
-using CommunityToolkit.Maui;
+﻿using CommunityToolkit.Maui;
+using FyreWorksPM.Configuration;
+using FyreWorksPM.DataAccess.Data;
 using FyreWorksPM.Pages.Creation;
+using FyreWorksPM.Pages.Editing;
 using FyreWorksPM.Pages.Foundation;
-using FyreWorksPM.ViewModels.Creation;
-using FyreWorksPM.ViewModels.Foundation;
 using FyreWorksPM.Pages.PopUps;
 using FyreWorksPM.Pages.Solitary;
-using FyreWorksPM.ViewModels.Solitary;
-using FyreWorksPM.Services.Navigation;
-using FyreWorksPM.Services.Common;
-using FyreWorksPM.Configuration;
-using FyreWorksPM.Services.Item;
-using FyreWorksPM.Services.Client;
+using FyreWorksPM.Services.Auth;
 using FyreWorksPM.Services.Bid;
-using FyreWorksPM.DataAccess.Data;
+using FyreWorksPM.Services.Client;
+using FyreWorksPM.Services.Common;
+using FyreWorksPM.Services.Item;
+using FyreWorksPM.Services.Labor;
+using FyreWorksPM.Services.Navigation;
+using FyreWorksPM.Services.Tasks;
+using FyreWorksPM.ViewModels.Creation;
+using FyreWorksPM.ViewModels.Foundation;
+using FyreWorksPM.ViewModels.Solitary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using FyreWorksPM.Services.Tasks;
-using FyreWorksPM.Pages.Editing;
 
 namespace FyreWorksPM;
 
@@ -77,6 +78,12 @@ public static class MauiProgram
         {
             client.BaseAddress = new Uri(ApiConfig.BaseUrl);
         });
+
+        builder.Services.AddHttpClient<ILaborTemplateService, LaborTemplateService>(client =>
+        {
+            client.BaseAddress = new Uri(ApiConfig.BaseUrl); // Make sure BaseUrl ends with a `/`
+        });
+
 
 
         // ============================

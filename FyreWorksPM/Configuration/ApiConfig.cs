@@ -2,5 +2,10 @@
 
 public static class ApiConfig
 {
-    public const string BaseUrl = "https://localhost:7139";
+#if ANDROID
+    public const string BaseUrl = "https://10.0.2.2:7139/";
+#else
+    public const string BaseUrl = "https://localhost:7139/";
+#endif
+
 }
