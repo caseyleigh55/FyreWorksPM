@@ -31,7 +31,14 @@ namespace FyreWorksPM.Services.Labor
             return await response.Content.ReadFromJsonAsync<LaborTemplateDto>();
         }
 
-        public async Task<LaborTemplateDto?> CreateTemplateAsync(LaborTemplateDto template)
+        public async Task<LaborTemplateDto?> GetDefaultTemplateAsync()
+        {
+            var templates = await GetAllTemplatesAsync();
+            return templates.FirstOrDefault(t => t.IsDefault);
+        }
+
+
+        public async Task<LaborTemplateDto?> CreateTemplateAsync(CreateLaborTemplateDto template)
         {
             var response = await _httpClient.PostAsJsonAsync("api/LaborTemplates", template);
 

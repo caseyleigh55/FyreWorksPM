@@ -6,7 +6,8 @@ namespace FyreWorksPM.Services.Labor
     {
         Task<List<LaborTemplateDto>> GetAllTemplatesAsync();
         Task<LaborTemplateDto> GetTemplateByIdAsync(Guid id);
-        Task<LaborTemplateDto> CreateTemplateAsync(LaborTemplateDto template);
+        Task<LaborTemplateDto> CreateTemplateAsync(CreateLaborTemplateDto template);
         Task DeleteTemplateAsync(Guid id);
+        Task<LaborTemplateDto?> GetDefaultTemplateAsync();
     }
 }

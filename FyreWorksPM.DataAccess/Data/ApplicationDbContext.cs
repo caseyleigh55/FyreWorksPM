@@ -41,6 +41,20 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(t => t.TaskModelId)
             .OnDelete(DeleteBehavior.Restrict); // Or Cascade if you want them deleted with the task template
 
+        // LaborTemplate to LaborRates: One-to-many
+        modelBuilder.Entity<LaborTemplateModel>()
+            .HasMany(t => t.LaborRates)
+            .WithOne(r => r.LaborTemplateModel)
+            .HasForeignKey(r => r.LaborTemplateId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // LaborTemplate to LocationHours: One-to-many
+        modelBuilder.Entity<LaborTemplateModel>()
+            .HasMany(t => t.LocationHours)
+            .WithOne(h => h.LaborTemplateModel)
+            .HasForeignKey(h => h.LaborTemplateId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         base.OnModelCreating(modelBuilder);
     }
 

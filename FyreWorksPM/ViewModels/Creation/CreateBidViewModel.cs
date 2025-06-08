@@ -14,6 +14,7 @@ using FyreWorksPM.Services.Tasks;
 using FyreWorksPM.Utilities;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Text.Json;
 using System.Windows.Input;
 
 
@@ -126,6 +127,8 @@ public partial class CreateBidViewModel : ObservableObject
     [ObservableProperty] private BidTaskModel currentTask;
 
     [ObservableProperty] private decimal materialMarkup;
+
+    private string? _originalLaborTemplateJson;
 
     public string MaterialExpandButtonText => IsMaterialExpanded ? "△" : "▽";
     public double MaterialListHeight => IsMaterialExpanded ? -1 : 200;
@@ -655,8 +658,94 @@ public partial class CreateBidViewModel : ObservableObject
     {
         await ResetFormAsync();
         BidNumber = await _bidService.GetNextBidNumberAsync();
-        await Task.WhenAll(LoadClientsAsync(), LoadItemsAsync(), LoadTaskTemplatesAsync());
+        await Task.WhenAll(LoadClientsAsync(), LoadItemsAsync(), LoadTaskTemplatesAsync(), _laborTemplateService.GetDefaultTemplateAsync());
+        var defaultTemplate = await _laborTemplateService.GetDefaultTemplateAsync();
+        _originalLaborTemplateJson = JsonSerializer.Serialize(defaultTemplate, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        // Populate your form fields from the defaultTemplate like usual
+        ApplyLaborTemplate(defaultTemplate); // <- you likely already have this
+
     }
+
+    private void ApplyLaborTemplate(LaborTemplateDto template)
+    {
+        if (template == null) return;
+
+        // Set Labor Rates
+        var journeyman = template.LaborRates.FirstOrDefault(r => r.Role == "Journeyman");
+        var apprentice = template.LaborRates.FirstOrDefault(r => r.Role == "Apprentice");
+
+        if (journeyman != null)
+        {
+            JourneymanRegularDirectRate = journeyman.RegularDirectRate;
+            JourneymanRegularBilledRate = journeyman.RegularBilledRate;
+            JourneymanOvernightDirectRate = journeyman.OvernightDirectRate;
+            JourneymanOvernightBilledRate = journeyman.OvernightBilledRate;
+        }
+
+        if (apprentice != null)
+        {
+            ApprenticeRegularDirectRate = apprentice.RegularDirectRate;
+            ApprenticeRegularBilledRate = apprentice.RegularBilledRate;
+            ApprenticeOvernightDirectRate = apprentice.OvernightDirectRate;
+            ApprenticeOvernightBilledRate = apprentice.OvernightBilledRate;
+        }
+
+        // Set Location Hours Matrix
+        LaborHourMatrix.Clear();
+        foreach (var hour in template.LocationHours)
+        {
+            LaborHourMatrix.Add(new InstallLocationHoursViewModel
+            {
+                LocationName = hour.LocationName,
+                NormalHours = hour.Normal,
+                LiftHours = hour.Lift,
+                PanelHours = hour.Panel,
+                PipeHours = hour.Pipe
+            });
+        }
+    }
+
+
+    private LaborTemplateDto BuildCurrentLaborTemplateDto()
+    {
+        return new LaborTemplateDto
+        {
+            TemplateName = "UnsavedTemplate",
+            IsDefault = false,
+            LaborRates = new List<LaborRateDto>
+        {
+            new LaborRateDto
+            {
+                Role = "Journeyman",
+                RegularDirectRate = JourneymanRegularDirectRate,
+                RegularBilledRate = JourneymanRegularBilledRate,
+                OvernightDirectRate = JourneymanOvernightDirectRate,
+                OvernightBilledRate = JourneymanOvernightBilledRate
+            },
+            new LaborRateDto
+            {
+                Role = "Apprentice",
+                RegularDirectRate = ApprenticeRegularDirectRate,
+                RegularBilledRate = ApprenticeRegularBilledRate,
+                OvernightDirectRate = ApprenticeOvernightDirectRate,
+                OvernightBilledRate = ApprenticeOvernightBilledRate
+            }
+        },
+            LocationHours = LaborHourMatrix.Select(l => new LocationHourDto
+            {
+                LocationName = l.LocationName,
+                Normal = l.NormalHours,
+                Lift = l.LiftHours,
+                Panel = l.PanelHours,
+                Pipe = l.PipeHours
+            }).ToList()
+        };
+    }
+
 
     public Task ResetFormAsync()
     {
@@ -694,9 +783,8 @@ public partial class CreateBidViewModel : ObservableObject
                 return;
             }
 
-            var template = new LaborTemplateDto
-            {
-                Id = Guid.NewGuid(),
+            var template = new CreateLaborTemplateDto
+            {               
                 TemplateName = TemplateName,
                 IsDefault = IsDefaultTemplate,
                 LaborRates = new List<LaborRateDto>
@@ -1388,6 +1476,28 @@ public partial class CreateBidViewModel : ObservableObject
 
 
         };
+
+        var currentTemplateDto = BuildCurrentLaborTemplateDto(); // Method that returns what the user sees now
+        var currentJson = JsonSerializer.Serialize(currentTemplateDto, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        if (_originalLaborTemplateJson != null && _originalLaborTemplateJson != currentJson)
+        {
+            var confirm = await Shell.Current.DisplayAlert(
+                "Unsaved Changes",
+                "You've modified the labor template but haven't saved it. Would you like to save it as a new template?",
+                "Yes, Save",
+                "No"
+            );
+
+            if (confirm)
+            {
+                await SaveTemplateAsync(); // or navigate to the save template screen
+            }
+        }
+
 
         try
         {
