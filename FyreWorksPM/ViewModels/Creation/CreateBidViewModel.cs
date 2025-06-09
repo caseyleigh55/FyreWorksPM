@@ -58,23 +58,14 @@ public partial class CreateBidViewModel : ObservableObject
 
         CreatedDate = DateTime.Today;
 
-        LaborHourMatrix = new ObservableCollection<InstallLocationHoursViewModel>
-{
-    new() { LocationName = "Warehouse", NormalHours = 0.5m, LiftHours = 1.0m, PanelHours = 0.0m, PipeHours = 1.0m },
-    new() { LocationName = "Hardlid", NormalHours = 0.5m, LiftHours = 1.0m, PanelHours = 0.0m, PipeHours = 1.0m },
-    new() { LocationName = "T-Bar", NormalHours = 0.25m, LiftHours = 1.0m, PanelHours = 0.0m, PipeHours = 1.0m },
-    new() { LocationName = "Underground", NormalHours = 1.0m, LiftHours = 0.0m, PanelHours = 0.0m, PipeHours = 0.0m },
-    new() { LocationName = "Panel Room", NormalHours = 1.0m, LiftHours = 0.0m, PanelHours = 1.0m, PipeHours = 0.0m },
-    new() { LocationName = "Demo", NormalHours = 0.25m, LiftHours = 0.75m, PanelHours = 1.0m, PipeHours = 1.0m },
-    new() { LocationName = "Trim", NormalHours = 0.25m, LiftHours = 0.5m, PanelHours = 3.0m, PipeHours = 0.0m }
-};
+        LaborHourMatrix = new ObservableCollection<InstallLocationHoursViewModel>();
+        //DeviceHourSummaries = new ObservableCollection<DeviceHourSummaryViewModel>();
         DeviceHourSummaries = new ObservableCollection<DeviceHourSummaryViewModel>
-{
-    new() { ActivityType = "PreWire" },
-    new() { ActivityType = "Trim" },
-    new() { ActivityType = "Demo" }
-};
-       
+        {
+            new() { ActivityType = "PreWire" },
+            new() { ActivityType = "Trim" },
+            new() { ActivityType = "Demo" }
+        };
 
         NavigateToCreateTasksCommand = new AsyncRelayCommand(NavigateToCreateTasksAsync);
         NavigateToCreateItemsCommand = new AsyncRelayCommand(NavigateToCreateItemAsync);
@@ -650,9 +641,7 @@ public partial class CreateBidViewModel : ObservableObject
     [RelayCommand] public async Task SaveBidAsync() => await SaveBid();
 
     #endregion
-    #region Initialization
-
-    public async Task OnAppearingAsync() => await InitializeAsync();
+    #region Initialization   
 
     private async Task InitializeAsync()
     {
@@ -660,6 +649,12 @@ public partial class CreateBidViewModel : ObservableObject
         BidNumber = await _bidService.GetNextBidNumberAsync();
         await Task.WhenAll(LoadClientsAsync(), LoadItemsAsync(), LoadTaskTemplatesAsync(), _laborTemplateService.GetDefaultTemplateAsync());
         var defaultTemplate = await _laborTemplateService.GetDefaultTemplateAsync();
+
+        if (defaultTemplate == null)
+        {
+            defaultTemplate = GetTemplate(); // ← Your hardcoded template generator
+        }
+
         _originalLaborTemplateJson = JsonSerializer.Serialize(defaultTemplate, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
@@ -668,6 +663,27 @@ public partial class CreateBidViewModel : ObservableObject
         // Populate your form fields from the defaultTemplate like usual
         ApplyLaborTemplate(defaultTemplate); // <- you likely already have this
 
+    }
+    private LaborTemplateDto GetTemplate()
+    {
+        return new LaborTemplateDto
+        {
+            TemplateName = "Default",
+            IsDefault = true,
+            LaborRates = new List<LaborRateDto>(), // Empty or add defaults if needed
+            LocationHours = new List<LocationHourDto>
+        {
+             new() { LocationName = "Warehouse", Normal = 0.5m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
+            new() { LocationName = "Hardlid", Normal = 0.5m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
+            new() { LocationName = "T-Bar", Normal = 0.25m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
+            new() { LocationName = "Underground", Normal = 1.0m, Lift = 0.0m, Panel = 0.0m, Pipe = 0.0m },
+            new() { LocationName = "Panel Room", Normal = 1.0m, Lift = 0.0m, Panel = 1.0m, Pipe = 0.0m },
+            new() { LocationName = "Demo", Normal = 0.25m, Lift = 0.75m, Panel = 1.0m, Pipe = 1.0m },
+            new() { LocationName = "Trim", Normal = 0.25m, Lift = 0.5m, Panel = 3.0m, Pipe = 0.0m }
+            }
+        };
+        
+        
     }
 
     private void ApplyLaborTemplate(LaborTemplateDto template)
