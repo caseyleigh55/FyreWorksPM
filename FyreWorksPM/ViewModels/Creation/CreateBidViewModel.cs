@@ -1394,6 +1394,43 @@ public partial class CreateBidViewModel : ObservableObject
 
     #region Bid Saving
 
+    private async Task AutoSaveUnsavedTemplateAsync(string projectName)
+    {
+        var currentDto = BuildCurrentLaborTemplateDto();
+
+        var createDto = new CreateLaborTemplateDto
+        {
+            TemplateName = $"{projectName} - {DateTime.Now:MM-dd-yyyy HH:mm}",
+            IsDefault = false,
+            LaborRates = currentDto.LaborRates.Select(r => new LaborRateDto
+            {
+                Role = r.Role,
+                RegularDirectRate = r.RegularDirectRate,
+                RegularBilledRate = r.RegularBilledRate,
+                OvernightDirectRate = r.OvernightDirectRate,
+                OvernightBilledRate = r.OvernightBilledRate
+            }).ToList(),
+            LocationHours = currentDto.LocationHours.Select(h => new LocationHourDto
+            {
+                LocationName = h.LocationName,
+                Normal = h.Normal,
+                Lift = h.Lift,
+                Panel = h.Panel,
+                Pipe = h.Pipe
+            }).ToList()
+        };
+
+
+        await _laborTemplateService.CreateTemplateAsync(createDto);
+
+        // Update stored default template snapshot to new unsaved state
+        _originalLaborTemplateJson = JsonSerializer.Serialize(createDto, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+    }
+
+
     private async Task NavigateToCreateTasksAsync()
     {
         await _navigationService.GoToAsync("createtasks");
@@ -1477,7 +1514,7 @@ public partial class CreateBidViewModel : ObservableObject
 
         };
 
-        var currentTemplateDto = BuildCurrentLaborTemplateDto(); // Method that returns what the user sees now
+        var currentTemplateDto = BuildCurrentLaborTemplateDto(); // what user sees
         var currentJson = JsonSerializer.Serialize(currentTemplateDto, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
@@ -1485,18 +1522,30 @@ public partial class CreateBidViewModel : ObservableObject
 
         if (_originalLaborTemplateJson != null && _originalLaborTemplateJson != currentJson)
         {
+            // Show dialog before saving bid
             var confirm = await Shell.Current.DisplayAlert(
-                "Unsaved Changes",
-                "You've modified the labor template but haven't saved it. Would you like to save it as a new template?",
+                "Unsaved Template Changes",
+                "You've modified the labor template but haven't saved it. Do you want to save this as a new template?",
                 "Yes, Save",
                 "No"
             );
 
             if (confirm)
+            {                
+                return; // Exit bid save flow for now
+            }
+            else
             {
-                await SaveTemplateAsync(); // or navigate to the save template screen
+                // Auto-save non-default with project name + date
+                await AutoSaveUnsavedTemplateAsync(ProjectName); // we'll build this
+                _originalLaborTemplateJson = currentJson; // continue to save bid
             }
         }
+        else
+        {
+            // continue to save bid - template is unmodified
+        }
+
 
 
         try
