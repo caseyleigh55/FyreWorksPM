@@ -7,8 +7,24 @@ namespace FyreWorksPM.Pages.Creation;
 /// Code-behind for CreateBidPage.
 /// Responsible for initializing the page and wiring up events like adding a new client.
 /// </summary>
+[QueryProperty(nameof(SelectedTemplateId), "SelectedTemplateId")]
+[QueryProperty(nameof(FromEdit), "FromEdit")]
 public partial class CreateBidPage : ContentPage
 {
+    //public string SelectedTemplateId { get; set; }
+    private string _selectedTemplateId;
+    public string? SelectedTemplateId
+    {
+        get => _selectedTemplateId;
+        set
+        {
+            _selectedTemplateId = value;
+            System.Diagnostics.Debug.WriteLine($"SelectedTemplateId received: {value}");
+        }
+    }
+
+    public string FromEdit { get; set; }
+
     private readonly CreateBidViewModel _viewModel;
     private readonly CreateClientPage _createClientPage;
 
@@ -34,10 +50,24 @@ public partial class CreateBidPage : ContentPage
 
         if (BindingContext is CreateBidViewModel bidVm)
         {
-            await bidVm.LoadTaskTemplatesAsync();
-            await bidVm.LoadItemsAsync();
+            // ⬇️ Check if we’re coming from the Edit page
+            if (FromEdit == "true" && Guid.TryParse(SelectedTemplateId, out var selectedId))
+            {
+                System.Diagnostics.Debug.WriteLine($"FromEdit: {FromEdit}, TemplateId: {SelectedTemplateId}");
+
+                await bidVm.LoadTemplateByIdAsync(selectedId);
+            }
+            else
+            {
+                await bidVm.LoadTaskTemplatesAsync();
+                await bidVm.LoadItemsAsync();
+            }
         }
     }
+
+    
+
+
 
     private void OnComponentSelectionChanged(object sender, SelectionChangedEventArgs e)
     {

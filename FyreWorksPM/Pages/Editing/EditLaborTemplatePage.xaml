@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FyreWorksPM.ViewModels.Editing"
+             x:Class="FyreWorksPM.Pages.Editing.EditLaborTemplatePage"
+             x:Name="EditLaborTemplate"
+             Title="Edit LaborTemplate">
+
+    <Border Stroke="White" BackgroundColor="Black" StrokeThickness="1" Padding="10">
+        <ScrollView>
+        <VerticalStackLayout Spacing="15">
+            <!-- Header -->
+            <Label Text="Labor Calculator"
+                   TextDecorations="Underline"
+                   FontAttributes="Bold,Italic"
+                   FontSize="18"
+                   TextColor="White" />
+
+            <!-- Labor Hour Calculator -->
+            <Border Stroke="White" BackgroundColor="Black" StrokeThickness="1" Padding="10">
+                <Grid Padding="10" RowSpacing="5" ColumnSpacing="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Column Headers -->
+                    <Label Grid.Row="0" Grid.Column="0" Text="Location" FontAttributes="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="1" Text="Normal" FontAttributes="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="2" Text="Lift" FontAttributes="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="3" Text="Panel" FontAttributes="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="4" Text="Pipe" FontAttributes="Bold"/>
+
+                    <!-- Data Rows -->
+                    <CollectionView Grid.Row="1" Grid.ColumnSpan="5"
+                                    ItemsSource="{Binding LaborHourMatrix}"
+                                    SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnSpacing="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Label Grid.Column="0" Text="{Binding LocationName}" VerticalTextAlignment="Center"/>
+                                    <Entry Grid.Column="1" Text="{Binding NormalHours, Mode=TwoWay}" Keyboard="Numeric"/>
+                                    <Entry Grid.Column="2" Text="{Binding LiftHours, Mode=TwoWay}" Keyboard="Numeric"/>
+                                    <Entry Grid.Column="3" Text="{Binding PanelHours, Mode=TwoWay}" Keyboard="Numeric"/>
+                                    <Entry Grid.Column="4" Text="{Binding PipeHours, Mode=TwoWay}" Keyboard="Numeric"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
+            </Border>
+
+            <!-- Template Controls -->
+            <Grid ColumnDefinitions="2*,2*,*,*,*" Padding="5" ColumnSpacing="10"
+                  x:Name="save"
+                  x:DataType="vm:EditLaborTemplateViewModel">
+                <!-- Title -->
+                <Label Grid.Column="0" Text="Labor Rates"
+                       TextDecorations="Underline"
+                       FontAttributes="Bold,Italic"
+                       FontSize="18"
+                       TextColor="White" />
+
+                <!-- Template Name Entry -->
+                <Entry Grid.Column="1" Placeholder="New Template Name"
+                       Text="{Binding TemplateName}"
+                       WidthRequest="400" />
+
+                <!-- Default Checkbox -->
+                <Grid Grid.Column="2" RowDefinitions="Auto,Auto">
+                    <CheckBox Grid.Row="0" IsChecked="{Binding IsDefault}" HorizontalOptions="Center" />
+                    <Label Grid.Row="1" Text="Set as Default" HorizontalOptions="Center" />
+                </Grid>
+
+                <!-- Buttons -->
+                <Button Grid.Column="3" Text="Load Template"
+                        WidthRequest="200"
+                        Command="{Binding LoadTemplateCommand}"
+                        BackgroundColor="MediumPurple"
+                        TextColor="White" />
+
+                <Button Grid.Column="4" Text="Save Template"
+                        WidthRequest="200"
+                        Command="{Binding SaveTemplateCommand}"
+                        BackgroundColor="Green"
+                        TextColor="White" />
+            </Grid>
+
+            <!-- Labor Rates -->
+            <Border Stroke="White" BackgroundColor="Black" StrokeThickness="1" Padding="10">
+                <VerticalStackLayout Spacing="10" x:Name="LaborHours"
+                                     x:DataType="vm:EditLaborTemplateViewModel">
+                    <Label Text="Rates" FontAttributes="Bold" TextColor="White" />
+                    <Grid ColumnDefinitions="2*,*,*,*,*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+                        <Label Text="Regular Direct Rate" FontAttributes="Bold" Grid.Row="0" Grid.Column="1" />
+                        <Label Text="Regular Billed Rate" FontAttributes="Bold" Grid.Row="0" Grid.Column="2" />
+                        <Label Text="Overnight Direct Rate" FontAttributes="Bold" Grid.Row="0" Grid.Column="3" />
+                        <Label Text="Overnight Billed Rate" FontAttributes="Bold" Grid.Row="0" Grid.Column="4" />
+
+                        <!-- Journeyman -->
+                        <Label Text="Journeyman" Grid.Row="1" Grid.Column="0" />
+                        <Entry Text="{Binding JourneymanRegularDirectRate}" Grid.Row="1" Grid.Column="1" />
+                        <Entry Text="{Binding JourneymanRegularBilledRate}" Grid.Row="1" Grid.Column="2" />
+                        <Entry Text="{Binding JourneymanOvernightDirectRate}" Grid.Row="1" Grid.Column="3" />
+                        <Entry Text="{Binding JourneymanOvernightBilledRate}" Grid.Row="1" Grid.Column="4" />
+
+                        <!-- Apprentice -->
+                        <Label Text="Apprentice" Grid.Row="2" Grid.Column="0" />
+                        <Entry Text="{Binding ApprenticeRegularDirectRate}" Grid.Row="2" Grid.Column="1" />
+                        <Entry Text="{Binding ApprenticeRegularBilledRate}" Grid.Row="2" Grid.Column="2" />
+                        <Entry Text="{Binding ApprenticeOvernightDirectRate}" Grid.Row="2" Grid.Column="3" />
+                        <Entry Text="{Binding ApprenticeOvernightBilledRate}" Grid.Row="2" Grid.Column="4" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+            <Border Stroke="White" BackgroundColor="Black" StrokeThickness="1" Padding="10">
+                <VerticalStackLayout>
+                    <Label Text="Available Templates"
+               FontAttributes="Bold,Italic"
+               FontSize="18"
+               TextColor="White"
+               Margin="0,0,0,10" />
+
+                    <CollectionView ItemsSource="{Binding AvailableTemplates}" SelectionMode="Single"
+                        x:Name="TemplatesList"
+                        SelectionChanged="OnTemplateSelected">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="5" ColumnDefinitions="*,Auto">
+                                    <Label Grid.Column="0" Text="{Binding Name}" TextColor="White"/>
+                                    <Label Grid.Column="1" Text="(Default)" TextColor="Gold" 
+                               IsVisible="{Binding IsDefault}" FontAttributes="Italic"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+        </ScrollView>
+    </Border>
+</ContentPage>

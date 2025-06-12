@@ -12,6 +12,8 @@ using FyreWorksPM.Services.Labor;
 using FyreWorksPM.Services.Navigation;
 using FyreWorksPM.Services.Tasks;
 using FyreWorksPM.Utilities;
+using FyreWorksPM.Utilities.LaborTemplateSupportClasses;
+using FyreWorksPM.ViewModels.Editing;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text.Json;
@@ -509,14 +511,22 @@ public partial class CreateBidViewModel : ObservableObject
         }
     }
 
-    public decimal JourneymanRegularDirectRate { get; set; } = 65;
-    public decimal JourneymanRegularBilledRate { get; set; } = 90;
-    public decimal JourneymanOvernightDirectRate { get; set; } = 75;
-    public decimal JourneymanOvernightBilledRate { get; set; } = 115;
-    public decimal ApprenticeRegularDirectRate { get; set; } = 30;
-    public decimal ApprenticeRegularBilledRate { get; set; } = 54;
-    public decimal ApprenticeOvernightDirectRate { get; set; } = 45;
-    public decimal ApprenticeOvernightBilledRate { get; set; } = 83;
+    [ObservableProperty]
+    private decimal journeymanRegularDirectRate;
+    [ObservableProperty]
+    private decimal journeymanRegularBilledRate;
+    [ObservableProperty]
+    private decimal journeymanOvernightDirectRate;
+    [ObservableProperty]
+    private decimal journeymanOvernightBilledRate;
+    [ObservableProperty]
+    private decimal apprenticeRegularDirectRate;
+    [ObservableProperty]
+    private decimal apprenticeRegularBilledRate;
+    [ObservableProperty]
+    private decimal apprenticeOvernightDirectRate;
+    [ObservableProperty]
+    private decimal apprenticeOvernightBilledRate;
 
     public decimal JourneymanRegularHoursTotal =>
     DemoJourneymanHours + PrewireJourneymanHours + TrimJourneymanHours + TestJourneymanHours;
@@ -670,10 +680,28 @@ public partial class CreateBidViewModel : ObservableObject
         {
             TemplateName = "Default",
             IsDefault = true,
-            LaborRates = new List<LaborRateDto>(), // Empty or add defaults if needed
+            LaborRates = new List<LaborRateDto>
+        {
+            new LaborRateDto
+            {
+                Role = "Journeyman",
+                RegularDirectRate = 65m,
+                RegularBilledRate = 90m,
+                OvernightDirectRate = 75m,
+                OvernightBilledRate = 115m
+            },
+            new LaborRateDto
+            {
+                Role = "Apprentice",
+                RegularDirectRate = 30m,
+                RegularBilledRate = 54m,
+                OvernightDirectRate = 45m,
+                OvernightBilledRate = 83m
+            }
+        }, 
             LocationHours = new List<LocationHourDto>
         {
-             new() { LocationName = "Warehouse", Normal = 0.5m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
+            new() { LocationName = "Warehouse", Normal = 0.5m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
             new() { LocationName = "Hardlid", Normal = 0.5m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
             new() { LocationName = "T-Bar", Normal = 0.25m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
             new() { LocationName = "Underground", Normal = 1.0m, Lift = 0.0m, Panel = 0.0m, Pipe = 0.0m },
@@ -843,12 +871,34 @@ public partial class CreateBidViewModel : ObservableObject
         }
     }
 
+    public async Task LoadTemplateByIdAsync(Guid id)
+    {
+        var dto = await _laborTemplateService.GetTemplateByIdAsync(id);
+        if (dto == null)
+        {
+            Debug.WriteLine("DTO was null — template not found!");
+            return;
+        }
+        Debug.WriteLine($"Loaded template: {dto.TemplateName}");
+
+        var template = new TemplateModel
+        {
+            Id = dto.Id,
+            Name = dto.TemplateName,
+            IsDefault = dto.IsDefault,
+            // map other things if needed
+        };
+        Debug.WriteLine("Applying template with name: " + dto.TemplateName);
+
+        ApplyLaborTemplate(dto);
+    }
+
+
 
     [RelayCommand]
-    private async Task LoadTemplateAsync()
+    private async Task EditLaborTemplateAsync()
     {
-        // Load logic here
-        Debug.WriteLine("Template loaded!");
+        await _navigationService.GoToAsync("labortemplates");
     }
 
 

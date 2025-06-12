@@ -70,6 +70,13 @@ namespace FyreWorksPM.Services.Labor
             }
         }
 
+        public async Task<bool> UpdateTemplateAsync(Guid id, CreateLaborTemplateDto dto)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"api/LaborTemplates/{id}", dto);
+            return response.IsSuccessStatusCode;
+        }
+
+
         public async Task DeleteTemplateAsync(Guid id)
         {
             var response = await _httpClient.DeleteAsync($"api/LaborTemplates/{id}");

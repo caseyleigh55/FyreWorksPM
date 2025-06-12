@@ -5,7 +5,7 @@
     xmlns:converters="clr-namespace:FyreWorksPM.Common.Converters;assembly=FyreWorksPM"
     xmlns:controls="clr-namespace:FyreWorksPM.Controls"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-    xmlns:vm="clr-namespace:FyreWorksPM.ViewModels.Creation"
+    xmlns:vm="clr-namespace:FyreWorksPM.ViewModels.Creation"    
     x:Class="FyreWorksPM.Pages.Creation.CreateBidPage"
     x:Name="CreateBid"
     Title="New Bid">
@@ -562,7 +562,7 @@
                         
                             <Button Grid.Column="3" Text="Load Template"
                                     WidthRequest="200"
-                                    Command="{Binding LoadTemplateCommand}"
+                                    Command="{Binding EditLaborTemplateCommand}"
                                     BackgroundColor="MediumPurple"
                                     TextColor="White"
                                     Margin="10,0,10,0" />

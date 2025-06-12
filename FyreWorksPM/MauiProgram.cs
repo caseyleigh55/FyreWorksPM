@@ -15,6 +15,7 @@ using FyreWorksPM.Services.Labor;
 using FyreWorksPM.Services.Navigation;
 using FyreWorksPM.Services.Tasks;
 using FyreWorksPM.ViewModels.Creation;
+using FyreWorksPM.ViewModels.Editing;
 using FyreWorksPM.ViewModels.Foundation;
 using FyreWorksPM.ViewModels.Solitary;
 using Microsoft.EntityFrameworkCore;
@@ -127,6 +128,7 @@ public static class MauiProgram
         // Pop-Up ViewModels
         builder.Services.AddTransient<EditItemViewModel>();
         builder.Services.AddTransient<EditItemTypeViewModel>();
+        builder.Services.AddTransient<EditLaborTemplateViewModel>();
 
         // ============================
         // 📄 Pages (DI-resolved with ViewModels where needed)
@@ -177,8 +179,8 @@ public static class MauiProgram
 
         // Pop-Up Pages
         builder.Services.AddTransient<EditItemPage>();
-
         builder.Services.AddTransient<EditItemTypePage>();
+        builder.Services.AddTransient<EditLaborTemplatePage>();
 
         // Solitary Pages
         builder.Services.AddTransient<SelectedBidPage>();

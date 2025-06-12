@@ -172,6 +172,72 @@ namespace FyreWorksPM.Api.Controllers
         }
 
         // ========================================================
+        // Put: api/LaborTemplates/{id}
+        // Updates a template by ID
+        // ========================================================
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] CreateLaborTemplateDto dto)
+        {
+            var template = await _db.LaborTemplates
+                .Include(t => t.LaborRates)
+                .Include(t => t.LocationHours)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (template is null)
+                return NotFound();
+
+            // Update core fields
+            template.TemplateName = dto.TemplateName;
+            template.IsDefault = dto.IsDefault;
+
+            // Swap default status if needed
+            if (dto.IsDefault)
+            {
+                var currentDefault = await _db.LaborTemplates
+                    .Where(t => t.IsDefault && t.Id != id)
+                    .FirstOrDefaultAsync();
+
+                if (currentDefault is not null)
+                {
+                    currentDefault.IsDefault = false;
+                    _db.LaborTemplates.Update(currentDefault);
+                }
+            }
+
+            // Clear old entries
+            _db.LocationHours.RemoveRange(template.LocationHours);
+            _db.LaborRates.RemoveRange(template.LaborRates);
+
+            // Add new location hours
+            template.LocationHours = dto.LocationHours.Select(h => new LocationHourModel
+            {
+                LocationName = h.LocationName,
+                Normal = h.Normal,
+                Lift = h.Lift,
+                Panel = h.Panel,
+                Pipe = h.Pipe,
+                LaborTemplateId = id
+            }).ToList();
+
+            // Add new labor rates
+            template.LaborRates = dto.LaborRates.Select(r => new LaborRateModel
+            {
+                Role = r.Role,
+                RegularDirectRate = r.RegularDirectRate,
+                RegularBilledRate = r.RegularBilledRate,
+                OvernightDirectRate = r.OvernightDirectRate,
+                OvernightBilledRate = r.OvernightBilledRate,
+                LaborTemplateId = id
+            }).ToList();
+
+            _db.LaborTemplates.Update(template);
+            await _db.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+
+        // ========================================================
         // DELETE: api/LaborTemplates/{id}
         // Deletes a template by ID
         // ========================================================

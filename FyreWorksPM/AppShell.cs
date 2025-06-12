@@ -2,6 +2,7 @@
 using FyreWorksPM.Pages.Creation;
 using FyreWorksPM.Services.Auth;
 using FyreWorksPM.Pages.PopUps;
+using FyreWorksPM.Pages.Editing;
 
 namespace FyreWorksPM;
 
@@ -135,6 +136,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("createclient", typeof(CreateClientPage));
         Routing.RegisterRoute("createtasks", typeof(CreateTasksPage));
         Routing.RegisterRoute("createBid", typeof(CreateBidPage));
+        Routing.RegisterRoute("labortemplates", typeof(EditLaborTemplatePage));
         Routing.RegisterRoute("projects", typeof(ProjectsPage));
         Routing.RegisterRoute("services", typeof(ServicePage));
         Routing.RegisterRoute("register", typeof(CreateUserPage)); // Used by LoginShell
