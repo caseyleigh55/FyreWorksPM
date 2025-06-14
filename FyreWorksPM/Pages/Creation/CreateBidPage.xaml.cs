@@ -43,24 +43,24 @@ public partial class CreateBidPage : ContentPage
     {
         base.OnAppearing();
 
-        if (BindingContext is IViewModelLifecycle vm)
-        {
-            await vm.OnAppearingAsync();
-        }
+        //if (BindingContext is IViewModelLifecycle vm)
+        //{
+        //    await vm.OnAppearingAsync();
+        //}
 
-        if (BindingContext is CreateBidViewModel bidVm)
+        if (BindingContext is CreateBidViewModel Vm)
         {
             // ⬇️ Check if we’re coming from the Edit page
             if (FromEdit == "true" && Guid.TryParse(SelectedTemplateId, out var selectedId))
             {
                 System.Diagnostics.Debug.WriteLine($"FromEdit: {FromEdit}, TemplateId: {SelectedTemplateId}");
 
-                await bidVm.LoadTemplateByIdAsync(selectedId);
+                await Vm.LoadTemplateByIdAsync(selectedId);
             }
             else
             {
-                await bidVm.LoadTaskTemplatesAsync();
-                await bidVm.LoadItemsAsync();
+                await Vm.LoadTaskTemplatesAsync();
+                await Vm.LoadItemsAsync();
             }
         }
     }

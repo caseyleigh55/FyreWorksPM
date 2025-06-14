@@ -62,6 +62,8 @@ public partial class CreateBidViewModel : ObservableObject
 
         LaborHourMatrix = new ObservableCollection<InstallLocationHoursViewModel>();
         //DeviceHourSummaries = new ObservableCollection<DeviceHourSummaryViewModel>();
+
+
         DeviceHourSummaries = new ObservableCollection<DeviceHourSummaryViewModel>
         {
             new() { ActivityType = "PreWire" },
@@ -225,7 +227,7 @@ public partial class CreateBidViewModel : ObservableObject
     public ObservableCollection<BidTaskViewModel> AdminTasks { get; } = new();
     public ObservableCollection<BidTaskViewModel> EngineeringTasks { get; } = new();
 
-    public ObservableCollection<InstallLocationHoursViewModel> LaborHourMatrix { get; set; }
+    //public ObservableCollection<InstallLocationHoursViewModel> LaborHourMatrix { get; set; }
     public ObservableCollection<DeviceHourSummaryViewModel> DeviceHourSummaries { get; set; }
     public ObservableCollection<LaborSummaryRowViewModel> PrewireDeviceHours { get; set; } = new();
     [ObservableProperty]
@@ -233,7 +235,12 @@ public partial class CreateBidViewModel : ObservableObject
     [ObservableProperty]
     private LaborSummaryRowViewModel demoSummaryRow = new() { Location = "Demo" };
 
-
+    private ObservableCollection<InstallLocationHoursViewModel> _laborHourMatrix;
+    public ObservableCollection<InstallLocationHoursViewModel> LaborHourMatrix
+    {
+        get => _laborHourMatrix;
+        set => SetProperty(ref _laborHourMatrix, value);
+    }
 
     public ObservableCollection<BidComponentLineItemViewModel> ComponentLineItems { get; } = new();    
     public ObservableCollection<BidWireLineItemViewModel> WireLineItems { get; } = new();
@@ -655,6 +662,8 @@ public partial class CreateBidViewModel : ObservableObject
 
     private async Task InitializeAsync()
     {
+        Debug.WriteLine($"****************************************************************[InitializeAsync] {DateTime.Now:HH:mm:ss.fff} running");
+
         await ResetFormAsync();
         BidNumber = await _bidService.GetNextBidNumberAsync();
         await Task.WhenAll(LoadClientsAsync(), LoadItemsAsync(), LoadTaskTemplatesAsync(), _laborTemplateService.GetDefaultTemplateAsync());
@@ -672,7 +681,7 @@ public partial class CreateBidViewModel : ObservableObject
 
         // Populate your form fields from the defaultTemplate like usual
         ApplyLaborTemplate(defaultTemplate); // <- you likely already have this
-
+        Debug.WriteLine($"****************************************************************[InitializeAsync] {DateTime.Now:HH:mm:ss.fff} Finished");
     }
     private LaborTemplateDto GetTemplate()
     {
@@ -701,7 +710,7 @@ public partial class CreateBidViewModel : ObservableObject
         }, 
             LocationHours = new List<LocationHourDto>
         {
-            new() { LocationName = "Warehouse", Normal = 0.5m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
+            new() { LocationName = "Warehouse", Normal = 1.5m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
             new() { LocationName = "Hardlid", Normal = 0.5m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
             new() { LocationName = "T-Bar", Normal = 0.25m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
             new() { LocationName = "Underground", Normal = 1.0m, Lift = 0.0m, Panel = 0.0m, Pipe = 0.0m },
@@ -716,6 +725,7 @@ public partial class CreateBidViewModel : ObservableObject
 
     private void ApplyLaborTemplate(LaborTemplateDto template)
     {
+        LaborHourMatrix.Clear();
         if (template == null) return;
 
         // Set Labor Rates
@@ -723,7 +733,7 @@ public partial class CreateBidViewModel : ObservableObject
         var apprentice = template.LaborRates.FirstOrDefault(r => r.Role == "Apprentice");
 
         if (journeyman != null)
-        {
+        { 
             JourneymanRegularDirectRate = journeyman.RegularDirectRate;
             JourneymanRegularBilledRate = journeyman.RegularBilledRate;
             JourneymanOvernightDirectRate = journeyman.OvernightDirectRate;
@@ -737,20 +747,16 @@ public partial class CreateBidViewModel : ObservableObject
             ApprenticeOvernightDirectRate = apprentice.OvernightDirectRate;
             ApprenticeOvernightBilledRate = apprentice.OvernightBilledRate;
         }
-
-        // Set Location Hours Matrix
-        LaborHourMatrix.Clear();
-        foreach (var hour in template.LocationHours)
-        {
-            LaborHourMatrix.Add(new InstallLocationHoursViewModel
+        LaborHourMatrix = new ObservableCollection<InstallLocationHoursViewModel>(
+            template.LocationHours.Select(hour => new InstallLocationHoursViewModel
             {
                 LocationName = hour.LocationName,
                 NormalHours = hour.Normal,
                 LiftHours = hour.Lift,
                 PanelHours = hour.Panel,
                 PipeHours = hour.Pipe
-            });
-        }
+            })
+        );
     }
 
 
@@ -873,6 +879,8 @@ public partial class CreateBidViewModel : ObservableObject
 
     public async Task LoadTemplateByIdAsync(Guid id)
     {
+        LaborHourMatrix.Clear();
+
         var dto = await _laborTemplateService.GetTemplateByIdAsync(id);
         if (dto == null)
         {
@@ -903,23 +911,23 @@ public partial class CreateBidViewModel : ObservableObject
 
 
 
-    public decimal GetLaborRate(string location, string installType)
-    {
-        var match = LaborHourMatrix.FirstOrDefault(x =>
-            string.Equals(x.LocationName, location, StringComparison.OrdinalIgnoreCase));
+    //public decimal GetLaborRate(string location, string installType)
+    //{
+    //    var match = LaborHourMatrix.FirstOrDefault(x =>
+    //        string.Equals(x.LocationName, location, StringComparison.OrdinalIgnoreCase));
 
-        if (match == null)
-            return 0;
+    //    if (match == null)
+    //        return 0;
 
-        return installType.ToLower() switch
-        {
-            "normal" => match.NormalHours,
-            "lift" => match.LiftHours,
-            "panel" => match.PanelHours,
-            "pipe" => match.PipeHours,
-            _ => 0
-        };
-    }
+    //    return installType.ToLower() switch
+    //    {
+    //        "normal" => match.NormalHours,
+    //        "lift" => match.LiftHours,
+    //        "panel" => match.PanelHours,
+    //        "pipe" => match.PipeHours,
+    //        _ => 0
+    //    };
+    //}
 
     public void RecalculateDemoSummary()
     {
