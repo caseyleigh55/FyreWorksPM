@@ -15,6 +15,7 @@ using FyreWorksPM.Utilities;
 using FyreWorksPM.Utilities.LaborTemplateSupportClasses;
 using FyreWorksPM.ViewModels.Editing;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Windows.Input;
@@ -176,13 +177,16 @@ public partial class CreateBidViewModel : ObservableObject
         }
     }
 
+    [ObservableProperty]
+    private string templateName = "FyreWorksPM Default Template";
 
-    private string _templateName;
-    public string TemplateName
-    {
-        get => _templateName;
-        set => SetProperty(ref _templateName, value);
-    }
+
+    //private string _templateName = "FyreworksPM Default Template";
+    //public string TemplateName
+    //{
+    //    get => _templateName;
+    //    set => SetProperty(ref _templateName, value);
+    //}
 
     private bool _isDefaultTemplate;
     public bool IsDefaultTemplate
@@ -190,6 +194,8 @@ public partial class CreateBidViewModel : ObservableObject
         get => _isDefaultTemplate;
         set => SetProperty(ref _isDefaultTemplate, value);
     }
+
+    private bool _isInitializingTemplate;
 
 
 
@@ -239,8 +245,23 @@ public partial class CreateBidViewModel : ObservableObject
     public ObservableCollection<InstallLocationHoursViewModel> LaborHourMatrix
     {
         get => _laborHourMatrix;
-        set => SetProperty(ref _laborHourMatrix, value);
+        set
+        {
+            if (SetProperty(ref _laborHourMatrix, value))
+            {
+                foreach (var item in _laborHourMatrix)
+                    item.PropertyChanged += OnMatrixItemChanged;
+            }
+        }
     }
+
+    private void OnMatrixItemChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (TemplateName != "Unsaved Template")
+            TemplateName = "Unsaved Template";
+    }
+
+
 
     public ObservableCollection<BidComponentLineItemViewModel> ComponentLineItems { get; } = new();    
     public ObservableCollection<BidWireLineItemViewModel> WireLineItems { get; } = new();
@@ -518,6 +539,9 @@ public partial class CreateBidViewModel : ObservableObject
         }
     }
 
+    private bool _isTemplateDirty = false;
+
+
     [ObservableProperty]
     private decimal journeymanRegularDirectRate;
     [ObservableProperty]
@@ -534,6 +558,39 @@ public partial class CreateBidViewModel : ObservableObject
     private decimal apprenticeOvernightDirectRate;
     [ObservableProperty]
     private decimal apprenticeOvernightBilledRate;
+
+    partial void OnJourneymanRegularDirectRateChanged(decimal oldValue, decimal newValue) => HandleChange();
+    partial void OnJourneymanRegularBilledRateChanged(decimal oldValue, decimal newValue) => HandleChange();
+    partial void OnJourneymanOvernightDirectRateChanged(decimal oldValue, decimal newValue) => HandleChange();
+    partial void OnJourneymanOvernightBilledRateChanged(decimal oldValue, decimal newValue) => HandleChange();
+
+    partial void OnApprenticeRegularDirectRateChanged(decimal oldValue, decimal newValue) => HandleChange();
+    partial void OnApprenticeRegularBilledRateChanged(decimal oldValue, decimal newValue) => HandleChange();
+    partial void OnApprenticeOvernightDirectRateChanged(decimal oldValue, decimal newValue) => HandleChange();
+    partial void OnApprenticeOvernightBilledRateChanged(decimal oldValue, decimal newValue) => HandleChange();
+
+    private void HandleChange()
+    {
+        if (_isInitializingTemplate || _isTemplateDirty || TemplateName == "Unsaved Template")
+            return;
+
+        TemplateName = "Unsaved Template";
+        _isTemplateDirty = true;
+    }
+
+
+    partial void OnTemplateNameChanged(string oldValue, string newValue)
+    {
+        if (_isInitializingTemplate || _isTemplateDirty || newValue == "Unsaved Template")
+            return;
+
+        _isTemplateDirty = true;
+        TemplateName = "Unsaved Template";
+    }
+
+
+
+
 
     public decimal JourneymanRegularHoursTotal =>
     DemoJourneymanHours + PrewireJourneymanHours + TrimJourneymanHours + TestJourneymanHours;
@@ -680,14 +737,19 @@ public partial class CreateBidViewModel : ObservableObject
         });
 
         // Populate your form fields from the defaultTemplate like usual
-        ApplyLaborTemplate(defaultTemplate); // <- you likely already have this
-        Debug.WriteLine($"****************************************************************[InitializeAsync] {DateTime.Now:HH:mm:ss.fff} Finished");
+        // ApplyLaborTemplate(defaultTemplate); // <- you likely already have this
+        _isInitializingTemplate = true;
+        ApplyLaborTemplate(defaultTemplate);
+        _isInitializingTemplate = false;
     }
+
+
+
     private LaborTemplateDto GetTemplate()
     {
         return new LaborTemplateDto
         {
-            TemplateName = "Default",
+            TemplateName = "FyreWorksPM Default Template",
             IsDefault = true,
             LaborRates = new List<LaborRateDto>
         {
@@ -710,7 +772,7 @@ public partial class CreateBidViewModel : ObservableObject
         }, 
             LocationHours = new List<LocationHourDto>
         {
-            new() { LocationName = "Warehouse", Normal = 1.5m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
+            new() { LocationName = "Warehouse", Normal = 0.5m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
             new() { LocationName = "Hardlid", Normal = 0.5m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
             new() { LocationName = "T-Bar", Normal = 0.25m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
             new() { LocationName = "Underground", Normal = 1.0m, Lift = 0.0m, Panel = 0.0m, Pipe = 0.0m },
@@ -757,6 +819,13 @@ public partial class CreateBidViewModel : ObservableObject
                 PipeHours = hour.Pipe
             })
         );
+
+
+        TemplateName = string.IsNullOrWhiteSpace(template.TemplateName)? "Application Default Template" : template.TemplateName;
+        Debug.WriteLine($"[ApplyLaborTemplate] TemplateName set to: {TemplateName}");
+
+        _originalLaborTemplateJson = JsonSerializer.Serialize(template); // Preserve for "dirty" checks
+
     }
 
 

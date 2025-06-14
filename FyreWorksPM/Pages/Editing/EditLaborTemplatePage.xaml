@@ -89,18 +89,24 @@
                 </Grid>
 
                 <!-- Buttons -->
-                <Button Grid.Column="3" Text="Load Template"
+                <!--<Button Grid.Column="3" Text="Load Template"
                         WidthRequest="200"
                         Command="{Binding LoadTemplateCommand}"
                         BackgroundColor="MediumPurple"
-                        TextColor="White" />
+                        TextColor="White" />-->
 
-                <Button Grid.Column="4" Text="Save Template"
+                <Button Grid.Column="3" Text="Save Template"
                         WidthRequest="200"
                         Command="{Binding SaveTemplateCommand}"
                         BackgroundColor="Green"
                         TextColor="White" />
-            </Grid>
+                
+                <Button Grid.Column="4" Text="Cancel" 
+                        WidthRequest="200"
+                        Clicked="OnCancelClicked"
+                        BackgroundColor="DarkRed"
+                        TextColor="White" />
+                </Grid>
 
             <!-- Labor Rates -->
             <Border Stroke="White" BackgroundColor="Black" StrokeThickness="1" Padding="10">

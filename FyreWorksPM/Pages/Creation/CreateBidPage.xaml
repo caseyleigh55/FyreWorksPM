@@ -548,7 +548,7 @@
 
                         <!-- Template Name Entry -->
                         <Entry Grid.Column="1" Placeholder="New Template Name"
-                               Text="{Binding TemplateName}"
+                               Text="{Binding TemplateName, Mode=TwoWay}"
                                WidthRequest="400"
                                Margin="0,0" />
 

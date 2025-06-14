@@ -24,5 +24,9 @@ public partial class EditLaborTemplatePage : ContentPage
             TemplatesList.SelectedItem = null;
         }
     }
+    private async void OnCancelClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("..");
+    }
 
 }
