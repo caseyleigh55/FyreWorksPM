@@ -16,5 +16,10 @@ public class CreateBidDto
     public List<BidComponentLineItemDto> ComponentLineItems { get; set; } = new();
     public List<BidWireLineItemDto> WireLineItems { get; set; } = new();
     public List<BidMaterialLineItemDto> MaterialLineItems { get; set; } = new();
-    
+
+    //********************************************************************************************************************//
+    public decimal MaterialMarkup { get; set; }
+    public decimal AdjustedSaleTotal { get; set; }
+    public BidLaborTemplateDto BidLaborTemplate { get; set; } = new();
+    public List<ManualLaborHourDto> ManualLaborHours { get; set; } = new();
 }
