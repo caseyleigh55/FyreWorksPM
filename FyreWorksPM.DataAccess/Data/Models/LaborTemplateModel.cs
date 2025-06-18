@@ -8,7 +8,7 @@ namespace FyreWorksPM.DataAccess.Data.Models
 {
     public class LaborTemplateModel
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string TemplateName { get; set; } = string.Empty;
         public bool IsDefault { get; set; } = false;
 

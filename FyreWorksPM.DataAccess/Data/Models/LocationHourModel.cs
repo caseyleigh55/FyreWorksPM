@@ -8,7 +8,7 @@ namespace FyreWorksPM.DataAccess.Data.Models
 {
     public class LocationHourModel
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string LocationName { get; set; } = "";
 
         public decimal Normal { get; set; }
@@ -16,7 +16,7 @@ namespace FyreWorksPM.DataAccess.Data.Models
         public decimal Panel { get; set; }
         public decimal Pipe { get; set; }
 
-        public Guid LaborTemplateId { get; set; }
+        public int LaborTemplateId { get; set; }
         public LaborTemplateModel LaborTemplateModel { get; set; }
     }
 

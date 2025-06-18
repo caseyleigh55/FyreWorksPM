@@ -15,4 +15,11 @@ public class BidDto
     public bool IsActive { get; set; } = true;
     public List<CreateBidTaskDto>Tasks { get; set; } = new();
 
+    public decimal MaterialMarkup { get; set; }
+    public decimal AdjustedSaleTotal { get; set; }
+    public int LaborTemplateId { get; set; }
+    public BidLaborTemplateDto BidLaborTemplate { get; set; } = new();
+    public List<ManualLaborHourDto> ManualLaborHours { get; set; } = new();
+
+
 }

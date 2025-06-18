@@ -15,7 +15,7 @@ namespace FyreWorksPM.ViewModels.Editing
         private readonly ILaborTemplateService _laborTemplateService;
 
         // === Template Info ===
-        private Guid? _editingTemplateId;
+        private int? _editingTemplateId;
 
 
         private string _templateName;

@@ -5,11 +5,11 @@ namespace FyreWorksPM.Services.Labor
     public interface ILaborTemplateService
     {
         Task<List<LaborTemplateDto>> GetAllTemplatesAsync();
-        Task<LaborTemplateDto> GetTemplateByIdAsync(Guid id);
+        Task<LaborTemplateDto> GetTemplateByIdAsync(int id);
         Task<LaborTemplateDto> CreateTemplateAsync(CreateLaborTemplateDto template);
-        Task DeleteTemplateAsync(Guid id);
+        Task DeleteTemplateAsync(int id);
         Task<LaborTemplateDto?> GetDefaultTemplateAsync();
-        Task<bool> UpdateTemplateAsync(Guid id, CreateLaborTemplateDto dto);
+        Task<bool> UpdateTemplateAsync(int id, CreateLaborTemplateDto dto);
 
     }
 }

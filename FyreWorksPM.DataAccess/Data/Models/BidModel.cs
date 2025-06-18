@@ -33,7 +33,7 @@ public class BidModel
     //********************************************************************************************************************//
     public decimal MaterialMarkup { get; set; }
     public decimal AdjustedSaleTotal { get; set; }
-    public Guid LaborTemplateId { get; set; } = Guid.Empty; 
+    public int LaborTemplateId { get; set; } 
     public BidLaborTemplateModel BidLaborTemplate { get; set; } = new();
     public List<ManualLaborHourModel> ManualLaborHours { get; set; } = new();
 

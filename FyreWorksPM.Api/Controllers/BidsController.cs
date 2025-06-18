@@ -7,6 +7,8 @@ using FyreWorksPM.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using System.Threading;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace FyreWorksPM.Api.Controllers
@@ -61,7 +63,26 @@ namespace FyreWorksPM.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<BidDto>> CreateBid([FromBody] CreateBidDto dto)
         {
-            var lastBid = await _db.BidInfo.OrderByDescending(b => b.BidId).FirstOrDefaultAsync();
+            if (!ModelState.IsValid)
+            {
+                var errorList = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                return BadRequest(new
+                {
+                    Message = "Validation failed",
+                    Errors = errorList
+                });
+            }
+
+            try
+            {
+
+
+
+                var lastBid = await _db.BidInfo.OrderByDescending(b => b.BidId).FirstOrDefaultAsync();
             int nextNum = 1;
 
             if (lastBid != null && Regex.Match(lastBid.BidNumber, @"B-(\d{3})") is Match match && match.Success)
@@ -137,7 +158,10 @@ namespace FyreWorksPM.Api.Controllers
                 IsActive = dto.IsActive,
                 SiteInfo = siteInfo,
                 Tasks = bidTasks,
-                ComponentLineItems = bidComponentLineItems
+                ComponentLineItems = bidComponentLineItems,
+                MaterialMarkup = dto.MaterialMarkup,
+                AdjustedSaleTotal = dto.AdjustedSaleTotal
+
             };
             
 
@@ -168,6 +192,46 @@ namespace FyreWorksPM.Api.Controllers
             _db.BidWireLineItems.AddRange(wireLineItems);
             _db.BidMaterialLineItems.AddRange(materialLineItems);
 
+            var bidLaborTemplate = new BidLaborTemplateModel
+            {
+                BidId = bid.BidId,
+                LaborRates = dto.BidLaborTemplate?.LaborRates.Select(rate => new BidLaborRateModel
+                {
+                    Role = rate.Role,
+                    RegularDirectRate = rate.RegularDirectRate,
+                    RegularBilledRate = rate.RegularBilledRate,
+                    OvernightDirectRate = rate.OvernightDirectRate,
+                    OvernightBilledRate = rate.OvernightBilledRate
+                }).ToList() ?? new(),
+
+                LocationHours = dto.BidLaborTemplate?.LocationHours.Select(loc => new BidLocationHourModel
+                {
+                    LocationName = loc.LocationName,
+                    Normal = loc.Normal,
+                    Lift = loc.Lift,
+                    Panel = loc.Panel,
+                    Pipe = loc.Pipe
+                }).ToList() ?? new(),
+                TemplateName = "Snapshot", // or set meaningful name
+                IsDefault = false
+            };
+            _db.BidLaborTemplates.Add(bidLaborTemplate);
+
+            var manualLaborHours = dto.ManualLaborHours?.Select(h => new ManualLaborHourModel
+            {
+                BidId = bid.BidId,
+                Role = h.Role,
+                Category = h.Category,
+                Hours = h.Hours
+            }).ToList();
+
+            if (manualLaborHours != null && manualLaborHours.Any())
+            {
+                _db.ManualLaborHours.AddRange(manualLaborHours);
+            }
+
+
+
             await _db.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetBid), new { id = bid.BidId }, new BidDto
@@ -179,6 +243,19 @@ namespace FyreWorksPM.Api.Controllers
                 CreatedDate = bid.CreatedDate,
                 IsActive = bid.IsActive
             });
+
+
+
+        }
+    catch (Exception ex)
+    {
+        return BadRequest(new
+        {
+            Message = "Server error",
+            Error = ex.Message,
+            Inner = ex.InnerException?.Message
+    });
+    }
         }
 
 

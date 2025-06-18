@@ -33,7 +33,13 @@ namespace FyreWorksPM.Services.Bid
         public async Task<BidDto> CreateBidAsync(CreateBidDto dto)
         {
             var response = await _httpClient.PostAsJsonAsync("api/bids", dto);
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync(); // This!
+                Console.WriteLine($"BadRequest: {response.StatusCode}, Details: {error}");
+                throw new HttpRequestException($"Save failed: {error}");
+            }
+            //response.EnsureSuccessStatusCode();
 
             return await response.Content.ReadFromJsonAsync<BidDto>();
         }

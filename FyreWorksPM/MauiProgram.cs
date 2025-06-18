@@ -82,8 +82,20 @@ public static class MauiProgram
 
         builder.Services.AddHttpClient<ILaborTemplateService, LaborTemplateService>(client =>
         {
-            client.BaseAddress = new Uri(ApiConfig.BaseUrl); // Make sure BaseUrl ends with a `/`
+            client.BaseAddress = new Uri(ApiConfig.BaseUrl); 
         });
+
+        builder.Services.AddHttpClient<IBidLaborTemplateService, BidLaborTemplateService>(client =>
+        {
+            client.BaseAddress = new Uri(ApiConfig.BaseUrl);
+        });
+
+        builder.Services.AddHttpClient<IManualLaborHourService, ManualLaborHourService>(client =>
+        {
+            client.BaseAddress = new Uri(ApiConfig.BaseUrl);
+        });
+
+
 
 
 

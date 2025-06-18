@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FyreWorksPM.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialReset : Migration
+    public partial class freshstart : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -67,6 +67,20 @@ namespace FyreWorksPM.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LaborTemplates",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TemplateName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDefault = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LaborTemplates", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TaskTemplates",
                 columns: table => new
                 {
@@ -108,7 +122,10 @@ namespace FyreWorksPM.DataAccess.Migrations
                     ClientId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    SiteInfoId = table.Column<int>(type: "int", nullable: true)
+                    SiteInfoId = table.Column<int>(type: "int", nullable: true),
+                    MaterialMarkup = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    AdjustedSaleTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    LaborTemplateId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -147,6 +164,54 @@ namespace FyreWorksPM.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LaborRates",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RegularDirectRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    RegularBilledRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OvernightDirectRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OvernightBilledRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    LaborTemplateId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LaborRates", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LaborRates_LaborTemplates_LaborTemplateId",
+                        column: x => x.LaborTemplateId,
+                        principalTable: "LaborTemplates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LocationHours",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LocationName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Normal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Lift = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Panel = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Pipe = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    LaborTemplateId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LocationHours", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LocationHours_LaborTemplates_LaborTemplateId",
+                        column: x => x.LaborTemplateId,
+                        principalTable: "LaborTemplates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BidComponentLineItems",
                 columns: table => new
                 {
@@ -176,12 +241,34 @@ namespace FyreWorksPM.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BidLaborTemplates",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BidId = table.Column<int>(type: "int", nullable: false),
+                    TemplateName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDefault = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BidLaborTemplates", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BidLaborTemplates_BidInfo_BidId",
+                        column: x => x.BidId,
+                        principalTable: "BidInfo",
+                        principalColumn: "BidId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BidMaterialLineItems",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ItemName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ItemId = table.Column<int>(type: "int", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Qty = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     UnitCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -234,6 +321,7 @@ namespace FyreWorksPM.DataAccess.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ItemName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ItemId = table.Column<int>(type: "int", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Qty = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     UnitCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -251,6 +339,76 @@ namespace FyreWorksPM.DataAccess.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ManualLaborHours",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BidId = table.Column<int>(type: "int", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Hours = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ManualLaborHours", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ManualLaborHours_BidInfo_BidId",
+                        column: x => x.BidId,
+                        principalTable: "BidInfo",
+                        principalColumn: "BidId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BidLaborRateModel",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BidLaborTemplateId = table.Column<int>(type: "int", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RegularDirectRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    RegularBilledRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OvernightDirectRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OvernightBilledRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BidLaborRateModel", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BidLaborRateModel_BidLaborTemplates_BidLaborTemplateId",
+                        column: x => x.BidLaborTemplateId,
+                        principalTable: "BidLaborTemplates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BidLocationHourModel",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BidLaborTemplateId = table.Column<int>(type: "int", nullable: false),
+                    LocationName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Normal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Lift = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Panel = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Pipe = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BidLocationHourModel", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BidLocationHourModel_BidLaborTemplates_BidLaborTemplateId",
+                        column: x => x.BidLaborTemplateId,
+                        principalTable: "BidLaborTemplates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_BidComponentLineItems_BidId",
                 table: "BidComponentLineItems",
@@ -265,6 +423,22 @@ namespace FyreWorksPM.DataAccess.Migrations
                 name: "IX_BidInfo_SiteInfoId",
                 table: "BidInfo",
                 column: "SiteInfoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BidLaborRateModel_BidLaborTemplateId",
+                table: "BidLaborRateModel",
+                column: "BidLaborTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BidLaborTemplates_BidId",
+                table: "BidLaborTemplates",
+                column: "BidId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BidLocationHourModel_BidLaborTemplateId",
+                table: "BidLocationHourModel",
+                column: "BidLaborTemplateId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BidMaterialLineItems_BidId",
@@ -290,6 +464,21 @@ namespace FyreWorksPM.DataAccess.Migrations
                 name: "IX_Items_ItemTypeId",
                 table: "Items",
                 column: "ItemTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LaborRates_LaborTemplateId",
+                table: "LaborRates",
+                column: "LaborTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocationHours_LaborTemplateId",
+                table: "LocationHours",
+                column: "LaborTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ManualLaborHours_BidId",
+                table: "ManualLaborHours",
+                column: "BidId");
         }
 
         /// <inheritdoc />
@@ -297,6 +486,12 @@ namespace FyreWorksPM.DataAccess.Migrations
         {
             migrationBuilder.DropTable(
                 name: "BidComponentLineItems");
+
+            migrationBuilder.DropTable(
+                name: "BidLaborRateModel");
+
+            migrationBuilder.DropTable(
+                name: "BidLocationHourModel");
 
             migrationBuilder.DropTable(
                 name: "BidMaterialLineItems");
@@ -311,16 +506,31 @@ namespace FyreWorksPM.DataAccess.Migrations
                 name: "Items");
 
             migrationBuilder.DropTable(
+                name: "LaborRates");
+
+            migrationBuilder.DropTable(
+                name: "LocationHours");
+
+            migrationBuilder.DropTable(
+                name: "ManualLaborHours");
+
+            migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "BidLaborTemplates");
 
             migrationBuilder.DropTable(
                 name: "TaskTemplates");
 
             migrationBuilder.DropTable(
-                name: "BidInfo");
+                name: "ItemTypes");
 
             migrationBuilder.DropTable(
-                name: "ItemTypes");
+                name: "LaborTemplates");
+
+            migrationBuilder.DropTable(
+                name: "BidInfo");
 
             migrationBuilder.DropTable(
                 name: "BidSiteInfo");

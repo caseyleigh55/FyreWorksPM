@@ -2,7 +2,7 @@
 {
     public class TemplateModel
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsDefault { get; set; }
         public Dictionary<string, LaborCategory> Categories { get; set; }

@@ -5,7 +5,7 @@ public class CreateBidDto
     public string BidNumber { get; set; } = string.Empty;
     public string ProjectName { get; set; } = string.Empty;
     public int ClientId { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTime CreatedDate = DateTime.Now;
     public bool IsActive { get; set; } = true;
 
 
@@ -20,6 +20,7 @@ public class CreateBidDto
     //********************************************************************************************************************//
     public decimal MaterialMarkup { get; set; }
     public decimal AdjustedSaleTotal { get; set; }
+    public int LaborTemplateId { get; set; }
     public BidLaborTemplateDto BidLaborTemplate { get; set; } = new();
     public List<ManualLaborHourDto> ManualLaborHours { get; set; } = new();
 }

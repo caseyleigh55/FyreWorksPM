@@ -38,6 +38,16 @@ public partial class CreateBidViewModel : ObservableObject
     private readonly INavigationServices _navigationService;
     private readonly ILaborTemplateService _laborTemplateService;
 
+    private LaborTemplateDto? _originalTemplateObject;
+
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = false
+    };
+
+
     #endregion
 
     #region Constructor
@@ -255,6 +265,10 @@ public partial class CreateBidViewModel : ObservableObject
         }
     }
 
+    public List<ManualLaborHourDto> ManualLaborHours { get; set; } = new();
+
+
+
     private void OnMatrixItemChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (TemplateName != "Unsaved Template")
@@ -287,8 +301,24 @@ public partial class CreateBidViewModel : ObservableObject
         set => IsSprinklered = value == "Yes";
     }
 
+    private int? _selectedLaborTemplateId;
 
-   
+
+    private LaborTemplateDto _selectedTemplate;
+    public LaborTemplateDto SelectedTemplate
+    {
+        get => _selectedTemplate;
+        set
+        {
+            SetProperty(ref _selectedTemplate, value);
+            _originalLaborTemplateJson = JsonSerializer.Serialize(_selectedTemplate, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+        }
+    }
+
+
 
     public decimal AdminCostTotal => AdminTasks.Sum(t => t.Cost);
     public decimal AdminSaleTotal => AdminTasks.Sum(t => t.Sale);
@@ -730,16 +760,16 @@ public partial class CreateBidViewModel : ObservableObject
         {
             defaultTemplate = GetTemplate(); // ← Your hardcoded template generator
         }
-
-        _originalLaborTemplateJson = JsonSerializer.Serialize(defaultTemplate, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
-
         // Populate your form fields from the defaultTemplate like usual
         // ApplyLaborTemplate(defaultTemplate); // <- you likely already have this
         _isInitializingTemplate = true;
         ApplyLaborTemplate(defaultTemplate);
+
+        _originalLaborTemplateJson = JsonSerializer.Serialize(defaultTemplate, _jsonOptions);
+        _originalTemplateObject = defaultTemplate;
+        _selectedLaborTemplateId = defaultTemplate.Id;
+
+
         _isInitializingTemplate = false;
     }
 
@@ -749,6 +779,7 @@ public partial class CreateBidViewModel : ObservableObject
     {
         return new LaborTemplateDto
         {
+            Id = 0,
             TemplateName = "FyreWorksPM Default Template",
             IsDefault = true,
             LaborRates = new List<LaborRateDto>
@@ -772,7 +803,7 @@ public partial class CreateBidViewModel : ObservableObject
         }, 
             LocationHours = new List<LocationHourDto>
         {
-            new() { LocationName = "Warehouse", Normal = 0.5m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
+            new() { LocationName = "Warehouse", Normal = 1.5m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
             new() { LocationName = "Hardlid", Normal = 0.5m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
             new() { LocationName = "T-Bar", Normal = 0.25m, Lift = 1.0m, Panel = 0.0m, Pipe = 1.0m },
             new() { LocationName = "Underground", Normal = 1.0m, Lift = 0.0m, Panel = 0.0m, Pipe = 0.0m },
@@ -789,6 +820,10 @@ public partial class CreateBidViewModel : ObservableObject
     {
         LaborHourMatrix.Clear();
         if (template == null) return;
+
+        _selectedLaborTemplateId = template.Id;
+        _originalTemplateObject = template;
+        _originalLaborTemplateJson = JsonSerializer.Serialize(template, _jsonOptions);
 
         // Set Labor Rates
         var journeyman = template.LaborRates.FirstOrDefault(r => r.Role == "Journeyman");
@@ -823,8 +858,6 @@ public partial class CreateBidViewModel : ObservableObject
 
         TemplateName = string.IsNullOrWhiteSpace(template.TemplateName)? "Application Default Template" : template.TemplateName;
         Debug.WriteLine($"[ApplyLaborTemplate] TemplateName set to: {TemplateName}");
-
-        _originalLaborTemplateJson = JsonSerializer.Serialize(template); // Preserve for "dirty" checks
 
     }
 
@@ -936,7 +969,14 @@ public partial class CreateBidViewModel : ObservableObject
                 }).ToList()
             };
 
-            await _laborTemplateService.CreateTemplateAsync(template);
+            var createdTemplate = await _laborTemplateService.CreateTemplateAsync(template);
+            ApplyLaborTemplate(createdTemplate);
+            _originalLaborTemplateJson = JsonSerializer.Serialize(createdTemplate, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+            _selectedLaborTemplateId = createdTemplate.Id;
+
 
             await Shell.Current.DisplayAlert("Success", "Template saved successfully!", "OK");
         }
@@ -946,7 +986,7 @@ public partial class CreateBidViewModel : ObservableObject
         }
     }
 
-    public async Task LoadTemplateByIdAsync(Guid id)
+    public async Task LoadTemplateByIdAsync(int id)
     {
         LaborHourMatrix.Clear();
 
@@ -956,7 +996,7 @@ public partial class CreateBidViewModel : ObservableObject
             Debug.WriteLine("DTO was null — template not found!");
             return;
         }
-        Debug.WriteLine($"Loaded template: {dto.TemplateName}");
+        
 
         var template = new TemplateModel
         {
@@ -965,9 +1005,14 @@ public partial class CreateBidViewModel : ObservableObject
             IsDefault = dto.IsDefault,
             // map other things if needed
         };
-        Debug.WriteLine("Applying template with name: " + dto.TemplateName);
+        
 
         ApplyLaborTemplate(dto);
+        _originalLaborTemplateJson = JsonSerializer.Serialize(dto, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
     }
 
 
@@ -1537,7 +1582,7 @@ public partial class CreateBidViewModel : ObservableObject
 
     #region Bid Saving
 
-    private async Task AutoSaveUnsavedTemplateAsync(string projectName)
+    private async Task<LaborTemplateDto> AutoSaveUnsavedTemplateAsync(string projectName)
     {
         var currentDto = BuildCurrentLaborTemplateDto();
 
@@ -1563,21 +1608,23 @@ public partial class CreateBidViewModel : ObservableObject
             }).ToList()
         };
 
+        var createdTemplate = await _laborTemplateService.CreateTemplateAsync(createDto);
 
-        await _laborTemplateService.CreateTemplateAsync(createDto);
+        _originalLaborTemplateJson = JsonSerializer.Serialize(createdTemplate, _jsonOptions);
+        _originalTemplateObject = createdTemplate;
+        _selectedLaborTemplateId = createdTemplate.Id;
 
-        // Update stored default template snapshot to new unsaved state
-        _originalLaborTemplateJson = JsonSerializer.Serialize(createDto, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        return createdTemplate;
     }
+
 
 
     private async Task NavigateToCreateTasksAsync()
     {
         await _navigationService.GoToAsync("createtasks");
     }
+
+
 
     private async Task SaveBid()
     {
@@ -1588,8 +1635,37 @@ public partial class CreateBidViewModel : ObservableObject
             return;
         }
 
+        var currentTemplateDto = BuildCurrentLaborTemplateDto(); // what user sees
+
+        var manualLaborHours = new List<ManualLaborHourDto>
+{
+    // Journeyman
+    new() { Role = "Journeyman", Category = "Demo", Hours = DemoJourneymanHours },
+    new() { Role = "Journeyman", Category = "Prewire", Hours = PrewireJourneymanHours },
+    new() { Role = "Journeyman", Category = "Trim", Hours = TrimJourneymanHours },
+    new() { Role = "Journeyman", Category = "Test", Hours = TestJourneymanHours },
+
+    new() { Role = "Journeyman", Category = "Overnight Demo", Hours = OvernightDemoJourneymanHours },
+    new() { Role = "Journeyman", Category = "Overnight Prewire", Hours = OvernightPrewireJourneymanHours },
+    new() { Role = "Journeyman", Category = "Overnight Trim", Hours = OvernightTrimJourneymanHours },
+    new() { Role = "Journeyman", Category = "Overnight Test", Hours = OvernightTestJourneymanHours },
+
+    // Apprentice
+    new() { Role = "Apprentice", Category = "Demo", Hours = DemoApprenticeHours },
+    new() { Role = "Apprentice", Category = "Prewire", Hours = PrewireApprenticeHours },
+    new() { Role = "Apprentice", Category = "Trim", Hours = TrimApprenticeHours },
+    new() { Role = "Apprentice", Category = "Test", Hours = TestApprenticeHours },
+
+    new() { Role = "Apprentice", Category = "Overnight Demo", Hours = OvernightDemoApprenticeHours },
+    new() { Role = "Apprentice", Category = "Overnight Prewire", Hours = OvernightPrewireApprenticeHours },
+    new() { Role = "Apprentice", Category = "Overnight Trim", Hours = OvernightTrimApprenticeHours },
+    new() { Role = "Apprentice", Category = "Overnight Test", Hours = OvernightTestApprenticeHours }
+};
+
+
         var newBid = new CreateBidDto
         {
+            LaborTemplateId = _selectedLaborTemplateId ?? 0,
             BidNumber = BidNumber,
             ProjectName = ProjectName,
             ClientId = SelectedClient.Id,
@@ -1652,23 +1728,51 @@ public partial class CreateBidViewModel : ObservableObject
                 Qty = c.Qty,
                 UnitCost = c.UnitCost,
                 UnitSale = c.UnitSale
-            }).ToList()
+            }).ToList(),
+
+            MaterialMarkup = MaterialMarkup,
+            AdjustedSaleTotal = AdjustedSaleTotal,
+
+            ManualLaborHours = manualLaborHours,
+
+            BidLaborTemplate = new BidLaborTemplateDto
+            { TemplateName =$"{ProjectName} Labor Template",
+                LaborRates = currentTemplateDto.LaborRates.Select(rate => new BidLaborRateDto
+                {
+                    Role = rate.Role,
+                    RegularDirectRate = rate.RegularDirectRate,
+                    RegularBilledRate = rate.RegularBilledRate,
+                    OvernightDirectRate = rate.OvernightDirectRate,
+                    OvernightBilledRate = rate.OvernightBilledRate
+                }).ToList(),
+
+                LocationHours = currentTemplateDto.LocationHours.Select(loc => new BidLocationHourDto
+                {
+                    LocationName = loc.LocationName,
+                    Normal = loc.Normal,
+                    Lift = loc.Lift,
+                    Panel = loc.Panel,
+                    Pipe = loc.Pipe
+                }).ToList(),
+
+                IsDefault = currentTemplateDto.IsDefault
+            },
+
+
 
 
         };
 
-        var currentTemplateDto = BuildCurrentLaborTemplateDto(); // what user sees
-        var currentJson = JsonSerializer.Serialize(currentTemplateDto, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
 
-        if (_originalLaborTemplateJson != null && _originalLaborTemplateJson != currentJson)
+        var currentJson = JsonSerializer.Serialize(currentTemplateDto, _jsonOptions);
+        var originalJson = JsonSerializer.Serialize(_originalTemplateObject, _jsonOptions);
+
+
+        if (originalJson != currentJson)
         {
-            // Show dialog before saving bid
             var confirm = await Shell.Current.DisplayAlert(
                 "Unsaved Template Changes",
-                "You've modified the labor template but haven't saved it. Do you want to save this as a new template?",
+                "You've modified the labor template but haven't saved it. Do you want to go backand save this as a new template? If not, it will be saved generically",
                 "Yes, Save",
                 "No"
             );
@@ -1680,8 +1784,8 @@ public partial class CreateBidViewModel : ObservableObject
             else
             {
                 // Auto-save non-default with project name + date
-                await AutoSaveUnsavedTemplateAsync(ProjectName); // we'll build this
-                _originalLaborTemplateJson = currentJson; // continue to save bid
+                var createdTemplate = await AutoSaveUnsavedTemplateAsync(ProjectName);
+              
             }
         }
         else
@@ -1691,10 +1795,16 @@ public partial class CreateBidViewModel : ObservableObject
 
 
 
+
         try
         {
             await _bidService.CreateBidAsync(newBid);
             await Shell.Current.DisplayAlert("Success", "Bid saved successfully.", "OK");
+            _originalLaborTemplateJson = JsonSerializer.Serialize(currentTemplateDto, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
             await Shell.Current.Navigation.PopAsync();
         }
         catch (Exception ex)

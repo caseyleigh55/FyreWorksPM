@@ -30,6 +30,9 @@ namespace FyreWorksPM.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BidId"));
 
+                    b.Property<decimal>("AdjustedSaleTotal")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("BidNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -42,6 +45,12 @@ namespace FyreWorksPM.DataAccess.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
+
+                    b.Property<Guid>("LaborTemplateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("MaterialMarkup")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ProjectName")
                         .IsRequired()
@@ -57,6 +66,100 @@ namespace FyreWorksPM.DataAccess.Migrations
                     b.HasIndex("SiteInfoId");
 
                     b.ToTable("BidInfo", (string)null);
+                });
+
+            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidLaborRateModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BidLaborTemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("OvernightBilledRate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("OvernightDirectRate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("RegularBilledRate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("RegularDirectRate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BidLaborTemplateId");
+
+                    b.ToTable("BidLaborRateModel");
+                });
+
+            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidLaborTemplateModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BidId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("TemplateName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BidId")
+                        .IsUnique();
+
+                    b.ToTable("BidLaborTemplates");
+                });
+
+            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidLocationHourModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BidLaborTemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Lift")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("LocationName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Normal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Panel")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Pipe")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BidLaborTemplateId");
+
+                    b.ToTable("BidLocationHourModel");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidMaterialLineItemModel", b =>
@@ -174,15 +277,14 @@ namespace FyreWorksPM.DataAccess.Migrations
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.LaborRateModel", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("LaborTemplateId")
-                        .HasColumnType("uniqueidentifier");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("LaborTemplateModelId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("LaborTemplateId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("OvernightBilledRate")
                         .HasColumnType("decimal(18,2)");
@@ -202,16 +304,18 @@ namespace FyreWorksPM.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LaborTemplateModelId");
+                    b.HasIndex("LaborTemplateId");
 
                     b.ToTable("LaborRates");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.LaborTemplateModel", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
@@ -227,15 +331,14 @@ namespace FyreWorksPM.DataAccess.Migrations
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.LocationHourModel", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("LaborTemplateId")
-                        .HasColumnType("uniqueidentifier");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("LaborTemplateModelId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("LaborTemplateId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Lift")
                         .HasColumnType("decimal(18,2)");
@@ -255,9 +358,38 @@ namespace FyreWorksPM.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LaborTemplateModelId");
+                    b.HasIndex("LaborTemplateId");
 
                     b.ToTable("LocationHours");
+                });
+
+            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.ManualLaborHourModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BidId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Hours")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BidId");
+
+                    b.ToTable("ManualLaborHours");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.TaskModel", b =>
@@ -510,6 +642,39 @@ namespace FyreWorksPM.DataAccess.Migrations
                     b.Navigation("SiteInfo");
                 });
 
+            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidLaborRateModel", b =>
+                {
+                    b.HasOne("FyreWorksPM.DataAccess.Data.Models.BidLaborTemplateModel", "BidLaborTemplate")
+                        .WithMany("LaborRates")
+                        .HasForeignKey("BidLaborTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BidLaborTemplate");
+                });
+
+            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidLaborTemplateModel", b =>
+                {
+                    b.HasOne("BidModel", "Bid")
+                        .WithOne("BidLaborTemplate")
+                        .HasForeignKey("FyreWorksPM.DataAccess.Data.Models.BidLaborTemplateModel", "BidId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bid");
+                });
+
+            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidLocationHourModel", b =>
+                {
+                    b.HasOne("FyreWorksPM.DataAccess.Data.Models.BidLaborTemplateModel", "BidLaborTemplate")
+                        .WithMany("LocationHours")
+                        .HasForeignKey("BidLaborTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BidLaborTemplate");
+                });
+
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidMaterialLineItemModel", b =>
                 {
                     b.HasOne("BidModel", "Bid")
@@ -544,7 +709,7 @@ namespace FyreWorksPM.DataAccess.Migrations
                 {
                     b.HasOne("FyreWorksPM.DataAccess.Data.Models.LaborTemplateModel", "LaborTemplateModel")
                         .WithMany("LaborRates")
-                        .HasForeignKey("LaborTemplateModelId")
+                        .HasForeignKey("LaborTemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -555,11 +720,22 @@ namespace FyreWorksPM.DataAccess.Migrations
                 {
                     b.HasOne("FyreWorksPM.DataAccess.Data.Models.LaborTemplateModel", "LaborTemplateModel")
                         .WithMany("LocationHours")
-                        .HasForeignKey("LaborTemplateModelId")
+                        .HasForeignKey("LaborTemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("LaborTemplateModel");
+                });
+
+            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.ManualLaborHourModel", b =>
+                {
+                    b.HasOne("BidModel", "Bid")
+                        .WithMany("ManualLaborHours")
+                        .HasForeignKey("BidId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bid");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Models.BidComponentLineItemModel", b =>
@@ -595,13 +771,25 @@ namespace FyreWorksPM.DataAccess.Migrations
 
             modelBuilder.Entity("BidModel", b =>
                 {
+                    b.Navigation("BidLaborTemplate")
+                        .IsRequired();
+
                     b.Navigation("ComponentLineItems");
+
+                    b.Navigation("ManualLaborHours");
 
                     b.Navigation("MaterialLineItems");
 
                     b.Navigation("Tasks");
 
                     b.Navigation("WireLineItems");
+                });
+
+            modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.BidLaborTemplateModel", b =>
+                {
+                    b.Navigation("LaborRates");
+
+                    b.Navigation("LocationHours");
                 });
 
             modelBuilder.Entity("FyreWorksPM.DataAccess.Data.Models.ItemTypeModel", b =>

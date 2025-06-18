@@ -55,6 +55,21 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(h => h.LaborTemplateId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<BidModel>()
+            .HasOne(b => b.BidLaborTemplate)
+            .WithOne(t => t.Bid)
+            .HasForeignKey<BidLaborTemplateModel>(t => t.BidId);
+
+        modelBuilder.Entity<BidLaborTemplateModel>()
+       .HasOne(t => t.Bid)
+       .WithOne(b => b.BidLaborTemplate)
+       .HasForeignKey<BidLaborTemplateModel>(t => t.BidId);
+
+        modelBuilder.Entity<ManualLaborHourModel>()
+            .HasOne(h => h.Bid)
+            .WithMany(b => b.ManualLaborHours)
+            .HasForeignKey(h => h.BidId);
+
         base.OnModelCreating(modelBuilder);
     }
 
@@ -111,6 +126,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<LaborTemplateModel> LaborTemplates { get; set; }
     public DbSet<LaborRateModel> LaborRates { get; set; }
     public DbSet<LocationHourModel> LocationHours { get; set; }
+
+    public DbSet<ManualLaborHourModel> ManualLaborHours { get; set; }
+    public DbSet<BidLaborTemplateModel> BidLaborTemplates { get; set; }
+
 
     #endregion    
 }

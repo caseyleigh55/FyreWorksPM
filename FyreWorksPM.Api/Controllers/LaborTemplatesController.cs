@@ -38,10 +38,10 @@ namespace FyreWorksPM.Api.Controllers
                 }
             }
 
-            var templateId = Guid.NewGuid();
+            var templateId = new int();
             var template = new LaborTemplateModel
             {
-                Id = templateId,
+                Id = new int(),
                 TemplateName = dto.TemplateName,
                 IsDefault = dto.IsDefault
             };
@@ -101,7 +101,7 @@ namespace FyreWorksPM.Api.Controllers
         // Get a template by its ID
         // ========================================================
         [HttpGet("{id}")]
-        public async Task<ActionResult<LaborTemplateDto>> GetTemplateByIdAsync(Guid id)
+        public async Task<ActionResult<LaborTemplateDto>> GetTemplateByIdAsync(int id)
         {
             var template = await _db.LaborTemplates
                 .Include(t => t.LaborRates)
@@ -176,7 +176,7 @@ namespace FyreWorksPM.Api.Controllers
         // Updates a template by ID
         // ========================================================
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] CreateLaborTemplateDto dto)
+        public async Task<IActionResult> Update(int id, [FromBody] CreateLaborTemplateDto dto)
         {
             var template = await _db.LaborTemplates
                 .Include(t => t.LaborRates)

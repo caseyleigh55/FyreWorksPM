@@ -22,7 +22,7 @@ namespace FyreWorksPM.Services.Labor
             return await response.Content.ReadFromJsonAsync<List<LaborTemplateDto>>();
         }
 
-        public async Task<LaborTemplateDto?> GetTemplateByIdAsync(Guid id)
+        public async Task<LaborTemplateDto?> GetTemplateByIdAsync(int id)
         {
             var response = await _httpClient.GetAsync($"api/LaborTemplates/{id}");
             if (!response.IsSuccessStatusCode)
@@ -70,14 +70,14 @@ namespace FyreWorksPM.Services.Labor
             }
         }
 
-        public async Task<bool> UpdateTemplateAsync(Guid id, CreateLaborTemplateDto dto)
+        public async Task<bool> UpdateTemplateAsync(int id, CreateLaborTemplateDto dto)
         {
             var response = await _httpClient.PutAsJsonAsync($"api/LaborTemplates/{id}", dto);
             return response.IsSuccessStatusCode;
         }
 
 
-        public async Task DeleteTemplateAsync(Guid id)
+        public async Task DeleteTemplateAsync(int id)
         {
             var response = await _httpClient.DeleteAsync($"api/LaborTemplates/{id}");
             response.EnsureSuccessStatusCode();

@@ -8,10 +8,10 @@ namespace FyreWorksPM.DataAccess.DTO
 {
     public class ManualLaborHourDto
     {
+        public int Id { get; set; }              // Unique identifier for the record
         public string Role { get; set; }          // "Journeyman", "Apprentice"
-        public string Location { get; set; }      // "Demo", "Trim", etc.
+        public string Category { get; set; }      // "Demo", "Trim", etc.
         public decimal Hours { get; set; }        // The actual number of hours
-        public bool IsOvernight { get; set; }     // Optional, if you separate night/day
     }
 
 }

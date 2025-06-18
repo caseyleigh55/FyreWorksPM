@@ -51,7 +51,7 @@ public partial class CreateBidPage : ContentPage
         if (BindingContext is CreateBidViewModel Vm)
         {
             // ⬇️ Check if we’re coming from the Edit page
-            if (FromEdit == "true" && Guid.TryParse(SelectedTemplateId, out var selectedId))
+            if (FromEdit == "true" && int.TryParse(SelectedTemplateId, out var selectedId))
             {
                 System.Diagnostics.Debug.WriteLine($"FromEdit: {FromEdit}, TemplateId: {SelectedTemplateId}");
 
