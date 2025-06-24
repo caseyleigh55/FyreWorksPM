@@ -866,8 +866,9 @@ public partial class CreateBidViewModel : ObservableObject
     {
         return new LaborTemplateDto
         {
-            TemplateName = "UnsavedTemplate",
-            IsDefault = false,
+            Id = _selectedLaborTemplateId ?? 0,
+            TemplateName = this.TemplateName,
+            IsDefault = this.IsDefaultTemplate,
             LaborRates = new List<LaborRateDto>
         {
             new LaborRateDto
@@ -1022,26 +1023,6 @@ public partial class CreateBidViewModel : ObservableObject
     {
         await _navigationService.GoToAsync("labortemplates");
     }
-
-
-
-    //public decimal GetLaborRate(string location, string installType)
-    //{
-    //    var match = LaborHourMatrix.FirstOrDefault(x =>
-    //        string.Equals(x.LocationName, location, StringComparison.OrdinalIgnoreCase));
-
-    //    if (match == null)
-    //        return 0;
-
-    //    return installType.ToLower() switch
-    //    {
-    //        "normal" => match.NormalHours,
-    //        "lift" => match.LiftHours,
-    //        "panel" => match.PanelHours,
-    //        "pipe" => match.PipeHours,
-    //        _ => 0
-    //    };
-    //}
 
     public void RecalculateDemoSummary()
     {
@@ -1665,7 +1646,7 @@ public partial class CreateBidViewModel : ObservableObject
 
         var newBid = new CreateBidDto
         {
-            LaborTemplateId = _selectedLaborTemplateId ?? 0,
+            LaborTemplateId = _selectedLaborTemplateId!.Value,
             BidNumber = BidNumber,
             ProjectName = ProjectName,
             ClientId = SelectedClient.Id,
@@ -1785,7 +1766,8 @@ public partial class CreateBidViewModel : ObservableObject
             {
                 // Auto-save non-default with project name + date
                 var createdTemplate = await AutoSaveUnsavedTemplateAsync(ProjectName);
-              
+                _selectedLaborTemplateId = createdTemplate.Id;
+                newBid.LaborTemplateId = createdTemplate.Id;
             }
         }
         else
@@ -1800,10 +1782,7 @@ public partial class CreateBidViewModel : ObservableObject
         {
             await _bidService.CreateBidAsync(newBid);
             await Shell.Current.DisplayAlert("Success", "Bid saved successfully.", "OK");
-            _originalLaborTemplateJson = JsonSerializer.Serialize(currentTemplateDto, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+           
 
             await Shell.Current.Navigation.PopAsync();
         }
